@@ -1,0 +1,23 @@
+# Build outputs and secrets (per PLAN.md git workflow)
+circuits/build/
+registrar/state/
+*.ptau
+.env
+node_modules/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Hardhat
+contracts/cache/
+contracts/artifacts/
+contracts/typechain-types/
+contracts/coverage/
+contracts/ignition/deployments/chain-31337/
+
+# Large raw GIS downloads (keep the small sample committed)
+geo/data/raw/*.zip
+geo/data/raw/*full*.geojson
