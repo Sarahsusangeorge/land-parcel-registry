@@ -67,6 +67,41 @@ Raw: `bench/results/circuit_toy.json`.
 | Verification: valid proof | pass |
 | Verification: duplicate insert rejected | pass |
 
+## Circuit: register_parcel_dev (Sprint 2, Maneesh)
+
+Circuit: `circuits/register_parcel_dev.circom` — N=8 cells, N_LEVELS=16, Groth16. (Dev/test
+version of `register_parcel.circom`; identical G1–G5 constraints, smaller params to fit pot19.)
+Setup: pot19_pp.ptau (Hermez ceremony, prepared phase2). Run: `npm test` in `registrar/`.
+Raw: `bench/results/circuit_reg_dev.json`.
+
+| Metric | Value |
+|---|---|
+| Non-linear constraints | 79,330 |
+| Linear constraints | 79,134 |
+| Wires | 158,555 |
+| Groth16 setup time (Apple Silicon) | ~15 s |
+| Proving time – test 1 (A) | 3,422 ms |
+| Proving time – test 3 (C after A) | 5,928 ms (two proofs) |
+| Verification: valid proof (test 1, test 3) | pass |
+| Rejection: shared cells (test 2) | pass |
+| Rejection: tampered commitment (test 4) | pass |
+| Rejection: non-prefix active cells (test 5) | pass |
+
+## Circuit: register_parcel production (Sprint 2, Maneesh)
+
+Circuit: `circuits/register_parcel.circom` — N=16 cells, N_LEVELS=32, Groth16. **Groth16
+setup requires pot21 (2^21 SRS points); pot21 generation is ~160 min on Apple Silicon and
+not run during sprint 2.** Constraint count confirmed by `circom --r1cs`.
+
+| Metric | Value |
+|---|---|
+| Non-linear constraints | 287,745 |
+| Linear constraints | 287,745 |
+| Wires | 588,732 |
+| Required ptau | pot21 (2^21 = 2,097,152; 588,732×2 > 2^20) |
+| Groth16 setup time | TBD (pot21 not yet generated) |
+| Prove time | TBD |
+
 ## Known limitations (so far)
 
 - Grid approximation: an overlap smaller than the gap between cell centres (res 12 edge about 9.4 m) can slip through.

@@ -1,0 +1,15 @@
+{
+  "circuit": "register_parcel_dev",
+  "params": { "N": 8, "N_LEVELS": 16 },
+  "nonLinearConstraints": 79330,
+  "linearConstraints": 79134,
+  "wires": 158555,
+  "groth16SetupMs": 15589,
+  "tests": [
+    { "name": "fixture A inserts into empty tree and proof verifies", "proveMs": 3422, "result": "pass" },
+    { "name": "fixture B inserted after A fails (shared cells are now occupied)", "result": "pass" },
+    { "name": "fixture C inserted after A proves (no shared cells)", "proveMs": 5928, "result": "pass" },
+    { "name": "tampered cells make commitment constraint fail", "result": "pass" },
+    { "name": "non-prefix active cells violate G1 and fail witness generation", "result": "pass" }
+  ]
+}

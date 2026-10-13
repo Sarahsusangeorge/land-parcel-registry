@@ -4,7 +4,12 @@
   "description": "Sparse Merkle tree manager and proof generator for the land parcel registry.",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest --testPathPattern='test/'"
+    "test": "jest"
+  },
+  "jest": {
+    "testMatch": ["**/test/**/*.test.js"],
+    "testTimeout": 600000,
+    "workerIdleMemoryLimit": "2048MB"
   },
   "dependencies": {
     "circomlib": "2.0.5",

@@ -4,10 +4,11 @@
 // The tree uses Poseidon hashing, matching the SMTProcessor circuit.
 //
 // API
-//   load(snapshot)               – restore a saved tree (or start empty)
-//   smt.insertCell(cell, id, nLevels)  – insert H3 cell; returns circuit witness
-//   smt.findCell(cell)           – lookup; returns { found, value }
-//   smt.save()                   – serialise for storage
+//   load(snapshot)                      – restore a saved tree or start fresh
+//   smt.insertCell(cell, id, nLevels)   – insert H3 cell; returns circuit witness
+//   smt.findCell(cell)                  – lookup; returns { found, value }
+//   smt.save()                          – serialise for storage
+//   smt.root()                          – current root as BigInt
 
 const { newMemEmptyTrie, buildPoseidon } = require("circomlibjs");
 
@@ -31,50 +32,71 @@ async function cellKey(cell) {
  * @param {object|null} snapshot  Output of a prior save(), or null.
  */
 async function load(snapshot) {
+  const poseidon = await getPoseidon();
+  const F = poseidon.F;
   const tree = await newMemEmptyTrie();
+
+  // Track (key→value) entries so we can serialise the tree later.
+  // Keys and values are stored as BigInts (field elements).
+  const entries = new Map();  // key (BigInt) → value (BigInt)
 
   if (snapshot && snapshot.entries) {
     for (const [keyHex, valueHex] of snapshot.entries) {
-      await tree.insert(BigInt(keyHex), BigInt(valueHex));
+      const k = BigInt(keyHex);
+      const v = BigInt(valueHex);
+      await tree.insert(k, v);
+      entries.set(k, v);
     }
   }
 
-  return wrapTree(tree);
+  return wrapTree(tree, entries, F);
 }
 
-function wrapTree(tree) {
+function wrapTree(tree, entries, F) {
+  let currentRoot = F.toObject(tree.root);   // BigInt root, updated on each insert
+
   return {
-    _tree: tree,
+    _tree: tree,  // expose for direct root access in inputs.js
+
+    /** Current SMT root as a BigInt field element. */
+    root() {
+      return currentRoot;
+    },
 
     /**
      * Insert a fine H3 cell into the SMT.
      * @param {BigInt|string} cell      H3 cell decimal value.
-     * @param {BigInt|number} parcelId  Value to store (e.g. 1n or a parcel index).
-     * @param {number} nLevels          Circuit N_LEVELS; siblings are padded to this.
-     * @returns {object}  Circuit witness fields:
-     *   { fnc, oldRoot, oldKey, oldValue, isOld0, siblings[nLevels], newRoot, newKey }
+     * @param {BigInt|number} parcelId  Value to store.
+     * @param {number} nLevels          Circuit N_LEVELS; siblings padded to this.
+     * @returns {object}  Circuit witness: { fnc, oldRoot, oldKey, oldValue,
+     *                                       isOld0, siblings[nLevels], newRoot, newKey }
      */
     async insertCell(cell, parcelId, nLevels) {
       const poseidon = await getPoseidon();
-      const F = poseidon.F;
+      const Fp = poseidon.F;
       const key = await cellKey(BigInt(cell));
-      const res = await tree.insert(key, BigInt(parcelId));
+      const val = BigInt(parcelId);
+      const res = await tree.insert(key, val);  // throws "Key already exists" if occupied
 
-      const siblings = res.siblings.map(s => F.toObject(s));
+      entries.set(key, val);
+
+      const siblings = res.siblings.map(s => Fp.toObject(s));
       if (nLevels !== undefined) {
         while (siblings.length < nLevels) siblings.push(0n);
       }
 
-      return {
+      const witness = {
         fnc:      res.fnc,
-        oldRoot:  F.toObject(res.oldRoot),
-        oldKey:   F.toObject(res.oldKey),
-        oldValue: F.toObject(res.oldValue),
+        oldRoot:  Fp.toObject(res.oldRoot),
+        oldKey:   Fp.toObject(res.oldKey),
+        oldValue: Fp.toObject(res.oldValue),
         isOld0:   res.isOld0 ? 1n : 0n,
         siblings,
-        newRoot:  F.toObject(res.newRoot),
+        newRoot:  Fp.toObject(res.newRoot),
         newKey:   key,
       };
+      currentRoot = witness.newRoot;
+      return witness;
     },
 
     /**
@@ -84,12 +106,12 @@ function wrapTree(tree) {
      */
     async findCell(cell) {
       const poseidon = await getPoseidon();
-      const F = poseidon.F;
+      const Fp = poseidon.F;
       const key = await cellKey(BigInt(cell));
       const res = await tree.find(key);
       return {
         found: res.found,
-        value: res.found ? F.toObject(res.foundValue) : null,
+        value: res.found ? Fp.toObject(res.foundValue) : null,
       };
     },
 
@@ -98,15 +120,11 @@ function wrapTree(tree) {
      * Entries are [key, value] pairs as 0x-hex strings.
      */
     save() {
-      const entries = [];
-      for (const [k, v] of tree.entries()) {
-        entries.push([`0x${k.toString(16)}`, `0x${v.toString(16)}`]);
+      const out = [];
+      for (const [k, v] of entries) {
+        out.push([`0x${k.toString(16)}`, `0x${v.toString(16)}`]);
       }
-      const poseidon = _poseidon;
-      const rootHex = poseidon
-        ? `0x${poseidon.F.toObject(tree.root).toString(16)}`
-        : "0x0";
-      return { root: rootHex, entries };
+      return { root: `0x${currentRoot.toString(16)}`, entries: out };
     },
   };
 }
