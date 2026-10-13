@@ -1,0 +1,18 @@
+{
+  "name": "registrar",
+  "version": "1.0.0",
+  "description": "Sparse Merkle tree manager and proof generator for the land parcel registry.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest --testPathPattern='test/'"
+  },
+  "dependencies": {
+    "circomlib": "2.0.5",
+    "circomlibjs": "0.1.7",
+    "ethers": "6.17.0",
+    "snarkjs": "0.7.6"
+  },
+  "devDependencies": {
+    "jest": "29.7.0"
+  }
+}
