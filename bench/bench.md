@@ -52,6 +52,21 @@ Excludes Groth16 verification, so it is **not** the TRL 4 verification-gas numbe
 
 Deployment: LandRegistry 1,561,293 gas.
 
+## Circuit: toy insert_one (Sprint 1, Maneesh)
+
+Circuit: `circuits/toy/insert_one.circom` — 1 × SMTProcessor(10), Groth16.
+Setup: local pot14 (dev-only — not a ceremony). Run: `node registrar/scripts/toy_prove.js`.
+Raw: `bench/results/circuit_toy.json`.
+
+| Metric | Value |
+|---|---|
+| Non-linear constraints | 6,604 |
+| Linear constraints | 6,270 |
+| Wires | 12,882 |
+| Proving time (single run, Apple Silicon) | 406 ms |
+| Verification: valid proof | pass |
+| Verification: duplicate insert rejected | pass |
+
 ## Known limitations (so far)
 
 - Grid approximation: an overlap smaller than the gap between cell centres (res 12 edge about 9.4 m) can slip through.
