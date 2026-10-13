@@ -79,7 +79,11 @@ def main():
               f"| {r['fit']}/{n} | {r['shared']}/{n} |")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps({"source": str(path), "n_parcels": n, "N": N,
+    try:  # record the input relative to the repo root, never a machine-specific path
+        source = str(path.resolve().relative_to(ROOT.parent))
+    except ValueError:
+        source = path.name
+    OUT.write_text(json.dumps({"source": source, "n_parcels": n, "N": N,
                                "areas_m2": areas, "summary": rows,
                                "counts": detail}, indent=2))
     print(f"\nwrote {OUT}")
