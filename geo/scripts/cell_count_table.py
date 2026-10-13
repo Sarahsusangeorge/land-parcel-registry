@@ -14,12 +14,12 @@ from collections import Counter
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from src.cells import area_m2, polygon_cells  # noqa: E402
+from src.cells import area_m2, fallback_cell, polygon_cells  # noqa: E402
 
 RESOLUTIONS = (11, 12, 13)
 MODES = ("center", "overlap")
 N = 16
-DEFAULT_IN = ROOT / "data" / "raw" / "fairfax_sample.geojson"
+DEFAULT_IN = ROOT / "data" / "raw" / "newton_parcels_full.geojson"
 OUT = ROOT.parent / "bench" / "results" / "cell_counts.json"
 
 
@@ -49,6 +49,24 @@ def main():
                 "fit": sum(1 <= c <= N for c in counts),
                 "shared": shared_cells(sets),
             })
+
+    # Rejected option: center mode plus one fallback cell for parcels that get none.
+    # Shows how many false neighbour collisions that fallback would add.
+    fb = []
+    for f in feats:
+        c = polygon_cells(f["geometry"], 12, "center")
+        fb.append((c, False) if c else ([fallback_cell(f["geometry"], 12)], True))
+    sets = [c for c, _ in fb]
+    counts = [len(s) for s in sets]
+    detail["res12_center_fallback"] = counts
+    rows.append({
+        "res": 12, "mode": "center + fallback",
+        "median": statistics.median(counts), "max": max(counts),
+        "zero": sum(c == 0 for c in counts),
+        "fit": sum(1 <= c <= N for c in counts),
+        "shared": shared_cells(sets),
+        "fallback_used": sum(u for _, u in fb),
+    })
 
     n = len(feats)
     print(f"\nParcel area (m²): median {statistics.median(areas):.0f}, "

@@ -21,3 +21,5 @@ contracts/ignition/deployments/chain-31337/
 # Large raw GIS downloads (keep the small sample committed)
 geo/data/raw/*.zip
 geo/data/raw/*full*.geojson
+
+contracts/deployments/
