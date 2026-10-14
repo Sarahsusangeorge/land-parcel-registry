@@ -127,6 +127,34 @@ C oldRoot = A newRoot (root chain verified ✓)
 
 Machine: MacBook Pro M4 Pro, 24 GB RAM, macOS. Node: no competing processes.
 
+## Full real-parcel run (Sprint 4, Maneesh)
+
+All 31 parcels in `geo/out/parcels.json` registered against a fresh Hardhat node with the real
+`Groth16Verifier.sol` (production zkey). Order: A first, B second, then C and P01–P28 in file
+order. Raw data: `bench/results/full_run.json`. Log: `patent/figures/logs/full_run.txt`.
+Run: `bash registrar/scripts/full_run.sh`.
+
+Machine: MacBook Pro M4 Pro, 24 GB RAM.
+
+| Metric | Value |
+|---|---|
+| Total parcels | 31 |
+| Registered | 30 |
+| Overlaps | 1 (B only — overlaps A as designed) |
+| Errors | 0 |
+| Prove time — mean | **10,102 ms** |
+| Prove time — max | **10,846 ms** |
+| Prove time — min | 9,760 ms |
+| registerParcel gas — mean (real verifier) | **415,942** |
+| registerParcel gas — max | **448,564** (A, first registration on empty tree) |
+| registerParcel gas — min | **414,724** |
+
+Note: A's gas is higher (448,564) because it is the first registration and the SMT root
+transition from 0 → newRoot writes a storage slot that is cold at deployment.
+
+No real-parcel overlap was found among the 30 Newton parcels (P01–P28 plus A and C).
+B is a synthetic fixture (A shifted 5 m east) and is the only overlap, as designed.
+
 ## Known limitations (so far)
 
 - Grid approximation: an overlap smaller than the gap between cell centres (res 12 edge about 9.4 m) can slip through.
