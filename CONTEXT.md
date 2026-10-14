@@ -2,7 +2,7 @@
 
 Read this first, then PLAN.md. This file says where the project is right now. PLAN.md says what the project is and how it is built.
 
-Last updated: 2026-10-14, by Maneesh (housekeeping: production build closed, .gitattributes, ptau provenance)
+Last updated: 2026-10-14, by Sarah (Sprint 3 contracts lane: real verifier deploy, e2e tests)
 
 ---
 
@@ -51,6 +51,9 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
 - Sprint 0: repo skeleton, geo and contracts setup, cell-count script (`957d2c9`)
 - Sprint 1: geo pipeline, Newton parcels, fixtures A/B/C, `geo/out/parcels.json` per I2 (`0f0bb36`, `2214fad`)
 - Sprint 2: `LandRegistry.sol` per I5, `MockVerifier.sol`, 13 mock tests passing, deploy script (`76c584d`)
+- Sprint 2 finish (branch `sarah/s2-finish`, PR #1): full `PLAN.md`, I6 fixture format, IDF-B Section 3 extended, Section 5 drafted
+- Sprint 3 (branch `sarah/s3-e2e`, stacked on `sarah/s2-finish`): `deploy.js` deploys the real `Groth16Verifier` and grants `REGISTRAR_ROLE` to the deployer; `registry.e2e.test.js` with Maneesh's fixtures, 8 tests passing (21 with the mock suite); gas reporter covers `registerParcel`
+- Measured with the real verifier: `registerParcel` 448,564 gas (A, empty tree) and 415,048 gas (C after A); `verifyProof` alone about 228,500
 - Patent: IDF-B Section 3 first pass
 
 **Maneesh** (branch `maneesh/s0-setup`)
@@ -67,7 +70,7 @@ Nothing running. Sprint 2 closed for Maneesh. Next: Sprint 3 (register.js and pr
 ### Not started
 
 - Sprint 3 and Sprint 4 for both lanes
-- IDF-B Sections 1, 2, 4, 6 (Maneesh), 5 (Sarah), 7 to 10 (both)
+- IDF-B Sections 1, 2, 4, 6 (Maneesh), 7 to 10 (both)
 - PR from `maneesh/s0-setup` into `main`
 
 ---
@@ -111,10 +114,12 @@ Read these before touching circuits, proofs or the verifier.
 
 ### Sarah (Sprint 3)
 
-1. Switch the deploy path from `MockVerifier` to the real `Groth16Verifier`.
-2. `contracts/test/registry.e2e.test.js` using Maneesh's fixtures: A registers; replaying A's proof reverts with `StaleRoot`; C registers after A; a changed public signal reverts with `InvalidProof`; a non-registrar caller reverts.
-3. Gas reporter on for `registerParcel`.
-4. IDF-B Section 7 figures in `patent/figures/`, and Section 5.
+1. ~~Switch the deploy path to the real `Groth16Verifier`.~~ Done.
+2. ~~`contracts/test/registry.e2e.test.js` using Maneesh's fixtures.~~ Done, 8 tests.
+3. ~~Gas reporter on for `registerParcel`.~~ Done.
+4. IDF-B Section 7 figures in `patent/figures/`.
+5. Finish IDF-B Section 3: read the claims of US20240202847A1.
+6. When Maneesh regenerates the verifier and fixtures after the circuit fixes (salt in the commitment, `active[0] == 1`), pull the new fixtures and rerun the e2e tests. Nothing in the tests should need to change.
 
 ### Both (Sprint 4, after Gate 3)
 

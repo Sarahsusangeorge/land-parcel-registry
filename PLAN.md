@@ -430,16 +430,16 @@ Acceptance: `demo.sh` prints registered, overlap (hitting A), registered, on a f
 
 Sarah lane
 
-- [ ] Remove the mock from the deploy path. Deploy uses the real `Groth16Verifier`.
-- [ ] `contracts/test/registry.e2e.test.js` with real proofs (fixtures produced by Maneesh's `--dry-run`, saved under `contracts/test/fixtures/` per I6):
+- [x] Remove the mock from the deploy path. Deploy uses the real `Groth16Verifier`.
+- [x] `contracts/test/registry.e2e.test.js` with real proofs (fixtures produced by Maneesh's `--dry-run`, saved under `contracts/test/fixtures/` per I6):
     - A real proof for A registers
     - Replaying A's proof after A reverts with `StaleRoot`
     - C's proof, generated against the root after A, registers
     - A proof with one public signal changed reverts with `InvalidProof`
     - A valid proof submitted by a non-registrar reverts
-- [ ] Turn on the gas reporter for `registerParcel`
+- [x] Turn on the gas reporter for `registerParcel`
 
-Acceptance: all end-to-end tests pass against the real verifier.
+Acceptance: all end-to-end tests pass against the real verifier. (Sarah lane done: 8 e2e tests + 13 mock tests pass; `registerParcel` with the real verifier used 448,564 gas for A and 415,048 for C.)
 
 Patent lane
 
@@ -597,6 +597,7 @@ Append new rows at the top. A decision that changes an interface needs both name
 
 | Date | Who | What changed |
 |---|---|---|
+| 2026-10-14 | Sarah | Sprint 3: deploy path uses the real `Groth16Verifier`; `registry.e2e.test.js` (8 tests) on Maneesh's fixtures; gas reporter covers `registerParcel` |
 | 2026-10-14 | Maneesh | Housekeeping: `CONTEXT.md`, `.gitattributes`, ptau provenance; PR #2 squash-merged into `main` |
 | 2026-10-14 | Sarah | `PLAN.md` replaced with the full plan; I6 fixture format proposed; IDF-B Sections 3 and 5; checked `LandRegistry` against Maneesh's generated verifier |
 | 2026-10-13 | Maneesh | Sprints 0 to 2 on `maneesh/s0-setup`: toy circuit (Gate 1 passed), `tree.js`, `inputs.js`, `register_parcel.circom`, production setup with pot20, `Groth16Verifier.sol`, 5 circuit tests |
