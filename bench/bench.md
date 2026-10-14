@@ -52,6 +52,65 @@ Excludes Groth16 verification, so it is **not** the TRL 4 verification-gas numbe
 
 Deployment: LandRegistry 1,561,293 gas.
 
+## Circuit: toy insert_one (Sprint 1, Maneesh)
+
+Circuit: `circuits/toy/insert_one.circom` — 1 × SMTProcessor(10), Groth16.
+Setup: local pot14 (dev-only — not a ceremony). Run: `node registrar/scripts/toy_prove.js`.
+Raw: `bench/results/circuit_toy.json`.
+
+| Metric | Value |
+|---|---|
+| Non-linear constraints | 6,604 |
+| Linear constraints | 6,270 |
+| Wires | 12,882 |
+| Proving time (single run, Apple Silicon) | 406 ms |
+| Verification: valid proof | pass |
+| Verification: duplicate insert rejected | pass |
+
+## Circuit: register_parcel_dev (Sprint 2, Maneesh)
+
+Circuit: `circuits/register_parcel_dev.circom` — N=8 cells, N_LEVELS=16, Groth16. (Dev/test
+version of `register_parcel.circom`; identical G1–G5 constraints, smaller params to fit pot19.)
+Setup: locally generated pot19 (dev only, not a ceremony; powersoftau new + contribute + prepare phase2). Run: `npm test` in `registrar/`.
+Raw: `bench/results/circuit_reg_dev.json`.
+
+| Metric | Value |
+|---|---|
+| Non-linear constraints | 79,330 |
+| Linear constraints | 79,134 |
+| Wires | 158,555 |
+| Groth16 setup time (Apple Silicon) | ~15 s |
+| Proving time – test 1 (A) | 3,422 ms |
+| Proving time – test 3 (C after A) | 5,928 ms (two proofs) |
+| Verification: valid proof (test 1, test 3) | pass |
+| Rejection: shared cells (test 2) | pass |
+| Rejection: tampered commitment (test 4) | pass |
+| Rejection: non-prefix active cells (test 5) | pass |
+
+## Circuit: register_parcel production (Sprint 2 follow-up, Maneesh)
+
+Circuit: `circuits/register_parcel.circom` — N=16 cells, N_LEVELS=32, Groth16.
+Setup: locally generated pot20 (powersoftau new + contribute + prepare phase2; ~75 min total).
+Prove bench: `node registrar/scripts/bench_prove.js 3` (3 runs, fixture A, Apple Silicon).
+Raw: `bench/results/circuit_reg_prod.json`.
+
+| Metric | Value |
+|---|---|
+| Non-linear constraints | 588,297 |
+| Wires | 588,732 |
+| Required ptau | pot20 (2^20 = 1,048,576 > 588,297) |
+| pot20 prepare phase2 time (Apple Silicon) | ~75 min |
+| Groth16 setup time (Apple Silicon) | 42 s |
+| Prove time — mean (3 runs, fixture A) | **9,751 ms** |
+| Prove time — max (3 runs, fixture A) | **10,035 ms** |
+| Proof size (JSON) | 719 bytes |
+| zkey size | 268.7 MB |
+| vkey size | 3.2 KB |
+| Verification: valid proof | pass |
+| Rejection: shared cells (test 2) | pass |
+| Rejection: tampered commitment (test 4) | pass |
+| Rejection: non-prefix active cells (test 5) | pass |
+
 ## Known limitations (so far)
 
 - Grid approximation: an overlap smaller than the gap between cell centres (res 12 edge about 9.4 m) can slip through.
