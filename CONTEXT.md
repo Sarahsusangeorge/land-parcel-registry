@@ -2,7 +2,7 @@
 
 Read this first, then PLAN.md. This file says where the project is right now. PLAN.md says what the project is and how it is built.
 
-Last updated: 2026-10-14, by Maneesh (housekeeping: production build closed, .gitattributes, ptau provenance)
+Last updated: 2026-10-14, by Maneesh (Sprint 3: register.js I4 CLI, proof fixtures, demo.sh)
 
 ---
 
@@ -59,10 +59,11 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
 - Sprint 2: `circuits/register_parcel.circom` (N=16, N_LEVELS=32), `circuits/register_parcel_dev.circom` (N=8, N_LEVELS=16), `registrar/src/inputs.js`, 5 circuit tests passing (`e369d49`)
 - Follow-up: constraint check, leftover processes killed, Sarah's 13 tests confirmed still passing, dev circuit decision logged (`85de2e6`)
   - Sprint 2 follow-up: production circuit built, Groth16Verifier.sol exported from the production zkey, 5/5 circuit tests and 13/13 contract tests pass, pushed (`1a47f53`)
+  - Sprint 3: `registrar/src/register.js` (I4 CLI), proof fixtures A/B/C, `demo.sh`. All three Sprint 3 Maneesh tasks done (`b793a88`, `f317ee2`).
 
 ### In progress
 
-Nothing running. Sprint 2 closed for Maneesh. Next: Sprint 3 (register.js and proof fixtures).
+Nothing running. Sprint 3 closed for Maneesh.
 
 ### Not started
 
@@ -95,19 +96,23 @@ Read these before touching circuits, proofs or the verifier.
 | ptau provenance — pot19 | Locally generated (powersoftau new bn128 19 + contribute + prepare phase2). Not a public ceremony. Dev/test only. Confirmed: `pot19_0000.ptau` and `pot19_final.ptau` intermediates are present in `circuits/build/`. |
 | ptau provenance — pot20 | Locally generated (powersoftau new bn128 20 + contribute + prepare phase2). Not a public ceremony. Fine for TRL 4 prototype; must be replaced before any public or production use. Confirmed: `pot20_0000.ptau` and `pot20_final.ptau` intermediates are present in `circuits/build/ptau/`. |
 | Geo settings | FINE_RES 12, CELL_MODE center (from Sarah's bench). 95.9% of 24,102 Newton parcels fit 1–16 cells, zero neighbour collisions. Fixture C touches A but shares no cells. |
+| snarkjs process exit | snarkjs holds a background timer that prevents Node.js from exiting naturally. All scripts that call snarkjs.groth16.fullProve must end with `process.exit(0)` (or `.then(() => process.exit(0))`). |
+| Demo prove times | A: 9,723 ms, C: 9,631 ms (single uncontested run, M4 Pro, no competing node processes). |
 
 ---
 
 ## 6. Next tasks
 
-### Maneesh (Sprint 3)
+### Maneesh (Sprint 3) — DONE
 
-1. Confirm the production build finished and committed. Production `Groth16Verifier.sol` in `contracts/contracts/`.
-2. Push `maneesh/s0-setup`, open a PR into `main`, tell Sarah.
-3. `registrar/src/register.js`: the I4 CLI. Load tree, check overlap with `findCell` first, build inputs, prove, export calldata, call `registerParcel`, save tree and salt only after the tx confirms.
-4. `--dry-run`: prove without submitting. Use it to generate proof fixtures for A (valid), B (expected overlap) and C (valid after A). Commit them to `contracts/test/fixtures/`.
-5. `registrar/scripts/demo.sh`: fresh tree, register A, attempt B, register C. Expected output: `registered`, `overlap` (hitting A), `registered`.
-6. Stale root handling: rebuild the proof once, then report `error`.
+- [x] `registrar/src/register.js` (I4 CLI): overlap check, prove, tx submit, StaleRoot rebuild, save after confirm
+- [x] `--dry-run` mode; proof fixtures A.json, C_after_A.json, B_overlap.json committed to `contracts/test/fixtures/`
+- [x] `registrar/scripts/demo.sh`: registered / overlap (A) / registered ✓
+- [x] StaleRoot handling in register.js
+
+### Maneesh (Sprint 4)
+
+- Register all real parcels, benchmarks, IDF-B Sections 1/2/4/6, TRL 4 checklist
 
 ### Sarah (Sprint 3)
 

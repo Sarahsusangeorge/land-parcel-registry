@@ -41,6 +41,20 @@ from the Hermez GCS mirror (now access-restricted). In practice: generate locall
 step is mandatory — passing a raw phase1 file to `groth16 setup` completes silently but
 writes a corrupt 12-byte zkey. `build.sh` handles the full sequence automatically.
 
+## Sprint 3 checklist — Maneesh
+
+- [x] `registrar/src/register.js`: I4 CLI — load tree, findCell overlap check, prove
+      with production zkey, export Solidity calldata, call registerParcel, save state
+      only after tx confirms; --dry-run mode; StaleRoot rebuild
+- [x] Proof fixtures generated and verified against production vkey:
+      `contracts/test/fixtures/A.json`, `C_after_A.json`, `B_overlap.json`
+- [x] StaleRoot handling: rebuild proof once, then report status "error"
+- [x] `registrar/scripts/demo.sh`: fresh Hardhat node, real Groth16Verifier, A/B/C
+      → registered / overlap (hits A) / registered ✓
+- [x] Prove times recorded in `bench/bench.md`
+
 ## Changelog
 
+- 2026-10-14 (Maneesh): Sprint 3 — register.js I4 CLI, proof fixtures, demo.sh.
+      Demo prove times: A 9,723 ms, C 9,631 ms. All three Sprint 3 Maneesh tasks done.
 - 2026-10-14 (Maneesh): housekeeping — .gitattributes, untrack NOTES-FOR-MANEESH.md, fix pot19 bench provenance, CONTEXT.md production-build status.

@@ -111,6 +111,22 @@ Raw: `bench/results/circuit_reg_prod.json`.
 | Rejection: tampered commitment (test 4) | pass |
 | Rejection: non-prefix active cells (test 5) | pass |
 
+## End-to-end demo registration (Sprint 3, Maneesh)
+
+Registrar: `registrar/src/register.js` (I4 CLI). Circuit: production (N=16, N_LEVELS=32).
+Setup: real Groth16Verifier deployed to local Hardhat node. Run: `bash registrar/scripts/demo.sh`.
+
+| Parcel | Status | Prove time | tokenId | tx |
+|---|---|---|---|---|
+| A | registered | **9,723 ms** | 1 | `0x923e97dc62998bf9ab118c8c942b689f31a8559d88330b879f8d96e195d4d10f` |
+| B | overlap (hits A) | — | — | — |
+| C | registered | **9,631 ms** | 2 | `0xd5ffdd79bde2bf8b44db6cff7f5e289c14b7791cf80280542927759184c9245e` |
+
+A newRoot = `1627276571125689245575422886857369656002719209654662685577916150576429071912`
+C oldRoot = A newRoot (root chain verified ✓)
+
+Machine: MacBook Pro M4 Pro, 24 GB RAM, macOS. Node: no competing processes.
+
 ## Known limitations (so far)
 
 - Grid approximation: an overlap smaller than the gap between cell centres (res 12 edge about 9.4 m) can slip through.
