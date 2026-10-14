@@ -68,6 +68,75 @@ they are additive and do not rename any frozen key.
 being present in `status:"registered"` lines from this registrar. They are omitted from
 `status:"overlap"` and `status:"error"` lines where they are not meaningful.
 
+## TRL 4 checklist
+
+TRL 4 = "Technology validated in lab". Evidence required: the system does what it
+claims (non-overlap enforcement) on real data, with measured performance.
+
+### ZK circuit and trusted setup
+
+- [x] Production circuit compiled and constraint count confirmed
+      — `circuits/register_parcel.circom`, 588,297 constraints
+        (`bench/results/circuit_reg_prod.json`)
+- [x] pot20 generated locally (single contributor), prepare-phase2 complete
+      — `circuits/build/ptau/pot20_final.ptau` (gitignored; provenance in CONTEXT.md §5)
+- [x] Production zkey generated with `groth16 setup`
+      — `circuits/build/register_parcel_final.zkey` (gitignored)
+- [x] Verification key exported and committed
+      — `circuits/build/register_parcel_vkey.json`
+- [x] Groth16Verifier.sol exported from production zkey
+      — `contracts/contracts/Groth16Verifier.sol`
+- [x] All 5 circuit tests pass against production zkey
+      — `registrar/test/circuit.test.js`
+
+### Smart contract
+
+- [x] `LandRegistry.sol` deployed with real Groth16Verifier
+      — `contracts/contracts/LandRegistry.sol`; deploy script `contracts/scripts/deploy.js`
+- [x] 13 mock-verifier contract tests passing
+      — `contracts/test/registry.test.js` (`bench/results/gas-report.txt`)
+- [x] registerParcel gas measured with the real verifier on real parcels
+      — `bench/results/full_run.json`: mean 415,942, max 448,564, min 414,724
+
+### Registrar CLI (I4)
+
+- [x] `register.js` overlap check, prove, submit, StaleRoot rebuild
+      — `registrar/src/register.js`
+- [x] Proof fixtures A, B (overlap), C committed
+      — `contracts/test/fixtures/A.json`, `B_overlap.json`, `C_after_A.json`
+- [x] Dry-run mode verified
+      — `registrar/src/register.js` (`--dry-run` flag)
+
+### End-to-end demo (Gate 3)
+
+- [x] Fresh Hardhat node + real Groth16Verifier: A registered, B overlap, C registered
+      — `registrar/scripts/demo.sh`; log: `patent/figures/logs/demo_run.txt`
+- [x] Clean-clone reproducibility confirmed
+      — CONTEXT.md §5 "Gate 3 clean-clone" entry (2026-10-14)
+
+### Full real-parcel run (Gate 4 / TRL 4 evidence)
+
+- [x] All 31 parcels in `geo/out/parcels.json` processed: 30 registered, 1 overlap (B only)
+      — `bench/results/full_run.json`; log: `patent/figures/logs/full_run.txt`
+- [x] No unintended overlap among the 30 real Newton parcels
+      — `bench/results/full_run.json` (every status except B is "registered")
+- [x] Prove time measured across all parcels: mean 10,102 ms, max 10,846 ms
+      — `bench/results/full_run.json` (`stats.prove_ms`)
+- [x] registerParcel gas measured with real verifier: mean 415,942
+      — `bench/results/full_run.json` (`stats.gas_used`)
+- [x] Geo pipeline handles real-world parcels with zero neighbour collisions
+      — `bench/bench.md` "Geo: cells per parcel" (res 12, center mode)
+
+### Still missing (as of 2026-10-14)
+
+- [ ] E2E contract tests with real proof fixtures (Sarah, Sprint 3 task 2):
+      `contracts/test/registry.e2e.test.js` — not yet written
+- [ ] Gas reporter on `registerParcel` with real verifier in test suite (Sarah, Sprint 3 task 3)
+- [ ] IDF-B Sections 1, 2, 4, 6 (Maneesh), 5 (Sarah), 7–10 (both) — in progress
+- [ ] README updated with reproduction steps and TRL 4 claim
+- [ ] Public ptau ceremony file swap before any production or public use
+- [ ] Decision log rows still marked "Pending" resolved (tree key, cell mode, N/N_LEVELS, registrar holds cells)
+
 ## Changelog
 
 - 2026-10-14 (Maneesh): Sprint 3 — register.js I4 CLI, proof fixtures, demo.sh.
