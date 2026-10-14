@@ -1,6 +1,6 @@
 # Invention Disclosure (IDF-B) Draft
 
-Version: 0.1 | Last updated: 2026-10-12 | Updated by: Sarah
+Version: 0.2 | Last updated: 2026-10-14 | Updated by: Sarah
 Inventors: (as agreed with mentor)
 
 ## 1. Title of the invention
@@ -10,7 +10,7 @@ Inventors: (as agreed with mentor)
 <!-- Owner: Maneesh | Sprint 1 | Status: Not started -->
 
 ## 3. Prior patents and publications
-<!-- Owner: Sarah | Sprint 1-2 | Status: In progress (first pass 2026-10-13; rows marked "to verify" not yet read in full) -->
+<!-- Owner: Sarah | Sprint 1-2 | Status: Nearly done (2026-10-14). One row to verify: US20240202847A1 claims -->
 
 ### Patents
 
@@ -25,9 +25,12 @@ Inventors: (as agreed with mentor)
 | Reference | Summary | Limitations | How our invention differs |
 |---|---|---|---|
 | [Torun, A. "Geodata Enabled Hierarchical Blockchain Architecture for Resolving Boundary Conflicts in Cadastre Surveys and Land Registration", FIG Congress 2018 (peer review journal paper 9260)](https://fig.net/resources/publications/prj/showpeerreviewpaper.asp?pubid=9260) | Blockchain + middleware + GIS/CAD model; a boundary change is recorded only after hierarchical approval by all stakeholders, with the registry as a trusted node | Conflicts are prevented by human approval workflow, not by an automatic geometric check; geometry is exchanged in the clear; no ZK | Our overlap check is automatic and cryptographic (cell insert into an empty tree slot, verified by the contract), and geometry stays private |
-| Privacy-preserving location sharing with hexagonal grids and zero-knowledge proofs (TU Munich, 2025; press release ["Hexagons for data protection"](https://www.tum.de/en/news-and-events/all-news/press-releases/details/hexagons-for-data-protection)) | Proves a user's location lies in a hexagonal grid cell without revealing it | To verify: paper not yet read. Appears to target point location of users, not land parcels | Proves non-overlap of a set of private cells against all registered parcels, with an on-chain root update, not membership of one point |
+| Ernstberger, J., Zhang, C., Ciprian, L., Jovanovic, P., Steinhorst, S. Zero-Knowledge Location Privacy (ZKLP), IEEE Symposium on Security and Privacy 2025 (TU Munich, HKU, UCL; [TUM press release](https://www.tum.de/en/news-and-events/all-news/press-releases/details/hexagons-for-data-protection), [report](https://www.theregister.com/2025/05/17/privacy_preserving_location_sharing/)) | zk-SNARKs that let a user prove their location lies in a chosen region of a hexagonal Discrete Global Grid System without revealing the exact point; granularity chosen by the user | Proves membership of one point in a region; no land parcels, polygons, registries or overlap between regions; no on-chain state | We prove the opposite relation for a set of cells: none of a parcel's private cells is already occupied, against a tree of all registered parcels, with the root update checked on-chain |
+| Patel, M., Vyas, A., Katwala, S. "Design and Implementation of a Geospatially Enabled Blockchain Application for Land Record Management", ISPRS Annals X-5/W2-2025, pp. 491–496 (GIFTS Summit 2025, Pune) ([link](https://isprs-annals.copernicus.org/articles/X-5-W2-2025/491/2025/)) | Indian land-record prototype (Java, MySQL, GIS, smart contracts) for buyers, sellers, inspectors and administrators; reports reduced fraud and duplication; spatial data supports visual verification of parcels | Duplication handled by ledger records and visual checks, not an automatic geometric test; no ZK; no boundary privacy described | Automatic, cryptographic non-overlap check at registration, enforced by the contract, with boundaries kept private. Shows the Indian context we target |
 
-Search still to run (Sprint 2): Google Patents and InPASS for "zero-knowledge" + "land parcel"; "sparse Merkle tree" + "non-membership" + "geospatial"; "geohash" + "NFT" + "overlap"; IEEE Xplore and Scholar for ZK proof-of-location and blockchain cadastre surveys.
+Searched so far: Google Patents and web for "geospatial NFT", "land parcel tokenization", "polygon non-overlap blockchain", "zero-knowledge proof of location", "blockchain cadastre boundary conflict". None found combines private parcel cells with a zero-knowledge non-overlap proof enforced on-chain.
+
+Still to run before filing: InPASS (Indian Patent Office) for "land" + "blockchain" + "overlap"; Google Patents for "sparse Merkle tree" + "non-membership" + "geospatial"; read the claims of US20240202847A1. A patent agent's search should confirm this before the claims are drafted.
 
 ## 4. Summary and background (gap and novelty)
 <!-- Owner: Maneesh | Sprint 2 | Status: Not started -->
@@ -39,7 +42,13 @@ Search still to run (Sprint 2): Google Patents and InPASS for "zero-knowledge" +
 ### Our solution and novelty
 
 ## 5. Objectives
-<!-- Owner: Sarah | Sprint 2 | Status: Not started -->
+<!-- Owner: Sarah | Sprint 2 | Status: Draft (2026-10-14) -->
+
+1. Prevent double tokenization of the same physical land: reject any registration whose parcel occupies a grid cell already held by a registered parcel, regardless of the land ID, owner or documents submitted with it.
+2. Keep exact boundaries private: put only a commitment to the parcel's cells, coarse public parent cells and the owner on the public chain, never the polygon or the fine cells.
+3. Make the check enforceable, not advisory: the registry contract accepts a parcel only with a zero-knowledge proof that every fine cell was inserted into an empty slot of the occupied-cell sparse Merkle tree, moving it from the current on-chain root to the new one. A registrar cannot skip the check, reuse an old root or change the commitment.
+4. Let true neighbours register without false conflicts: assign each grid cell to the one parcel containing its centre, so parcels that only share a boundary never collide.
+5. Work on real cadastral data at practical cost: validate on official US municipal parcel polygons, with measured proof time, verification gas and the share of parcels that fit one proof, as a basis for Indian land records once digitized boundaries are available.
 
 ## 6. Working principle
 <!-- Owner: Maneesh | Sprint 2 | Status: Not started -->
@@ -75,4 +84,6 @@ Search still to run (Sprint 2): Google Patents and InPASS for "zero-knowledge" +
 
 ## Changelog
 
+- 2026-10-14: Section 3 extended (ZKLP, ISPRS 2025) and search status recorded; Section 5 drafted (Sarah).
+- 2026-10-13: Section 3 first pass (Sarah).
 - 2026-10-12: Template created (Sarah, Sprint 0).
