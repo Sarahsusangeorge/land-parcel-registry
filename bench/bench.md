@@ -71,7 +71,7 @@ Raw: `bench/results/circuit_toy.json`.
 
 Circuit: `circuits/register_parcel_dev.circom` — N=8 cells, N_LEVELS=16, Groth16. (Dev/test
 version of `register_parcel.circom`; identical G1–G5 constraints, smaller params to fit pot19.)
-Setup: pot19_pp.ptau (Hermez ceremony, prepared phase2). Run: `npm test` in `registrar/`.
+Setup: locally generated pot19 (dev only, not a ceremony; powersoftau new + contribute + prepare phase2). Run: `npm test` in `registrar/`.
 Raw: `bench/results/circuit_reg_dev.json`.
 
 | Metric | Value |

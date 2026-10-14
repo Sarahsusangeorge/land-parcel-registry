@@ -1,5 +1,7 @@
 # PLAN.md
 
+Read CONTEXT.md first for current status.
+
 Placeholder. Replace this file with the export of "Land Parcel Non-Overlap Registry: Build Plan to TRL 4"
 (export the doc as Markdown) during Sprint 0, then keep this repo copy as the source of truth.
 
@@ -33,7 +35,12 @@ requires `2^k ≥ constraints`, so pot19 (2^19 = 524,288 < 588,297) is insuffici
 pot20 (2^20 = 1,048,576 > 588,297) is the minimum. pot21 would also work but is
 unnecessarily large.
 
-**How to apply:** The build script downloads `powersOfTau28_hez_final_20.ptau` from the
-GCS mirror listed in the snarkjs README. If that mirror is unavailable, generate a local
-ceremony file with `snarkjs powersoftau new bn128 20` + `contribute` (no `prepare phase2`
-required — snarkjs `groth16 setup` accepts raw ptau files directly).
+**How to apply:** The build script attempts to download `powersOfTau28_hez_final_20.ptau`
+from the Hermez GCS mirror (now access-restricted). In practice: generate locally with
+`snarkjs powersoftau new bn128 20` + `contribute` + `prepare phase2`. The `prepare phase2`
+step is mandatory — passing a raw phase1 file to `groth16 setup` completes silently but
+writes a corrupt 12-byte zkey. `build.sh` handles the full sequence automatically.
+
+## Changelog
+
+- 2026-10-14 (Maneesh): housekeeping — .gitattributes, untrack NOTES-FOR-MANEESH.md, fix pot19 bench provenance, CONTEXT.md production-build status.

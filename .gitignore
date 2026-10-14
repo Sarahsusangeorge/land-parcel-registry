@@ -23,3 +23,7 @@ geo/data/raw/*.zip
 geo/data/raw/*full*.geojson
 
 contracts/deployments/
+
+# Scratch notes and AI tool state
+NOTES-FOR-MANEESH.md
+.claude/
