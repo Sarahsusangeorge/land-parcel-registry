@@ -17,14 +17,14 @@ const { load }        = require("../src/tree");
 const { buildInputs } = require("../src/inputs");
 
 const REPO_ROOT = path.resolve(__dirname, "../../");
-// DEV circuit (N=8, N_LEVELS=16) – fits pot19; same G1–G5 constraints as production.
-const WASM  = path.join(REPO_ROOT, "circuits/build/register_parcel_dev_js/register_parcel_dev.wasm");
-const ZKEY  = path.join(REPO_ROOT, "circuits/build/register_parcel_dev_final.zkey");
-const VKEY_PATH = path.join(REPO_ROOT, "circuits/build/register_parcel_dev_vkey.json");
+// Production circuit (N=16, N_LEVELS=32).
+const WASM  = path.join(REPO_ROOT, "circuits/build/register_parcel_js/register_parcel.wasm");
+const ZKEY  = path.join(REPO_ROOT, "circuits/build/register_parcel_final.zkey");
+const VKEY_PATH = path.join(REPO_ROOT, "circuits/build/register_parcel_vkey.json");
 
-// Dev circuit dimensions – must match component main = RegisterParcel(8, 16) in register_parcel_dev.circom
-const DEV_N        = 8;
-const DEV_N_LEVELS = 16;
+// Circuit dimensions – must match component main = RegisterParcel(16, 32) in register_parcel.circom
+const CIRC_N        = 16;
+const CIRC_N_LEVELS = 32;
 
 const PARCELS_FILE = path.join(REPO_ROOT, "geo/out/parcels.json");
 const { parcels } = JSON.parse(fs.readFileSync(PARCELS_FILE, "utf8"));
@@ -53,7 +53,7 @@ async function proveAndVerify(input) {
 // ── test 1: A proves ──────────────────────────────────────────────────────────
 test("fixture A inserts into empty tree and proof verifies", async () => {
   const smt = await load(null);
-  const input = await buildInputs(byId["A"], smt, DEV_N, DEV_N_LEVELS);
+  const input = await buildInputs(byId["A"], smt, CIRC_N, CIRC_N_LEVELS);
   const { valid, publicSignals } = await proveAndVerify(input);
 
   expect(valid).toBe(true);
@@ -69,11 +69,11 @@ test("fixture A inserts into empty tree and proof verifies", async () => {
 test("fixture B inserted after A fails (shared cells are now occupied)", async () => {
   // Register A first
   const smt = await load(null);
-  await buildInputs(byId["A"], smt, DEV_N, DEV_N_LEVELS);   // inserts A's cells into the tree
+  await buildInputs(byId["A"], smt, CIRC_N, CIRC_N_LEVELS);   // inserts A's cells into the tree
 
   // Now try to build inputs for B — it shares 5 cells with A, so those inserts
   // will attempt to put a value into an already-occupied slot.
-  await expect(buildInputs(byId["B"], smt, DEV_N, DEV_N_LEVELS)).rejects.toThrow();
+  await expect(buildInputs(byId["B"], smt, CIRC_N, CIRC_N_LEVELS)).rejects.toThrow();
 }, 60_000);
 
 // ── test 3: C after A proves ──────────────────────────────────────────────────
@@ -81,12 +81,12 @@ test("fixture C inserted after A proves (no shared cells)", async () => {
   const smt = await load(null);
 
   // Register A
-  const inputA = await buildInputs(byId["A"], smt, DEV_N, DEV_N_LEVELS);
+  const inputA = await buildInputs(byId["A"], smt, CIRC_N, CIRC_N_LEVELS);
   const { valid: validA } = await proveAndVerify(inputA);
   expect(validA).toBe(true);
 
   // Register C — tree root is now A's newRoot
-  const inputC = await buildInputs(byId["C"], smt, DEV_N, DEV_N_LEVELS);
+  const inputC = await buildInputs(byId["C"], smt, CIRC_N, CIRC_N_LEVELS);
   expect(inputC.initialRoot).toBe(inputA._meta.expectedNewRoot);
 
   const { valid: validC, publicSignals } = await proveAndVerify(inputC);
@@ -97,7 +97,7 @@ test("fixture C inserted after A proves (no shared cells)", async () => {
 // ── test 4: tampered commitment fails ─────────────────────────────────────────
 test("tampered cells make commitment constraint fail", async () => {
   const smt = await load(null);
-  const input = await buildInputs(byId["A"], smt, DEV_N, DEV_N_LEVELS);
+  const input = await buildInputs(byId["A"], smt, CIRC_N, CIRC_N_LEVELS);
 
   // Replace the first cell value with a different number — the commitment
   // computed in the circuit will not match what the SMT paths prove.
@@ -112,7 +112,7 @@ test("tampered cells make commitment constraint fail", async () => {
 // ── test 5: non-prefix active fails ──────────────────────────────────────────
 test("non-prefix active cells violate G1 and fail witness generation", async () => {
   const smt = await load(null);
-  const input = await buildInputs(byId["A"], smt, DEV_N, DEV_N_LEVELS);
+  const input = await buildInputs(byId["A"], smt, CIRC_N, CIRC_N_LEVELS);
 
   // Fixture A has 5 active cells at indices 0-4, then zeros.
   // Force a "hole": set cells[1] = "0" while cells[2] stays non-zero.

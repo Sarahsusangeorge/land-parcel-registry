@@ -37,16 +37,26 @@ mkdir -p "$BUILD_DIR"
 DEV_MODE=0
 for arg in "$@"; do [ "$arg" = "--dev" ] && DEV_MODE=1; done
 
+PTAU_DIR="$BUILD_DIR/ptau"
+mkdir -p "$PTAU_DIR"
+
+# Hermez final ptau files — GCS mirror listed in snarkjs README.
+# NOTE: if the GCS bucket is access-restricted, the script auto-generates a local ptau.
+#   Locally generated files need prepare phase2 before groth16 setup (the script handles this).
+#   Hermez GCS files are already phase2-prepared and can be used directly.
+PTAU_BASE="https://storage.googleapis.com/zkevm/ptau"
+
 if [ "$DEV_MODE" = "1" ]; then
   CIRCUIT_NAME="register_parcel_dev"
-  PTAU_URL="https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_19.ptau"
-  PTAU="$BUILD_DIR/pot19_hez_final.ptau"
+  # Dev reuses the pot19 file already present in circuits/build/ (generated in Sprint 2).
+  PTAU="$BUILD_DIR/pot19_pp.ptau"
+  PTAU_URL="$PTAU_BASE/powersOfTau28_hez_final_19.ptau"
   echo "=== DEV MODE: N=8, N_LEVELS=16, pot19 (79,330 constraints) ==="
 else
   CIRCUIT_NAME="register_parcel"
   # 588,297 constraints; 2^20=1,048,576 > 588,297 → pot20 is sufficient.
-  PTAU_URL="https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_20.ptau"
-  PTAU="$BUILD_DIR/pot20_hez_final.ptau"
+  PTAU="$PTAU_DIR/pot20_final.ptau"
+  PTAU_URL="$PTAU_BASE/powersOfTau28_hez_final_20.ptau"
   echo "=== PRODUCTION MODE: N=16, N_LEVELS=32, pot20 (588,297 constraints) ==="
 fi
 
@@ -68,13 +78,35 @@ circom "$CIRCUIT" \
 echo "Constraint count:"
 $SNARKJS r1cs info "$R1CS" | grep "# of Constraints"
 
-echo "=== 2. Powers of Tau (Hermez ceremony file — already phase-2 prepared) ==="
-if [ ! -f "$PTAU" ]; then
-  echo "Downloading $(basename $PTAU_URL) …"
-  curl -L --progress-bar "$PTAU_URL" -o "$PTAU"
+echo "=== 2. Powers of Tau ==="
+# PTAU naming convention: *_final.ptau = raw phase1; *_pp.ptau = prepare-phase2 output.
+# groth16 setup requires the prepare-phase2 format.
+# Hermez GCS files are distributed already phase2-prepared; locally generated files need
+# an explicit prepare phase2 step.
+PTAU_PP="${PTAU/_final.ptau/_pp.ptau}"
+if [ ! -f "$PTAU_PP" ]; then
+  if [ ! -f "$PTAU" ]; then
+    echo "Attempting GCS download …"
+    if curl -L --fail --progress-bar "$PTAU_URL" -o "$PTAU" 2>/dev/null; then
+      echo "Downloaded $(basename $PTAU) (Hermez ceremony file — already phase2-prepared)"
+      PTAU_PP="$PTAU"  # Hermez files are already pp; use directly.
+    else
+      rm -f "$PTAU"
+      PTAU0="${PTAU/_final.ptau/_0000.ptau}"
+      K="$(echo $(basename $PTAU) | grep -oE 'pot[0-9]+' | grep -oE '[0-9]+')"
+      echo "Download failed — generating local ceremony (power=$K; this takes time) …"
+      $SNARKJS powersoftau new bn128 "$K" "$PTAU0" -v
+      $SNARKJS powersoftau contribute "$PTAU0" "$PTAU" --name="dev-local" -e="$(date -u +%s)"
+    fi
+  fi
+  if [ "$PTAU_PP" != "$PTAU" ]; then
+    echo "Running prepare phase2 (one-time; may take 30–90 min for pot19–pot20) …"
+    $SNARKJS powersoftau prepare phase2 "$PTAU" "$PTAU_PP" -v
+  fi
 else
-  echo "Using cached $(basename $PTAU)"
+  echo "Using cached $(basename $PTAU_PP)"
 fi
+PTAU="$PTAU_PP"
 
 echo "=== 3. Groth16 setup ==="
 $SNARKJS groth16 setup "$R1CS" "$PTAU" "$ZKEY0"

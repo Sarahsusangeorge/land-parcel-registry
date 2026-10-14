@@ -72,18 +72,33 @@ are valid — inactive slots get zeros in all those fields.
 
 **No.** pot19 = 2^19 = 524,288 < 588,297 constraints.
 
-The Hermez `powersOfTau28_hez_final_*.ptau` files are already phase-2 prepared (no
-`prepare phase2` step needed). For Groth16, snarkjs requires `2^k ≥ constraints`:
+For Groth16, snarkjs requires `2^k ≥ constraints`:
 
 | Ptau | 2^k | Fits? |
 |---|---|---|
 | pot19 | 524,288 | **No** (524,288 < 588,297) |
 | pot20 | 1,048,576 | **Yes** (1,048,576 > 588,297) |
 
-To build the production circuit:
-1. Run `bash circuits/scripts/build.sh` (no `--dev` flag).
-2. The script will download `powersOfTau28_hez_final_20.ptau` (~500 MB) automatically.
-3. No `prepare phase2` step — Hermez final files are already ceremony outputs.
+### ptau format: Hermez vs locally generated
+
+**Hermez `powersOfTau28_hez_final_*.ptau` files** are distributed in the phase2-prepared
+format — they can be passed directly to `groth16 setup` with no extra step. Both Hermez S3
+and GCS mirrors are now access-restricted and cannot be downloaded anonymously.
+
+**Locally generated files** (via `powersoftau new` + `contribute`) are raw phase1 ceremony
+files. They require `powersoftau prepare phase2` before `groth16 setup` will work. Passing a
+raw phase1 file to `groth16 setup` completes in milliseconds but produces a 12-byte (corrupt)
+zkey silently — no error, invalid output.
+
+**Sprint 2 production build** uses `circuits/build/ptau/pot20_pp.ptau` generated locally:
+```
+snarkjs powersoftau new bn128 20 ptau/pot20_0000.ptau  (~384 MB)
+snarkjs powersoftau contribute pot20_0000.ptau ptau/pot20_final.ptau
+snarkjs powersoftau prepare phase2 ptau/pot20_final.ptau ptau/pot20_pp.ptau  (~60 min, ~1.2 GB)
+```
+
+To build the production circuit after the ptau is ready:
+    bash circuits/scripts/build.sh       # downloads or generates ptau, runs prepare phase2, runs setup
 
 ### Dev circuit (register_parcel_dev.circom, N=8, N_LEVELS=16)
 
@@ -93,9 +108,8 @@ To build the production circuit:
 | # of Wires | 158,555 |
 | Fits pot19 (2^19=524,288)? | Yes |
 
-The dev circuit groth16 setup completed in ~15 s. All 5 jest tests pass.
-(The build dir contains pot19_pp.ptau, a manually prepared file from a prior run. The updated
-build.sh --dev now uses the Hermez pot19_hez_final.ptau directly — same SRS, no prepare phase2.)
+The dev circuit uses `circuits/build/pot19_pp.ptau` (604 MB, generated locally in Sprint 2).
+All 5 jest tests pass with the dev circuit.
 
 ## PLAN.md checkboxes
 

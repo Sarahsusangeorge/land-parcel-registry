@@ -87,19 +87,29 @@ Raw: `bench/results/circuit_reg_dev.json`.
 | Rejection: tampered commitment (test 4) | pass |
 | Rejection: non-prefix active cells (test 5) | pass |
 
-## Circuit: register_parcel production (Sprint 2, Maneesh)
+## Circuit: register_parcel production (Sprint 2 follow-up, Maneesh)
 
-Circuit: `circuits/register_parcel.circom` — N=16 cells, N_LEVELS=32, Groth16. **Groth16
-setup not run in sprint 2** — requires pot20 (~500 MB Hermez download, not yet fetched).
-Constraint count from `snarkjs r1cs info`.
+Circuit: `circuits/register_parcel.circom` — N=16 cells, N_LEVELS=32, Groth16.
+Setup: locally generated pot20 (powersoftau new + contribute + prepare phase2; ~75 min total).
+Prove bench: `node registrar/scripts/bench_prove.js 3` (3 runs, fixture A, Apple Silicon).
+Raw: `bench/results/circuit_reg_prod.json`.
 
 | Metric | Value |
 |---|---|
 | Non-linear constraints | 588,297 |
 | Wires | 588,732 |
-| Required ptau | pot20 (2^20 = 1,048,576 > 588,297; Hermez file, no prepare phase2 needed) |
-| Groth16 setup time | TBD |
-| Prove time | TBD |
+| Required ptau | pot20 (2^20 = 1,048,576 > 588,297) |
+| pot20 prepare phase2 time (Apple Silicon) | ~75 min |
+| Groth16 setup time (Apple Silicon) | 42 s |
+| Prove time — mean (3 runs, fixture A) | **9,751 ms** |
+| Prove time — max (3 runs, fixture A) | **10,035 ms** |
+| Proof size (JSON) | 719 bytes |
+| zkey size | 268.7 MB |
+| vkey size | 3.2 KB |
+| Verification: valid proof | pass |
+| Rejection: shared cells (test 2) | pass |
+| Rejection: tampered commitment (test 4) | pass |
+| Rejection: non-prefix active cells (test 5) | pass |
 
 ## Known limitations (so far)
 

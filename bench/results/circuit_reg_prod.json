@@ -1,0 +1,20 @@
+{
+  "circuit": "register_parcel",
+  "params": { "N": 16, "N_LEVELS": 32 },
+  "nonLinearConstraints": 588297,
+  "wires": 588732,
+  "ptau": "pot20_pp.ptau (locally generated — powersoftau new + contribute + prepare phase2)",
+  "groth16SetupMs": 42460,
+  "proveRuns": 3,
+  "proveTimeMeanMs": 9751,
+  "proveTimeMaxMs": 10035,
+  "proofBytes": 719,
+  "zkeyMB": 268.7,
+  "vkeySizeKB": 3.2,
+  "verification": "pass",
+  "rejectionTests": {
+    "sharedCells": "pass",
+    "tamperedCommitment": "pass",
+    "nonPrefixActiveCells": "pass"
+  }
+}
