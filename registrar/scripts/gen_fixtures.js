@@ -102,7 +102,7 @@ async function main() {
   const fixtureB = {
     status:     "overlap",
     parcel_id:  "B",
-    hits:       [...hits],
+    overlaps:   [...hits],
   };
   fs.writeFileSync(
     path.join(FIXTURE_DIR, "B_overlap.json"),

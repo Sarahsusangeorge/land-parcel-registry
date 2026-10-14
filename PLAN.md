@@ -53,6 +53,21 @@ writes a corrupt 12-byte zkey. `build.sh` handles the full sequence automaticall
       → registered / overlap (hits A) / registered ✓
 - [x] Prove times recorded in `bench/bench.md`
 
+### register.js "registered" output carries oldRoot, newRoot, commitment (Sprint 3)
+
+**Decision:** The I4 `registered` JSON line includes three fields beyond the frozen spec:
+`oldRoot`, `newRoot`, and `commitment`.
+
+**Reason:** The frozen I4 spec lists `parcel_id, status, overlaps, tx_hash, token_id, prove_ms`.
+These three extra fields duplicate what the contract already stores on-chain but surface them
+directly in the CLI output, making it easy to chain registrations, audit root transitions, and
+script against the proof without a separate on-chain call. They add no ambiguity to I4 because
+they are additive and do not rename any frozen key.
+
+**How to apply:** Consumers of the I4 output may rely on `oldRoot`, `newRoot`, `commitment`
+being present in `status:"registered"` lines from this registrar. They are omitted from
+`status:"overlap"` and `status:"error"` lines where they are not meaningful.
+
 ## Changelog
 
 - 2026-10-14 (Maneesh): Sprint 3 — register.js I4 CLI, proof fixtures, demo.sh.

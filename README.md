@@ -48,4 +48,37 @@ npx hardhat run scripts/deploy.js --network localhost   # terminal 2 -> deployme
 
 Tests read the committed `geo/out/parcels.json`; rerun the geo pipeline if you change it.
 
-The one-command demo is added in Sprint 3.
+## Registrar (Node 20+)
+
+```bash
+cd registrar
+npm ci
+```
+
+### Sprint 3 end-to-end demo
+
+The production ZK artefacts are gitignored (zkey is 269 MB). Copy them from the machine that
+ran `bash circuits/scripts/build.sh`, or re-run that script (requires ~75 min for pot20 setup):
+
+```
+circuits/build/register_parcel_final.zkey
+circuits/build/register_parcel_js/register_parcel.wasm
+circuits/build/register_parcel_vkey.json
+```
+
+Then, from the **repo root**:
+
+```bash
+bash registrar/scripts/demo.sh
+```
+
+The script starts a local Hardhat node, deploys the real `Groth16Verifier` + `LandRegistry`,
+registers parcel A, attempts B (expected overlap), registers C, then stops the node.
+
+Expected stdout (one JSON line per parcel):
+
+```
+{"status":"registered","parcel_id":"A","token_id":1,"tx_hash":"0x…",…}
+{"status":"overlap","parcel_id":"B","overlaps":["A"]}
+{"status":"registered","parcel_id":"C","token_id":2,"tx_hash":"0x…",…}
+```

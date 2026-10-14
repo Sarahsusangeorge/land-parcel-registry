@@ -1,7 +1,7 @@
 {
   "status": "overlap",
   "parcel_id": "B",
-  "hits": [
+  "overlaps": [
     "A"
   ]
 }

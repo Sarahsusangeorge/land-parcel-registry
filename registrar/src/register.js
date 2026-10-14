@@ -17,12 +17,12 @@
 //   --owner <addr>          Token recipient (default: admin from deployment)
 //   --registrar-key <key>   Registrar signer private key (default: Hardhat acct 1)
 //
-// Output (exactly one JSON line to stdout):
-//   {status:"overlap",    parcel_id, hits:[...]}
+// Output (exactly one JSON line to stdout) — I4 key names:
+//   {status:"overlap",    parcel_id, overlaps:[...]}
 //   {status:"dry-run",    parcel_id, oldRoot, newRoot, commitment,
-//                         a, b, c, pubSignals, coarseCells, metadataURI, proveMs}
-//   {status:"registered", parcel_id, tokenId, txHash,
-//                         oldRoot, newRoot, commitment, coarseCells, metadataURI, proveMs}
+//                         a, b, c, pubSignals, coarseCells, metadataURI, prove_ms}
+//   {status:"registered", parcel_id, token_id, tx_hash,
+//                         oldRoot, newRoot, commitment, coarseCells, metadataURI, prove_ms}
 //   {status:"error",      parcel_id, reason}
 
 const path    = require("path");
@@ -220,7 +220,7 @@ async function main() {
   // ── step 2: overlap check ───────────────────────────────────────────────────
   let hits = await checkOverlap(smt, state.cellIndex, parcel.fine_cells_dec);
   if (hits.size > 0) {
-    emit({ status: "overlap", parcel_id: opts.parcelId, hits: [...hits] });
+    emit({ status: "overlap", parcel_id: opts.parcelId, overlaps: [...hits] });
     return;
   }
 
@@ -247,7 +247,7 @@ async function main() {
       pubSignals:  publicSignals.slice(0, 3),
       coarseCells: parcel.coarse_cells_dec,
       metadataURI,
-      proveMs,
+      prove_ms: proveMs,
     });
     return;
   }
@@ -285,7 +285,7 @@ async function main() {
 
     hits = await checkOverlap(activeSmt, activeState.cellIndex, parcel.fine_cells_dec);
     if (hits.size > 0) {
-      emit({ status: "overlap", parcel_id: opts.parcelId, hits: [...hits] });
+      emit({ status: "overlap", parcel_id: opts.parcelId, overlaps: [...hits] });
       return;
     }
 
@@ -330,14 +330,14 @@ async function main() {
   emit({
     status:      "registered",
     parcel_id:   opts.parcelId,
-    tokenId,
-    txHash:      receipt.hash,
+    token_id:    tokenId,
+    tx_hash:     receipt.hash,
     oldRoot:     publicSignals[0],
     newRoot:     publicSignals[1],
     commitment:  publicSignals[2],
     coarseCells: parcel.coarse_cells_dec,
     metadataURI,
-    proveMs,
+    prove_ms:    proveMs,
   });
 }
 

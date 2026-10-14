@@ -6,7 +6,7 @@
 #
 # Expected output lines (status fields):
 #   registered   ← A
-#   overlap      ← B (hits A)
+#   overlap      ← B (overlaps A)
 #   registered   ← C
 #
 # The Hardhat node is stopped at the end regardless of success or failure.
@@ -63,7 +63,7 @@ if [ "$STATUS_A" != "registered" ]; then
   echo "[demo] ERROR: expected registered for A, got $STATUS_A" >&2
   exit 1
 fi
-PROVE_MS_A=$(echo "$LINE_A" | node -e "process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>console.log(JSON.parse(d).proveMs))")
+PROVE_MS_A=$(echo "$LINE_A" | node -e "process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>console.log(JSON.parse(d).prove_ms))")
 echo "[demo] A: registered (${PROVE_MS_A} ms)" >&2
 
 # ── attempt B (should overlap) ─────────────────────────────────────────────────
@@ -94,10 +94,10 @@ if [ "$STATUS_C" != "registered" ]; then
   echo "[demo] ERROR: expected registered for C, got $STATUS_C" >&2
   exit 1
 fi
-PROVE_MS_C=$(echo "$LINE_C" | node -e "process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>console.log(JSON.parse(d).proveMs))")
+PROVE_MS_C=$(echo "$LINE_C" | node -e "process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>console.log(JSON.parse(d).prove_ms))")
 echo "[demo] C: registered (${PROVE_MS_C} ms)" >&2
 
 echo "[demo] Demo complete. registered / overlap / registered ✓" >&2
 
 # Machine-readable summary for bench
-echo "{ \"A_proveMs\": $PROVE_MS_A, \"C_proveMs\": $PROVE_MS_C }" >&2
+echo "{ \"A_prove_ms\": $PROVE_MS_A, \"C_prove_ms\": $PROVE_MS_C }" >&2
