@@ -345,7 +345,10 @@ function emit(obj) {
   process.stdout.write(JSON.stringify(obj) + "\n");
 }
 
-main().catch(err => {
-  emit({ status: "error", reason: err.message || String(err) });
-  process.exit(1);
-});
+// snarkjs keeps a background timer alive; exit explicitly once main() settles.
+main()
+  .then(() => process.exit(0))
+  .catch(err => {
+    emit({ status: "error", reason: err.message || String(err) });
+    process.exit(1);
+  });
