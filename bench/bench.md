@@ -90,16 +90,15 @@ Raw: `bench/results/circuit_reg_dev.json`.
 ## Circuit: register_parcel production (Sprint 2, Maneesh)
 
 Circuit: `circuits/register_parcel.circom` — N=16 cells, N_LEVELS=32, Groth16. **Groth16
-setup requires pot21 (2^21 SRS points); pot21 generation is ~160 min on Apple Silicon and
-not run during sprint 2.** Constraint count confirmed by `circom --r1cs`.
+setup not run in sprint 2** — requires pot20 (~500 MB Hermez download, not yet fetched).
+Constraint count from `snarkjs r1cs info`.
 
 | Metric | Value |
 |---|---|
-| Non-linear constraints | 287,745 |
-| Linear constraints | 287,745 |
+| Non-linear constraints | 588,297 |
 | Wires | 588,732 |
-| Required ptau | pot21 (2^21 = 2,097,152; 588,732×2 > 2^20) |
-| Groth16 setup time | TBD (pot21 not yet generated) |
+| Required ptau | pot20 (2^20 = 1,048,576 > 588,297; Hermez file, no prepare phase2 needed) |
+| Groth16 setup time | TBD |
 | Prove time | TBD |
 
 ## Known limitations (so far)

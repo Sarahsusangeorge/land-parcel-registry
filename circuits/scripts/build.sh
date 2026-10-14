@@ -2,24 +2,24 @@
 # circuits/scripts/build.sh
 # Build the register_parcel Groth16 circuit end-to-end:
 #   1. Compile circom → .r1cs + _js/ (witness generator)
-#   2. Hermez Powers-of-Tau (phase 1) — download if missing
-#   3. Groth16 setup (phase 2, dev contribution only — replace for production)
+#   2. Hermez Powers-of-Tau — download if missing
+#      (Hermez final files are already phase-2 prepared; no prepare phase2 step)
+#   3. Groth16 setup (dev contribution only — replace with MPC ceremony for production)
 #   4. Export proving key (.zkey), verification key (.json), Solidity verifier
 #   5. Copy Groth16Verifier.sol into contracts/contracts/
 #
 # Usage (from repo root):
-#   bash circuits/scripts/build.sh            # production circuit (requires pot21, ~160 min ptau prep)
-#   bash circuits/scripts/build.sh --dev      # dev/test circuit  (N=8, N_LEVELS=16, uses pot19)
+#   bash circuits/scripts/build.sh            # production circuit (N=16, pot20, ~500 MB download)
+#   bash circuits/scripts/build.sh --dev      # dev/test circuit  (N=8,  pot19, already present)
 #
 # Requires:
 #   circom  ≥ 2.2.0   (cargo install circom)
 #   snarkjs ≥ 0.7.6   (npm install -g snarkjs, or: npx snarkjs)
 #   node    ≥ 20
 #
-# NOTE – ptau sizing:
-#   Production circuit (N=16, N_LEVELS=32): 588,732 wires → needs pot21 (2^21).
-#     powersOfTau28_hez_final_21.ptau is ~3 GB; prepare phase2 takes ~160 min on Apple Silicon.
-#   Dev circuit      (N=8,  N_LEVELS=16):  158,555 wires → fits pot19 (2^19).
+# ptau sizing (snarkjs groth16 requires 2^k ≥ constraints):
+#   Production (N=16, N_LEVELS=32): 588,297 constraints → pot20 (2^20 = 1,048,576 ✓)
+#   Dev        (N=8,  N_LEVELS=16):  79,330 constraints → pot19 (2^19 =   524,288 ✓)
 
 set -euo pipefail
 export PATH="$HOME/.cargo/bin:$PATH"
@@ -40,18 +40,14 @@ for arg in "$@"; do [ "$arg" = "--dev" ] && DEV_MODE=1; done
 if [ "$DEV_MODE" = "1" ]; then
   CIRCUIT_NAME="register_parcel_dev"
   PTAU_URL="https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_19.ptau"
-  PTAU_DL="$BUILD_DIR/pot19_hez_final.ptau"
-  PTAU="$BUILD_DIR/pot19_pp.ptau"
-  echo "=== DEV MODE: N=8, N_LEVELS=16, pot19 ==="
+  PTAU="$BUILD_DIR/pot19_hez_final.ptau"
+  echo "=== DEV MODE: N=8, N_LEVELS=16, pot19 (79,330 constraints) ==="
 else
   CIRCUIT_NAME="register_parcel"
-  # Production needs pot21 (2^21 SRS points — 588,732 wires × 2 > 2^20).
-  # Download: https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_21.ptau (~3 GB)
-  PTAU_URL="https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_21.ptau"
-  PTAU_DL="$BUILD_DIR/pot21_hez_final.ptau"
-  PTAU="$BUILD_DIR/pot21_pp.ptau"
-  echo "=== PRODUCTION MODE: N=16, N_LEVELS=32, pot21 ==="
-  echo "    WARNING: pot21 prepare phase2 takes ~160 min and produces a ~2 GB file."
+  # 588,297 constraints; 2^20=1,048,576 > 588,297 → pot20 is sufficient.
+  PTAU_URL="https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_20.ptau"
+  PTAU="$BUILD_DIR/pot20_hez_final.ptau"
+  echo "=== PRODUCTION MODE: N=16, N_LEVELS=32, pot20 (588,297 constraints) ==="
 fi
 
 CIRCUIT="$CIRCUITS_DIR/${CIRCUIT_NAME}.circom"
@@ -72,17 +68,15 @@ circom "$CIRCUIT" \
 echo "Constraint count:"
 $SNARKJS r1cs info "$R1CS" | grep "# of Constraints"
 
-echo "=== 2. Powers of Tau (download phase 1, prepare phase 2) ==="
-if [ ! -f "$PTAU_DL" ]; then
-  echo "Downloading $(basename $PTAU_URL) …"
-  curl -L --progress-bar "$PTAU_URL" -o "$PTAU_DL"
-fi
+echo "=== 2. Powers of Tau (Hermez ceremony file — already phase-2 prepared) ==="
 if [ ! -f "$PTAU" ]; then
-  echo "Preparing phase 2 (first run — may take a long time) …"
-  $SNARKJS powersoftau prepare phase2 "$PTAU_DL" "$PTAU" -v
+  echo "Downloading $(basename $PTAU_URL) …"
+  curl -L --progress-bar "$PTAU_URL" -o "$PTAU"
+else
+  echo "Using cached $(basename $PTAU)"
 fi
 
-echo "=== 3. Groth16 setup (phase 2) ==="
+echo "=== 3. Groth16 setup ==="
 $SNARKJS groth16 setup "$R1CS" "$PTAU" "$ZKEY0"
 # DEV contribution only — replace with a MPC ceremony before production.
 $SNARKJS zkey contribute "$ZKEY0" "$ZKEY1" --name="dev-build" -e="$(date -u +%s)"

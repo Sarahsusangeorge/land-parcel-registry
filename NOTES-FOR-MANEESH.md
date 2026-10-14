@@ -58,18 +58,44 @@ are valid — inactive slots get zeros in all those fields.
 
 ## Powers of Tau (ptau) sizing
 
-register_parcel.circom (N=16, N_LEVELS=32):
-- Non-linear constraints: 287,745
-- Wires: 588,732
-- Need pot19 (2^19 = 524,288 > 287,745)
+### Exact numbers from `snarkjs r1cs info circuits/build/register_parcel.r1cs`
 
-The Hermez ceremony `powersOfTau28_hez_final_19.ptau` is a phase1 file. You MUST
-run `powersoftau prepare phase2` before using it with `groth16 setup`. build.sh
-handles this automatically (it checks for pot19_pp.ptau and generates it if absent).
+| Field | Value |
+|---|---|
+| # of Constraints | **588,297** |
+| # of Wires | 588,732 |
+| # of Private Inputs | 578 |
+| # of Public Inputs | 0 |
+| # of Outputs | 3 |
 
-WARNING: `prepare phase2` for pot19 takes ~30-40 minutes on Apple Silicon and
-produces a ~600MB file. The file is gitignored. Run `bash circuits/scripts/build.sh`
-from the repo root; it caches all intermediate files.
+### Does production circuit fit pot19?
+
+**No.** pot19 = 2^19 = 524,288 < 588,297 constraints.
+
+The Hermez `powersOfTau28_hez_final_*.ptau` files are already phase-2 prepared (no
+`prepare phase2` step needed). For Groth16, snarkjs requires `2^k ≥ constraints`:
+
+| Ptau | 2^k | Fits? |
+|---|---|---|
+| pot19 | 524,288 | **No** (524,288 < 588,297) |
+| pot20 | 1,048,576 | **Yes** (1,048,576 > 588,297) |
+
+To build the production circuit:
+1. Run `bash circuits/scripts/build.sh` (no `--dev` flag).
+2. The script will download `powersOfTau28_hez_final_20.ptau` (~500 MB) automatically.
+3. No `prepare phase2` step — Hermez final files are already ceremony outputs.
+
+### Dev circuit (register_parcel_dev.circom, N=8, N_LEVELS=16)
+
+| Field | Value |
+|---|---|
+| # of Constraints | 79,330 |
+| # of Wires | 158,555 |
+| Fits pot19 (2^19=524,288)? | Yes |
+
+The dev circuit groth16 setup completed in ~15 s. All 5 jest tests pass.
+(The build dir contains pot19_pp.ptau, a manually prepared file from a prior run. The updated
+build.sh --dev now uses the Hermez pot19_hez_final.ptau directly — same SRS, no prepare phase2.)
 
 ## PLAN.md checkboxes
 
@@ -93,7 +119,7 @@ System tools: circom 2.2.3, Node 22.14.0, npm 10.9.2.
 | Circuit | Non-linear constraints | Wires | Prove time |
 |---|---|---|---|
 | insert_one (N_LEVELS=10) | 6,604 | 12,882 | 406–503 ms |
-| register_parcel (N=16, N_LEVELS=32) | 287,745 | 588,732 | TBD (groth16 setup not yet complete) |
+| register_parcel (N=16, N_LEVELS=32) | 588,297 (snarkjs r1cs info total) | 588,732 | TBD (pot20 download needed) |
 
 ## Sprint 2 summary (Group 3)
 
@@ -108,18 +134,20 @@ System tools: circom 2.2.3, Node 22.14.0, npm 10.9.2.
 | circuits/build/register_parcel_dev_final.zkey | Generated (71 MB). |
 | circuits/build/register_parcel_dev_vkey.json | Exported (3.2 KB). |
 | circuits/build/Groth16Verifier.sol | Exported from dev zkey; copied to contracts/contracts/. |
-| circuits/scripts/build.sh | Updated — accepts --dev (pot19) or default production (pot21). |
+| circuits/scripts/build.sh | Updated — accepts --dev (pot19) or default production (pot20). |
 | bench/bench.md | Updated with dev and production circuit numbers. |
 
 ### Production circuit groth16 setup — NOT RUN
 
-`register_parcel.circom` (N=16, N_LEVELS=32) has 588,732 wires. Groth16 setup requires
-wires×2 ≤ 2^p, so pot21 (2^21 = 2,097,152) is needed. pot21 `.ptau` is ~3 GB and
-`prepare phase2` takes ~160 min on Apple Silicon. To complete the production build:
+`register_parcel.circom` has 588,297 constraints (from `snarkjs r1cs info`). Groth16
+requires 2^k ≥ constraints: pot19 = 524,288 < 588,297 (does not fit); pot20 = 1,048,576
+> 588,297 (fits). Hermez final files are already ceremony outputs — no `prepare phase2`.
+
+To complete the production build:
 
     bash circuits/scripts/build.sh       # (no --dev flag)
 
-This will download powersOfTau28_hez_final_21.ptau, run prepare phase2, then setup.
+This will download `powersOfTau28_hez_final_20.ptau` (~500 MB) and run groth16 setup.
 The Groth16Verifier.sol in contracts/contracts/ was generated from the dev circuit and
 must be regenerated from the production zkey before mainnet deployment.
 
@@ -130,8 +158,9 @@ must be regenerated from the production zkey before mainnet deployment.
 | N (max cells) | 8 | 16 |
 | N_LEVELS (tree depth) | 16 | 32 |
 | Non-linear constraints | 79,330 | 287,745 |
+| Total constraints (snarkjs) | 79,330 | 588,297 |
 | Wires | 158,555 | 588,732 |
-| Required ptau | pot19 | pot21 |
+| Required ptau | pot19 | pot20 |
 | Groth16 setup | 15 s | TBD |
 | Fixtures A/B/C | All fit (≤8 cells) | All fit (≤16 cells) |
 
