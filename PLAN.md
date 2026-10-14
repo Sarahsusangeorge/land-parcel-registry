@@ -139,6 +139,9 @@ claims (non-overlap enforcement) on real data, with measured performance.
 
 ## Changelog
 
+- 2026-10-14 (Maneesh): Sprint 4 — full real-parcel run (30/31 registered, B only overlap),
+      bench.md updated, patent evidence logs, TRL 4 checklist in PLAN.md.
+      Prove ms: mean 10,102 / max 10,846. Gas (real verifier): mean 415,942 / max 448,564.
 - 2026-10-14 (Maneesh): Sprint 3 — register.js I4 CLI, proof fixtures, demo.sh.
       Demo prove times: A 9,723 ms, C 9,631 ms. All three Sprint 3 Maneesh tasks done.
 - 2026-10-14 (Maneesh): housekeeping — .gitattributes, untrack NOTES-FOR-MANEESH.md, fix pot19 bench provenance, CONTEXT.md production-build status.

@@ -2,7 +2,7 @@
 
 Read this first, then PLAN.md. This file says where the project is right now. PLAN.md says what the project is and how it is built.
 
-Last updated: 2026-10-14, by Maneesh (Sprint 3 fixes: I4 key names, Gate-3 clean-clone pass)
+Last updated: 2026-10-14, by Maneesh (Sprint 4: full real-parcel run, bench stats, patent logs, TRL 4 checklist)
 
 ---
 
@@ -60,16 +60,18 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
 - Follow-up: constraint check, leftover processes killed, Sarah's 13 tests confirmed still passing, dev circuit decision logged (`85de2e6`)
   - Sprint 2 follow-up: production circuit built, Groth16Verifier.sol exported from the production zkey, 5/5 circuit tests and 13/13 contract tests pass, pushed (`1a47f53`)
   - Sprint 3: `registrar/src/register.js` (I4 CLI), proof fixtures A/B/C, `demo.sh`. All three Sprint 3 Maneesh tasks done (`b793a88`, `f317ee2`).
+  - Sprint 4: full real-parcel run (`registrar/scripts/full_run.sh/js`), `bench/results/full_run.json`, `bench/bench.md` full-run section, `patent/figures/logs/` evidence logs, TRL 4 checklist in PLAN.md (`dbfc469`, `752d656`, `c4a9eb4`).
 
 ### In progress
 
-Nothing running. Sprint 3 closed for Maneesh.
+Nothing running. Sprint 4 Maneesh benchmarks complete. IDF-B sections next.
 
 ### Not started
 
-- Sprint 3 and Sprint 4 for both lanes
 - IDF-B Sections 1, 2, 4, 6 (Maneesh), 5 (Sarah), 7 to 10 (both)
-- PR from `maneesh/s0-setup` into `main`
+- Sarah Sprint 3 tasks: e2e tests, gas reporter, Section 7 figures
+- PR from `maneesh/s3-registrar` into `main` (after Sarah merges)
+- README with reproduction steps and TRL 4 claim
 
 ---
 
@@ -100,6 +102,8 @@ Read these before touching circuits, proofs or the verifier.
 | Demo prove times | A: 9,723 ms, C: 9,631 ms (single uncontested run, M4 Pro, no competing node processes). |
 | I4 key names | register.js output uses `overlaps`, `tx_hash`, `token_id`, `prove_ms` (I4 frozen spec). Extra fields `oldRoot`, `newRoot`, `commitment` are present on `registered` lines; decision log in PLAN.md. |
 | Gate 3 clean-clone | Passed 2026-10-14. Clone from origin, checkout maneesh/s3-registrar, `npm ci` in registrar/ and contracts/, copy zkey/wasm/vkey from working machine, `bash registrar/scripts/demo.sh` → registered / overlap / registered ✓ (A 9800 ms, C 9848 ms). |
+| Full real-parcel run | 31 parcels, 30 registered, 1 overlap (B only). Prove ms: mean 10,102, max 10,846, min 9,760. Gas (real verifier): mean 415,942, max 448,564, min 414,724. No unintended overlaps. Raw: `bench/results/full_run.json`. |
+| Patent evidence logs | `patent/figures/logs/demo_run.txt` (demo re-run), `patent/figures/logs/full_run.txt` (full 31-parcel run). Plain-text stdout+stderr captures. |
 
 ---
 
@@ -112,9 +116,13 @@ Read these before touching circuits, proofs or the verifier.
 - [x] `registrar/scripts/demo.sh`: registered / overlap (A) / registered ✓
 - [x] StaleRoot handling in register.js
 
-### Maneesh (Sprint 4)
+### Maneesh (Sprint 4) — benchmarks DONE
 
-- Register all real parcels, benchmarks, IDF-B Sections 1/2/4/6, TRL 4 checklist
+- [x] Full real-parcel run: 30 registered, 1 overlap (B). `bench/results/full_run.json`
+- [x] `bench/bench.md` "Full real-parcel run" section with counts, prove ms, gas stats
+- [x] Patent evidence logs: `patent/figures/logs/demo_run.txt`, `patent/figures/logs/full_run.txt`
+- [x] TRL 4 checklist in `PLAN.md` — all evidenced items ticked, 6 remaining listed
+- [ ] IDF-B Sections 1, 2, 4, 6
 
 ### Sarah (Sprint 3)
 
