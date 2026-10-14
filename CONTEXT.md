@@ -2,7 +2,7 @@
 
 Read this first, then PLAN.md. This file says where the project is right now. PLAN.md says what the project is and how it is built.
 
-Last updated: 2026-10-14, by Maneesh (Sprint 3: register.js I4 CLI, proof fixtures, demo.sh)
+Last updated: 2026-10-14, by Maneesh (Sprint 3 fixes: I4 key names, Gate-3 clean-clone pass)
 
 ---
 
@@ -98,6 +98,8 @@ Read these before touching circuits, proofs or the verifier.
 | Geo settings | FINE_RES 12, CELL_MODE center (from Sarah's bench). 95.9% of 24,102 Newton parcels fit 1–16 cells, zero neighbour collisions. Fixture C touches A but shares no cells. |
 | snarkjs process exit | snarkjs holds a background timer that prevents Node.js from exiting naturally. All scripts that call snarkjs.groth16.fullProve must end with `process.exit(0)` (or `.then(() => process.exit(0))`). |
 | Demo prove times | A: 9,723 ms, C: 9,631 ms (single uncontested run, M4 Pro, no competing node processes). |
+| I4 key names | register.js output uses `overlaps`, `tx_hash`, `token_id`, `prove_ms` (I4 frozen spec). Extra fields `oldRoot`, `newRoot`, `commitment` are present on `registered` lines; decision log in PLAN.md. |
+| Gate 3 clean-clone | Passed 2026-10-14. Clone from origin, checkout maneesh/s3-registrar, `npm ci` in registrar/ and contracts/, copy zkey/wasm/vkey from working machine, `bash registrar/scripts/demo.sh` → registered / overlap / registered ✓ (A 9800 ms, C 9848 ms). |
 
 ---
 
