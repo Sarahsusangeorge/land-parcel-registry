@@ -2,7 +2,7 @@
 
 Read this first, then PLAN.md. This file says where the project is right now. PLAN.md says what the project is and how it is built.
 
-Last updated: 2026-10-14, by Maneesh (Sprint 4: full real-parcel run, bench stats, patent logs, TRL 4 checklist)
+Last updated: 2026-10-15, by Maneesh (Sprint 5: circuit fix, rebuild, 7 tests, full run, IDF-B draft)
 
 ---
 
@@ -61,17 +61,20 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
   - Sprint 2 follow-up: production circuit built, Groth16Verifier.sol exported from the production zkey, 5/5 circuit tests and 13/13 contract tests pass, pushed (`1a47f53`)
   - Sprint 3: `registrar/src/register.js` (I4 CLI), proof fixtures A/B/C, `demo.sh`. All three Sprint 3 Maneesh tasks done (`b793a88`, `f317ee2`).
   - Sprint 4: full real-parcel run (`registrar/scripts/full_run.sh/js`), `bench/results/full_run.json`, `bench/bench.md` full-run section, `patent/figures/logs/` evidence logs, TRL 4 checklist in PLAN.md (`dbfc469`, `752d656`, `c4a9eb4`).
+  - Sprint 5: circuit fix (salt in commitment, active[0]===1), rebuild both circuits (588,814 constraints), 7/7 circuit tests, regenerated fixtures, demo re-run, full 31-parcel run (30 registered, B only overlap), bench.md updated, IDF-B sections 1/2/4/6/7/9/10 drafted, PLAN.md decision log rows resolved (`9662f07`, `cf625e2`, `3f392ff`, ...).
 
 ### In progress
 
-Nothing running. Sprint 4 Maneesh benchmarks complete. IDF-B sections next.
+Nothing running. Sprint 5 complete.
 
 ### Not started
 
-- IDF-B Sections 1, 2, 4, 6 (Maneesh), 5 (Sarah), 7 to 10 (both)
-- Sarah Sprint 3 tasks: e2e tests, gas reporter, Section 7 figures
+- IDF-B Section 5 (Sarah — Objectives), Section 8 (both — Experimental validation, numbers now in bench/)
+- Sarah Sprint 3 tasks: e2e tests with regenerated fixtures, gas reporter
+- Sarah Section 7 figures (architecture, registration flow, SMT root chain)
 - PR from `maneesh/s3-registrar` into `main` (after Sarah merges)
 - README with reproduction steps and TRL 4 claim
+- Res-13 secondary benchmark (Sarah: needs --fine-res flag in geo/src/parcels.py)
 
 ---
 
@@ -102,8 +105,11 @@ Read these before touching circuits, proofs or the verifier.
 | Demo prove times | A: 9,723 ms, C: 9,631 ms (single uncontested run, M4 Pro, no competing node processes). |
 | I4 key names | register.js output uses `overlaps`, `tx_hash`, `token_id`, `prove_ms` (I4 frozen spec). Extra fields `oldRoot`, `newRoot`, `commitment` are present on `registered` lines; decision log in PLAN.md. |
 | Gate 3 clean-clone | Passed 2026-10-14. Clone from origin, checkout maneesh/s3-registrar, `npm ci` in registrar/ and contracts/, copy zkey/wasm/vkey from working machine, `bash registrar/scripts/demo.sh` → registered / overlap / registered ✓ (A 9800 ms, C 9848 ms). |
-| Full real-parcel run | 31 parcels, 30 registered, 1 overlap (B only). Prove ms: mean 10,102, max 10,846, min 9,760. Gas (real verifier): mean 415,942, max 448,564, min 414,724. No unintended overlaps. Raw: `bench/results/full_run.json`. |
-| Patent evidence logs | `patent/figures/logs/demo_run.txt` (demo re-run), `patent/figures/logs/full_run.txt` (full 31-parcel run). Plain-text stdout+stderr captures. |
+| Full real-parcel run (post-fix) | 31 parcels, 30 registered, 1 overlap (B only). Prove ms: mean 10,104, max 10,482, min 9,950. Gas (real Groth16Verifier): mean 415,944, max 448,564, min 414,700. No unintended overlaps. Raw: `bench/results/full_run.json`. |
+| Patent evidence logs | `patent/figures/logs/demo_run.txt` (demo re-run 2026-10-15), `patent/figures/logs/full_run.txt` (full 31-parcel run 2026-10-15). Plain-text stdout+stderr captures with fixed circuit. |
+| Circuit fix (2026-10-15) | Salt added to commitment: `Poseidon([Poseidon(cells), salt])`. `active[0] === 1` constraint added. Both circuits rebuilt. New constraint counts: prod 588,814, dev 158,981. 7/7 tests pass. See PLAN.md decision log for rationale. |
+| Prove time (measured, pre-fix) | Mean **9,751 ms**, max **10,035 ms** (3 runs, fixture A) — superseded by post-fix run below. |
+| Prove time (post-fix, 31-parcel run) | Mean **10,104 ms**, max **10,482 ms** (M4 Pro, 31 parcels). Salt adds negligible overhead. |
 
 ---
 
@@ -116,13 +122,28 @@ Read these before touching circuits, proofs or the verifier.
 - [x] `registrar/scripts/demo.sh`: registered / overlap (A) / registered ✓
 - [x] StaleRoot handling in register.js
 
-### Maneesh (Sprint 4) — benchmarks DONE
+### Maneesh (Sprint 4) — DONE
 
 - [x] Full real-parcel run: 30 registered, 1 overlap (B). `bench/results/full_run.json`
 - [x] `bench/bench.md` "Full real-parcel run" section with counts, prove ms, gas stats
 - [x] Patent evidence logs: `patent/figures/logs/demo_run.txt`, `patent/figures/logs/full_run.txt`
-- [x] TRL 4 checklist in `PLAN.md` — all evidenced items ticked, 6 remaining listed
-- [ ] IDF-B Sections 1, 2, 4, 6
+- [x] TRL 4 checklist in `PLAN.md` -- all evidenced items ticked, remaining items listed
+- [x] IDF-B Sections 1, 2, 4, 6, 7, 9, 10 drafted
+
+### Maneesh (Sprint 5) — DONE
+
+- [x] Circuit review: both findings confirmed (salt missing, empty parcel not rejected)
+- [x] Circuit fix: salt in commitment (I3), `active[0] === 1` (I1), both circuits
+- [x] Rebuild production circuit (588,814 constraints) and dev circuit (158,981 constraints)
+- [x] 7/7 circuit tests pass (5 original + test 6 salt binding + test 7 empty parcel)
+- [x] Regenerated proof fixtures A.json, C_after_A.json against new vkey
+- [x] 13/13 contract tests pass
+- [x] demo.sh: registered / overlap / registered (A 9983 ms, C 10007 ms)
+- [x] Full 31-parcel run: 30 registered, 1 overlap (B), 0 errors
+- [x] bench.md updated: pre-fix numbers superseded, post-fix numbers added
+- [x] PLAN.md decision log: geo settings and circuit fix rows added
+- [x] TRL 4 checklist updated in PLAN.md
+- [x] NOTES-FOR-MANEESH.md updated with findings summary and Sarah's action items
 
 ### Sarah (Sprint 3)
 
