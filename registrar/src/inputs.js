@@ -7,16 +7,51 @@
 //   const { buildInputs } = require("./inputs");
 //   const input = await buildInputs(parcelEntry, smt, N, N_LEVELS);
 //   // input is ready to pass to snarkjs.groth16.fullProve(input, wasm, zkey)
+//
+// Commitment (I3):
+//   inner      = Poseidon(cells[0..N-1])
+//   commitment = Poseidon([inner, salt])
+//
+// salt is a random 248-bit value generated fresh for each call.
+// It is a private circuit input (not in public signals).
 
-// (getPoseidon not needed here — inputs.js delegates all hashing to tree.js)
+const crypto = require("crypto");
+const { buildPoseidon } = require("circomlibjs");
 
 const N        = 16;
 const N_LEVELS = 32;
 
+let _poseidon = null;
+async function getPoseidon() {
+  if (!_poseidon) _poseidon = await buildPoseidon();
+  return _poseidon;
+}
+
+/**
+ * Generate a random 248-bit salt (fits safely in the BN128 scalar field).
+ */
+function randomSalt() {
+  return BigInt("0x" + crypto.randomBytes(31).toString("hex"));
+}
+
+/**
+ * Compute the I3 commitment in JavaScript (matches the circuit's G3).
+ *   inner      = Poseidon(cells[0..N-1])
+ *   commitment = Poseidon([inner, salt])
+ *
+ * @param {BigInt[]} cells  Padded cell array (length exactly n).
+ * @param {BigInt}   salt
+ */
+async function computeCommitment(cells, salt) {
+  const poseidon = await getPoseidon();
+  const inner = poseidon.F.toObject(poseidon(cells));
+  return poseidon.F.toObject(poseidon([inner, salt]));
+}
+
 /**
  * Build the circuit input for a single parcel registration.
  *
- * @param {object} parcel     Entry from geo/out/parcels.json (parcel_id, fine_cells_dec, …)
+ * @param {object} parcel     Entry from geo/out/parcels.json (parcel_id, fine_cells_dec, ...)
  * @param {object} smt        Live SMT tree (result of tree.load())
  * @param {number} [n]        Circuit N (default 16)
  * @param {number} [nLevels]  Circuit N_LEVELS (default 32)
@@ -57,7 +92,7 @@ async function buildInputs(parcel, smt, n = N, nLevels = N_LEVELS) {
       oldValues.push(w.oldValue.toString());
       isOld0.push(w.isOld0.toString());
     } else {
-      // Inactive slot: NOP — zeros everywhere.
+      // Inactive slot: NOP -- zeros everywhere.
       siblings.push(new Array(nLevels).fill("0"));
       oldKeys.push("0");
       oldValues.push("0");
@@ -66,26 +101,32 @@ async function buildInputs(parcel, smt, n = N, nLevels = N_LEVELS) {
   }
 
   // Compute the final root (root after all active inserts) from the tree.
-  // The tree root was already advanced by the insertCell calls above.
   const finalRoot = smt.root();
+
+  // Generate salt and compute the I3 commitment in JavaScript.
+  const salt = randomSalt();
+  const commitment = await computeCommitment(cells, salt);
 
   const circuitInput = {
     initialRoot:  currentRoot.toString(),
     cells:        cells.map(c => c.toString()),
     n_cells:      String(parcel.fine_cells_dec.length),
+    salt:         salt.toString(),
     siblings,
     oldKey:       oldKeys,
     oldValue:     oldValues,
     isOld0,
   };
 
-  // Test-only metadata — NOT circuit signals.
+  // Test-only metadata -- NOT circuit signals.
   circuitInput._meta = {
-    expectedOldRoot: currentRoot.toString(),
-    expectedNewRoot: finalRoot.toString(),
+    expectedOldRoot:    currentRoot.toString(),
+    expectedNewRoot:    finalRoot.toString(),
+    expectedCommitment: commitment.toString(),
+    salt:               salt.toString(),
   };
 
   return circuitInput;
 }
 
-module.exports = { buildInputs, N, N_LEVELS };
+module.exports = { buildInputs, computeCommitment, randomSalt, N, N_LEVELS };
