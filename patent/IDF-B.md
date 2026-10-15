@@ -10,7 +10,7 @@ Inventors: (as agreed with mentor)
 <!-- Owner: Maneesh | Sprint 1 | Status: Not started -->
 
 ## 3. Prior patents and publications
-<!-- Owner: Sarah | Sprint 1-2 | Status: Nearly done (2026-10-14). One row to verify: US20240202847A1 claims -->
+<!-- Owner: Sarah | Sprint 1-2 | Status: Done (2026-10-15). A patent agent's search should confirm before filing -->
 
 ### Patents
 
@@ -18,7 +18,7 @@ Inventors: (as agreed with mentor)
 |---|---|---|---|
 | VIT IDF-B: Blockchain-Based Immutable Land Registry System with NFT Ownership, E-Notary Authentication, and Zero-Knowledge Privacy Protection (invention disclosure, TRL 3) | Land ownership as ERC-721 NFTs; documents on IPFS with only a hash on-chain; E-Notary step; ZK proofs for funds, KYC and ownership at transfer; escrow | Duplicate check only on land IDs and document hashes, so the same land under a new ID passes; location is a single public GPS point; ZK circuits are mocks; no geometry in any proof | We detect duplicates by physical location: every fine grid cell of the parcel must enter an empty slot of the occupied-cell tree, enforced on-chain by a real Groth16 proof, without the boundary or fine cells going on-chain |
 | [US 12,333,587 B2](https://patents.google.com/patent/US12333587): Associating land NFTs with digital representations of land parcels (Deere & Co.; filed 2022-05-12, granted 2025-06-17) | Covers a parcel with recursively subdivided S2 cells (Hilbert-curve cell values) and stores the cell list with a land NFT at the owner's blockchain address; used for agricultural-operation agreements | Cell values are a public, "objective and immutable" definition of the land; no parcel-to-parcel overlap or duplicate-registration check; no zero-knowledge proof; cells not kept private | **Closest prior art for "grid cells + land NFT".** We do not claim cells-on-NFT. We claim: cells kept private by the registrar; a ZK proof that each cell was inserted into an empty slot of a sparse Merkle tree (insert proof = non-overlap proof); the contract accepting only proofs whose old root equals the current on-chain root; only a commitment and coarse parent cells published |
-| US20240202847A1: Blockchain-GIS based framework for land registration | Cited by the VIT IDF-B as storing parcel geography with blockchain records | To verify: claims not yet read | To verify after reading the claims |
+| [US 2024/0202847 A1](https://patents.google.com/patent/US20240202847A1/en): Blockchain-GIS based framework for land registration (University of Florida Research Foundation; inventors Alem, Lawal, Nawari; filed 2023-12-15, priority 2022-12-15, published 2024-06-20; pending) | A permissioned ledger run by a municipal authority receives a land parcel record with geocoded data and a georeferenced map; smart contracts validate it against municipal geo-spatial records; the record is added as a block and the owner gets an electronic ownership confirmation (claims 1, 10, 19). Says coordinates give each parcel a unique identification "to avoid double registration" | No defined overlap test: duplicates are avoided by a coordinate identifier and validation against municipal records, so a slightly redrawn boundary is not caught by any geometric check. Map and ownership data sit openly on the ledger, "transparent to all authorized participants"; no zero-knowledge proof, no boundary privacy, no grid cells, Merkle tree or NFT | We replace identifier matching with a geometric test: every fine grid cell must enter an empty slot of the occupied-cell tree, so a redrawn copy of the same land (fixture B, shifted 5 m) is rejected. The test is proved in zero knowledge and enforced by the contract, and exact boundaries and fine cells never go on-chain |
 
 ### Publications
 
@@ -30,7 +30,7 @@ Inventors: (as agreed with mentor)
 
 Searched so far: Google Patents and web for "geospatial NFT", "land parcel tokenization", "polygon non-overlap blockchain", "zero-knowledge proof of location", "blockchain cadastre boundary conflict". None found combines private parcel cells with a zero-knowledge non-overlap proof enforced on-chain.
 
-Still to run before filing: InPASS (Indian Patent Office) for "land" + "blockchain" + "overlap"; Google Patents for "sparse Merkle tree" + "non-membership" + "geospatial"; read the claims of US20240202847A1. A patent agent's search should confirm this before the claims are drafted.
+Still to run before filing: InPASS (Indian Patent Office) for "land" + "blockchain" + "overlap"; Google Patents for "sparse Merkle tree" + "non-membership" + "geospatial". A patent agent's search should confirm this before the claims are drafted.
 
 ## 4. Summary and background (gap and novelty)
 <!-- Owner: Maneesh | Sprint 2 | Status: Not started -->
@@ -94,6 +94,7 @@ Evidence logs: `patent/figures/logs/` (contract and geo test runs, gas report).
 
 ## Changelog
 
+- 2026-10-15: Section 3: US 2024/0202847 A1 claims read and row completed (Sarah).
 - 2026-10-15: Section 7 figures 1 to 3 added (Sarah).
 - 2026-10-14: Section 3 extended (ZKLP, ISPRS 2025) and search status recorded; Section 5 drafted (Sarah).
 - 2026-10-13: Section 3 first pass (Sarah).

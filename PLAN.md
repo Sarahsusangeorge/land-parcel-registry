@@ -409,7 +409,7 @@ Acceptance: all mock tests pass. Deploy script works on `npx hardhat node`. (Don
 Patent lane
 
 - [ ] Maneesh: IDF-B Sections 4 (gap) and 6 (working principle)
-- [ ] Sarah: IDF-B Section 5 (objectives) and finish Section 3 (Section 5 drafted; Section 3 needs the US20240202847A1 claims read)
+- [x] Sarah: IDF-B Section 5 (objectives) and finish Section 3
 
 Gate 2 (end of Sprint 2)
 

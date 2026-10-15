@@ -133,7 +133,7 @@ Read these before touching circuits, proofs or the verifier.
 2. ~~`contracts/test/registry.e2e.test.js` using Maneesh's fixtures.~~ Done, 8 tests.
 3. ~~Gas reporter on for `registerParcel`.~~ Done.
 4. ~~IDF-B Section 7 figures.~~ Done (Sprint 4).
-5. Finish IDF-B Section 3: read the claims of US20240202847A1.
+5. ~~Finish IDF-B Section 3.~~ Done (US 2024/0202847 A1 row completed).
 6. When Maneesh regenerates the verifier and fixtures after the circuit fixes, pull the new fixtures and rerun the e2e tests. Nothing in the tests should need to change.
 
 ### Both (Sprint 4, after Gate 3)
