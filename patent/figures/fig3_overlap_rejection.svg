@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 600" width="920" height="600" font-family="Helvetica, Arial, sans-serif">
+<rect width="920" height="600" fill="#ffffff"/>
+<text x="40" y="44" font-size="20" font-weight="700" fill="#1f2328">Fig. 3. A redrawn parcel B is rejected; neighbour C is accepted</text>
+<text x="40" y="70" font-size="14" fill="#57606a">Real parcels from the City of Newton, MA. H3 resolution 12, centre rule. B = parcel A shifted 5 m east.</text>
+<rect x="40" y="96" width="560" height="470" fill="none" stroke="#d0d7de"/>
+<path d="M484.5,321.2 L431.7,331.0 L413.4,379.3 L447.9,417.8 L500.8,408.0 L519.1,359.7 Z" fill="#1a7f37" fill-opacity="0.18" stroke="#1a7f37" stroke-width="1.2"/>
+<path d="M397.1,292.5 L344.3,302.3 L326.0,350.6 L360.5,389.1 L413.4,379.3 L431.7,331.0 Z" fill="#1a7f37" fill-opacity="0.18" stroke="#1a7f37" stroke-width="1.2"/>
+<path d="M468.2,234.4 L415.4,244.2 L397.1,292.5 L431.7,331.0 L484.5,321.2 L502.8,272.9 Z" fill="#1a7f37" fill-opacity="0.18" stroke="#1a7f37" stroke-width="1.2"/>
+<path d="M238.6,321.9 L185.7,331.7 L167.4,379.9 L202.0,418.4 L254.9,408.7 L273.1,360.4 Z" fill="none" stroke="#57606a" stroke-width="1.2" stroke-dasharray="4 3"/>
+<path d="M380.8,205.7 L328.0,215.5 L309.7,263.8 L344.3,302.3 L397.1,292.5 L415.4,244.2 Z" fill="#cf222e" fill-opacity="0.30" stroke="#cf222e" stroke-width="2"/>
+<path d="M293.4,177.0 L240.6,186.8 L222.3,235.1 L256.9,273.6 L309.7,263.8 L328.0,215.5 Z" fill="#cf222e" fill-opacity="0.30" stroke="#cf222e" stroke-width="2"/>
+<path d="M309.7,263.8 L256.9,273.6 L238.6,321.9 L273.1,360.4 L326.0,350.6 L344.3,302.3 Z" fill="#cf222e" fill-opacity="0.30" stroke="#cf222e" stroke-width="2"/>
+<path d="M206.0,148.3 L153.2,158.1 L134.9,206.4 L169.4,244.9 L222.3,235.1 L240.6,186.8 Z" fill="#cf222e" fill-opacity="0.30" stroke="#cf222e" stroke-width="2"/>
+<path d="M222.3,235.1 L169.4,244.9 L151.2,293.2 L185.7,331.7 L238.6,321.9 L256.9,273.6 Z" fill="#cf222e" fill-opacity="0.30" stroke="#cf222e" stroke-width="2"/>
+<path d="M537.6,304.5 L453.7,513.7 L415.6,457.2 L359.9,374.2 L380.8,333.3 L385.4,324.2 L390.0,315.2 L418.7,259.1 L438.6,266.7 L473.7,280.1 L537.6,304.5 Z" fill="none" stroke="#1a7f37" stroke-width="2.5"/>
+<path d="M418.7,259.1 L390.0,315.2 L163.4,383.2 L102.4,170.9 L103.1,164.8 L105.7,158.9 L106.9,157.4 L109.4,154.3 L110.7,153.4 L112.8,151.9 L115.0,150.6 L120.1,148.8 L126.3,148.4 L130.2,149.3 L132.2,149.7 L291.9,210.7 L326.7,224.0 L418.7,259.1 Z" fill="none" stroke="#1f6feb" stroke-width="2.5"/>
+<path d="M442.4,259.1 L413.7,315.2 L187.1,383.2 L126.1,170.9 L126.8,164.8 L129.4,158.9 L130.6,157.4 L133.1,154.3 L134.4,153.4 L136.5,151.9 L138.7,150.6 L143.8,148.8 L150.0,148.4 L153.9,149.3 L155.9,149.7 L315.6,210.7 L350.4,224.0 L442.4,259.1 Z" fill="none" stroke="#1f2328" stroke-width="1.8" stroke-dasharray="7 4"/>
+<text x="264.2" y="254.3" font-size="26" font-weight="700" fill="#1f6feb" text-anchor="middle" dominant-baseline="middle" stroke="#ffffff" stroke-width="5" paint-order="stroke">A</text>
+<text x="431.7" y="331.0" font-size="26" font-weight="700" fill="#1a7f37" text-anchor="middle" dominant-baseline="middle" stroke="#ffffff" stroke-width="5" paint-order="stroke">C</text>
+<text x="238.3" y="370.2" font-size="22" font-weight="700" fill="#1f2328" dominant-baseline="middle" stroke="#ffffff" stroke-width="5" paint-order="stroke">B</text>
+<line x1="60" y1="544" x2="107.4" y2="544" stroke="#1f2328" stroke-width="3"/>
+<text x="60" y="536" font-size="13" fill="#1f2328">10 m</text>
+<text x="630" y="110" font-size="15" font-weight="700" fill="#1f2328">Parcel boundaries</text>
+<line x1="630" y1="134" x2="652" y2="134" stroke="#1f6feb" stroke-width="2.5"/>
+<text x="662" y="138" font-size="13" fill="#1f2328">A: real parcel, registered first</text>
+<line x1="630" y1="160" x2="652" y2="160" stroke="#1f2328" stroke-width="1.8" stroke-dasharray="7 4"/>
+<text x="662" y="164" font-size="13" fill="#1f2328">B: A redrawn 5 m east</text>
+<line x1="630" y1="186" x2="652" y2="186" stroke="#1a7f37" stroke-width="2.5"/>
+<text x="662" y="190" font-size="13" fill="#1f2328">C: real neighbour sharing A's edge</text>
+<text x="630" y="230" font-size="15" font-weight="700" fill="#1f2328">Grid cells (H3 res 12)</text>
+<rect x="630" y="248" width="22" height="18" rx="3" fill="#cf222e" fill-opacity="0.30" stroke="#cf222e" stroke-width="2"/>
+<text x="662" y="262" font-size="13" fill="#1f2328">Held by A, claimed again by B (5)</text>
+<rect x="630" y="278" width="22" height="18" rx="3" fill="none" stroke="#57606a" stroke-dasharray="4 3"/>
+<text x="662" y="292" font-size="13" fill="#1f2328">Claimed by B only (1)</text>
+<rect x="630" y="308" width="22" height="18" rx="3" fill="#1a7f37" fill-opacity="0.18" stroke="#1a7f37"/>
+<text x="662" y="322" font-size="13" fill="#1f2328">Held by C (3)</text>
+<text x="630" y="360" font-size="15" font-weight="700" fill="#1f2328">Registration outcome</text>
+<text x="630" y="386" font-size="13" fill="#1f6feb" xml:space="preserve">A: every cell inserted into an empty slot;</text>
+<text x="630" y="408" font-size="13" fill="#1f6feb" xml:space="preserve">   proof verifies, token 1 minted</text>
+<text x="630" y="430" font-size="13" fill="#cf222e" xml:space="preserve">B: 5 of 6 cells already occupied;</text>
+<text x="630" y="452" font-size="13" fill="#cf222e" xml:space="preserve">   no valid insert proof exists, rejected</text>
+<text x="630" y="474" font-size="13" fill="#1a7f37" xml:space="preserve">C: no cell shared with A or B;</text>
+<text x="630" y="496" font-size="13" fill="#1a7f37" xml:space="preserve">   proof verifies, token 2 minted</text>
+<text x="630" y="536" font-size="12" fill="#57606a">A cell belongs to the parcel containing</text>
+<text x="630" y="552" font-size="12" fill="#57606a">its centre, so parcels that only touch</text>
+<text x="630" y="568" font-size="12" fill="#57606a">never share a cell.</text>
+</svg>

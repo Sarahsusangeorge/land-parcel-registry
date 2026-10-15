@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 580" width="920" height="580" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#6e7781"/></marker><marker id="arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#cf222e"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1f6feb"/></marker></defs>
+<rect width="920" height="580" fill="#ffffff"/>
+<text x="40" y="44" font-size="20" font-weight="700" fill="#1f2328">Fig. 1. System architecture</text>
+<text x="40" y="70" font-size="14" fill="#57606a">Exact boundaries and fine cells stay with the registrar; the chain enforces non-overlap through the proof.</text>
+<rect x="40" y="96" width="400" height="450" rx="10" fill="none" stroke="#d0d7de" stroke-width="1.5"/>
+<text x="60" y="122" font-size="15" font-weight="700" fill="#1f2328">Registrar (off-chain, private)</text>
+<rect x="560" y="96" width="320" height="450" rx="10" fill="none" stroke="#d0d7de" stroke-width="1.5"/>
+<text x="580" y="122" font-size="15" font-weight="700" fill="#1f2328">Public chain (EVM)</text>
+<text x="240" y="150" font-size="13" fill="#57606a" text-anchor="middle">Certified parcel polygon (GeoJSON)</text>
+<line x1="240" y1="158" x2="240" y2="176" stroke="#6e7781" stroke-width="1.25" marker-end="url(#ar)"/>
+<rect x="70" y="178" width="340" height="72" rx="8" fill="#ffffff" stroke="#6e7781" stroke-width="1.25"/>
+<text x="240.0" y="202" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">Geo pipeline</text>
+<text x="240.0" y="220" font-size="12" fill="#1f2328" text-anchor="middle">Polygon to fine H3 cells (private, res 12)</text>
+<text x="240.0" y="236" font-size="12" fill="#1f2328" text-anchor="middle">and coarse parent cells (public, res 9)</text>
+<line x1="240" y1="250" x2="240" y2="288" stroke="#6e7781" stroke-width="1.25" marker-end="url(#ar)"/>
+<text x="250" y="273" font-size="12" fill="#57606a">fine cells</text>
+<rect x="70" y="290" width="340" height="72" rx="8" fill="#ffffff" stroke="#6e7781" stroke-width="1.25"/>
+<text x="240.0" y="314" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">Occupied-cell sparse Merkle tree</text>
+<text x="240.0" y="332" font-size="12" fill="#1f2328" text-anchor="middle">Key Poseidon(cell), value 1, depth 32</text>
+<text x="240.0" y="348" font-size="12" fill="#1f2328" text-anchor="middle">Insert into an occupied slot fails</text>
+<line x1="240" y1="362" x2="240" y2="400" stroke="#6e7781" stroke-width="1.25" marker-end="url(#ar)"/>
+<text x="250" y="385" font-size="12" fill="#57606a">old and new roots, siblings</text>
+<rect x="70" y="402" width="340" height="72" rx="8" fill="#ffffff" stroke="#6e7781" stroke-width="1.25"/>
+<text x="240.0" y="426" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">Groth16 prover (Circom circuit)</text>
+<text x="240.0" y="444" font-size="12" fill="#1f2328" text-anchor="middle">Cells match the salted commitment;</text>
+<text x="240.0" y="460" font-size="12" fill="#1f2328" text-anchor="middle">each cell went into an empty slot</text>
+<text x="240" y="508" font-size="12.5" fill="#cf222e" text-anchor="middle">Never leaves the registrar:</text>
+<text x="240" y="526" font-size="12.5" fill="#cf222e" text-anchor="middle">exact polygon, fine cells, salt</text>
+<rect x="580" y="178" width="280" height="72" rx="8" fill="#ffffff" stroke="#6e7781" stroke-width="1.25"/>
+<text x="720.0" y="202" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">Groth16Verifier</text>
+<text x="720.0" y="220" font-size="12" fill="#1f2328" text-anchor="middle">verifyProof(a, b, c,</text>
+<text x="720.0" y="236" font-size="12" fill="#1f2328" text-anchor="middle">[oldRoot, newRoot, commitment])</text>
+<rect x="580" y="318" width="280" height="136" rx="8" fill="#ddf4ff" stroke="#1f6feb" stroke-width="2"/>
+<text x="720.0" y="342" font-size="14" font-weight="700" fill="#1f2328" text-anchor="middle">LandRegistry (ERC-721)</text>
+<text x="720.0" y="360" font-size="12" fill="#1f2328" text-anchor="middle">Checks, in order:</text>
+<text x="720.0" y="376" font-size="12" fill="#1f2328" text-anchor="middle">1 caller has REGISTRAR_ROLE</text>
+<text x="720.0" y="392" font-size="12" fill="#1f2328" text-anchor="middle">2 coarse cells not empty</text>
+<text x="720.0" y="408" font-size="12" fill="#1f2328" text-anchor="middle">3 oldRoot equals occupiedRoot</text>
+<text x="720.0" y="424" font-size="12" fill="#1f2328" text-anchor="middle">4 commitment unused, 5 proof valid</text>
+<text x="720.0" y="440" font-size="12" fill="#1f2328" text-anchor="middle">Then: root = newRoot, mint to owner</text>
+<line x1="720" y1="318" x2="720" y2="252" stroke="#6e7781" stroke-width="1.25" marker-end="url(#ar)"/>
+<text x="730" y="289" font-size="12" fill="#57606a">verifyProof</text>
+<text x="720" y="496" font-size="12.5" fill="#1a7f37" text-anchor="middle">Public: roots, commitment,</text>
+<text x="720" y="514" font-size="12.5" fill="#1a7f37" text-anchor="middle">coarse cells, owner, token ID</text>
+<line x1="410" y1="438" x2="578" y2="438" stroke="#1f6feb" stroke-width="1.75" marker-end="url(#ara)"/>
+<text x="500" y="372" font-size="11.5" fill="#1f6feb" text-anchor="middle">registerParcel:</text>
+<text x="500" y="387" font-size="11.5" fill="#1f6feb" text-anchor="middle">proof, 3 public</text>
+<text x="500" y="402" font-size="11.5" fill="#1f6feb" text-anchor="middle">signals, coarse</text>
+<text x="500" y="417" font-size="11.5" fill="#1f6feb" text-anchor="middle">cells, owner</text>
+</svg>

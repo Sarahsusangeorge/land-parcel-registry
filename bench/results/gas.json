@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "measured_at": "2026-10-15T02:40:49.833Z",
+    "network": "hardhat",
+    "verifier": "Groth16Verifier.sol (production zkey, N=16, N_LEVELS=32)",
+    "method": "gasUsed from transaction receipts; fresh deployment; fixtures registered in order A, C_after_A"
+  },
+  "registerParcel": {
+    "n": 2,
+    "mean": 431806,
+    "min": 415048,
+    "max": 448564
+  },
+  "runs": [
+    {
+      "fixture": "A.json",
+      "coarse_cells": 1,
+      "gas_used": 448564
+    },
+    {
+      "fixture": "C_after_A.json",
+      "coarse_cells": 2,
+      "gas_used": 415048
+    }
+  ],
+  "verifyProof_alone_estimate": 228528,
+  "deployment": {
+    "Groth16Verifier": 385561,
+    "LandRegistry": 1561293
+  },
+  "notes": [
+    "A is the first registration: occupiedRoot goes from 0 to non-zero, a fresh storage write, so it costs more.",
+    "verifyProof_alone_estimate includes the 21,000 base transaction cost."
+  ]
+}

@@ -1,6 +1,6 @@
 # Invention Disclosure (IDF-B) Draft
 
-Version: 0.2 | Last updated: 2026-10-14 | Updated by: Sarah
+Version: 0.3 | Last updated: 2026-10-15 | Updated by: Sarah
 Inventors: (as agreed with mentor)
 
 ## 1. Title of the invention
@@ -64,6 +64,16 @@ Still to run before filing: InPASS (Indian Patent Office) for "land" + "blockcha
 
 ### Figures
 
+Figure files are in `patent/figures/` (SVG source and PNG).
+
+- **Fig. 1, System architecture** (`fig1_architecture`): registrar side (geo pipeline, occupied-cell sparse Merkle tree, Groth16 prover) and chain side (`LandRegistry`, `Groth16Verifier`), with what stays private and what is public.
+- **Fig. 2, Registration sequence** (`fig2_registration_sequence`): the 12 steps from a certified polygon to a minted token, including the branch where an occupied cell stops the registration.
+- **Fig. 3, Overlap rejection** (`fig3_overlap_rejection`): real Newton parcels A and C and fixture B (A shifted 5 m east) with their res-12 H3 cells. B claims 5 of A's 5 cells, so no valid insert proof exists and it is rejected; C touches A but shares no cell and is accepted. Drawn by `geo/scripts/figure_overlap.py` from `geo/out/parcels.json`.
+
+Figs. 1 and 2 show the commitment with a salt, as specified in PLAN.md I1. The circuit used for the current measurements does not yet include the salt; see CONTEXT.md.
+
+Evidence logs: `patent/figures/logs/` (contract and geo test runs, gas report).
+
 ## 8. Experimental validation results
 <!-- Owner: Both | Sprint 4 | Status: Not started -->
 
@@ -84,6 +94,7 @@ Still to run before filing: InPASS (Indian Patent Office) for "land" + "blockcha
 
 ## Changelog
 
+- 2026-10-15: Section 7 figures 1 to 3 added (Sarah).
 - 2026-10-14: Section 3 extended (ZKLP, ISPRS 2025) and search status recorded; Section 5 drafted (Sarah).
 - 2026-10-13: Section 3 first pass (Sarah).
 - 2026-10-12: Template created (Sarah, Sprint 0).
