@@ -27,6 +27,9 @@ breaks all existing proofs and the cell index. Requires agreement from both
 Maneesh and Sarah and a coordinated re-run of the geo pipeline, circuit, and
 all registrations.
 
+Resolution comparison (res 11, 12, 13) across all 24,102 Newton parcels is in
+`bench/results/cell_counts.json`. No additional benchmark run is planned.
+
 ### Circuit fix — salt in commitment and active[0]===1 constraint (Sprint 5, 2026-10-15)
 
 **Decision:** Add a private `salt` input to register_parcel.circom and change
@@ -176,11 +179,14 @@ claims (non-overlap enforcement) on real data, with measured performance.
 - [ ] Gas reporter on `registerParcel` with real verifier in test suite (Sarah, Sprint 3 task 3)
 - [ ] IDF-B Section 5 (Sarah — Objectives), Section 8 (both — Experimental validation)
 - [ ] README updated with reproduction steps and TRL 4 claim
-- [ ] Public ptau ceremony file swap before any production or public use
-- [ ] Res-13 secondary benchmark (Sarah: add --fine-res flag to geo/src/parcels.py)
+- [ ] Public ptau ceremony file swap (required if/when deployment is ever permitted; public deployment is **forbidden until the provisional patent application is filed** -- this is not a TRL 4 requirement)
 
 ## Changelog
 
+- 2026-10-15 (Maneesh): Sprint 5 follow-up — data dir corrected (registrar/data/),
+      wrong-salt test 8 added (8/8 pass), res-13 removed (cell_counts.json is the
+      resolution comparison), testnet-deployment caveat removed (forbidden until patent
+      filing), TRL 4 status updated (all Maneesh evidence done, waiting on Sarah e2e).
 - 2026-10-15 (Maneesh): Sprint 5 — circuit fix (salt in commitment, active[0]===1),
       rebuild, 7/7 tests, regenerated fixtures, demo re-run, full real-parcel re-run
       (30/31, B only), bench.md updated, IDF-B sections 1/2/4/6/7/9/10 drafted,

@@ -2,7 +2,7 @@
 
 Read this first, then PLAN.md. This file says where the project is right now. PLAN.md says what the project is and how it is built.
 
-Last updated: 2026-10-15, by Maneesh (Sprint 5: circuit fix, rebuild, 7 tests, full run, IDF-B draft)
+Last updated: 2026-10-15, by Maneesh (Sprint 5 follow-up: data dir corrected, wrong-salt test 8, res-13 removed, patent deployment rule clarified, TRL 4 status updated)
 
 ---
 
@@ -65,7 +65,7 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
 
 ### In progress
 
-Nothing running. Sprint 5 complete.
+TRL 4 status: All Maneesh-side evidence done. Waiting on Sarah's e2e tests passing with the regenerated fixtures.
 
 ### Not started
 
@@ -74,7 +74,6 @@ Nothing running. Sprint 5 complete.
 - Sarah Section 7 figures (architecture, registration flow, SMT root chain)
 - PR from `maneesh/s3-registrar` into `main` (after Sarah merges)
 - README with reproduction steps and TRL 4 claim
-- Res-13 secondary benchmark (Sarah: needs --fine-res flag in geo/src/parcels.py)
 
 ---
 
@@ -84,10 +83,13 @@ Read these before touching circuits, proofs or the verifier.
 
 | Topic | Fact |
 | --- | --- |
+| Runtime state dir | Registrar writes `demo_state.json` and `full_run_state.json` to `registrar/data/`, not `registrar/state/`. `registrar/data/` is gitignored (holds salts and private cells). Nothing in it is git-tracked. |
+| Resolution comparison | `bench/results/cell_counts.json` has the parcel-fit counts for res 11, 12, and 13 across the 24,102 Newton parcels. Use this as the authoritative resolution comparison; no additional benchmark run needed. |
+| Public deployment | **Forbidden until the provisional patent application is filed.** No public demo, testnet deployment, or posting before that. This is not a TRL 4 caveat -- TRL 4 is lab validation only. |
 | Constraint count | Production circuit: **588,297** (from `snarkjs r1cs info`). An earlier figure of 287k was wrong. Use 588,297 everywhere. |
 | Powers of tau | Production needs **pot20** (2^20). pot19 is too small. |
 | Hermez file | The public Hermez download is dead. The old Google Cloud bucket returns "Access denied". Do not retry that link. |
-| Our ptau | Generated locally on Maneesh's Mac, single contributor. Fine for the TRL 4 prototype. Must be swapped for a public ceremony file before any public or production use. Say which one was used in the IDF-B. |
+| Our ptau | Generated locally on Maneesh's Mac, single contributor. Fine for the TRL 4 prototype. Must be swapped for a public ceremony file if/when deployment is ever permitted (after patent filing). Say which one was used in the IDF-B. |
 | Dev circuit | `register_parcel_dev.circom`: N=8, N_LEVELS=16, about 79k constraints, fits pot19. Same public signals as production. **Tests only.** |
 | Current verifier | `Groth16Verifier.sol` is exported from the production zkey (N=16, N_LEVELS=32). The dev circuit is for fast tests only. |
 | Public signals | `[oldRoot, newRoot, commitment]`, as in I5. Unchanged. |
@@ -99,7 +101,7 @@ Read these before touching circuits, proofs or the verifier.
 | Groth16 setup time | 42 s (production circuit, pot20_pp.ptau) |
 | pot20 prepare phase2 time | ~75 min (Apple Silicon) |
 | ptau provenance — pot19 | Locally generated (powersoftau new bn128 19 + contribute + prepare phase2). Not a public ceremony. Dev/test only. Confirmed: `pot19_0000.ptau` and `pot19_final.ptau` intermediates are present in `circuits/build/`. |
-| ptau provenance — pot20 | Locally generated (powersoftau new bn128 20 + contribute + prepare phase2). Not a public ceremony. Fine for TRL 4 prototype; must be replaced before any public or production use. Confirmed: `pot20_0000.ptau` and `pot20_final.ptau` intermediates are present in `circuits/build/ptau/`. |
+| ptau provenance — pot20 | Locally generated (powersoftau new bn128 20 + contribute + prepare phase2). Not a public ceremony. Fine for TRL 4 prototype; must be replaced if/when deployment is ever permitted (after patent filing). Confirmed: `pot20_0000.ptau` and `pot20_final.ptau` intermediates are present in `circuits/build/ptau/`. |
 | Geo settings | FINE_RES 12, CELL_MODE center (from Sarah's bench). 95.9% of 24,102 Newton parcels fit 1–16 cells, zero neighbour collisions. Fixture C touches A but shares no cells. |
 | snarkjs process exit | snarkjs holds a background timer that prevents Node.js from exiting naturally. All scripts that call snarkjs.groth16.fullProve must end with `process.exit(0)` (or `.then(() => process.exit(0))`). |
 | Demo prove times | A: 9,723 ms, C: 9,631 ms (single uncontested run, M4 Pro, no competing node processes). |

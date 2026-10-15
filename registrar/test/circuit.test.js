@@ -163,3 +163,37 @@ test("all-zero cells violate active[0]===1 and fail witness generation", async (
     snarkjs.groth16.fullProve(toCircuit(input), WASM, ZKEY)
   ).rejects.toThrow();
 }, 300_000);
+
+// -- test 8: wrong salt -- proof cannot verify for original commitment --------
+// The commitment is a circuit output: commitment = Poseidon([Poseidon(cells), salt]).
+// Changing the salt produces a different commitment; a verifier holding the original
+// commitment on-chain must reject any proof generated with a different salt.
+test("wrong salt produces different commitment -- original commitment verification fails", async () => {
+  const smt = await load(null);
+  const input = await buildInputs(byId["A"], smt, CIRC_N, CIRC_N_LEVELS);
+
+  // Record the original commitment C1 = Poseidon([inner, S1]).
+  const originalCommitment = input._meta.expectedCommitment;
+
+  // Change only the salt; all other inputs (cells, Merkle paths) are unchanged.
+  // The circuit will compute C2 = Poseidon([inner, S2]) where S2 = S1 + 1.
+  const wrongSaltInput = {
+    ...toCircuit(input),
+    salt: (BigInt(input.salt) + 1n).toString(),
+  };
+
+  const { proof, publicSignals } = await snarkjs.groth16.fullProve(
+    wrongSaltInput, WASM, ZKEY
+  );
+
+  // A different salt must produce a different commitment.
+  expect(publicSignals[2]).not.toBe(originalCommitment);
+
+  // A verifier holding the original commitment C1 on-chain must reject this proof.
+  // Claim C1 as the public commitment signal and verify -- must fail.
+  const claimedSignals = [...publicSignals];
+  claimedSignals[2] = originalCommitment;
+
+  const valid = await snarkjs.groth16.verify(vkey, claimedSignals, proof);
+  expect(valid).toBe(false);
+}, 300_000);
