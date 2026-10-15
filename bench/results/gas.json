@@ -1,6 +1,6 @@
 {
   "meta": {
-    "measured_at": "2026-10-15T02:40:49.833Z",
+    "measured_at": "2026-10-15T04:07:15.135Z",
     "network": "hardhat",
     "verifier": "Groth16Verifier.sol (production zkey, N=16, N_LEVELS=32)",
     "method": "gasUsed from transaction receipts; fresh deployment; fixtures registered in order A, C_after_A"
@@ -31,5 +31,14 @@
   "notes": [
     "A is the first registration: occupiedRoot goes from 0 to non-zero, a fresh storage write, so it costs more.",
     "verifyProof_alone_estimate includes the 21,000 base transaction cost."
-  ]
+  ],
+  "cross_check_full_run": {
+    "source": "bench/results/full_run.json",
+    "registered": 30,
+    "gas_used": {
+      "mean": 415942,
+      "max": 448564,
+      "min": 414724
+    }
+  }
 }

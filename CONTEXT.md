@@ -2,7 +2,7 @@
 
 Read this first, then PLAN.md. This file says where the project is right now. PLAN.md says what the project is and how it is built.
 
-Last updated: 2026-10-15, by Sarah (merged `maneesh/s3-registrar` into `main`; Sarah lane status)
+Last updated: 2026-10-15, by Sarah (Sprint 4 Sarah lane: figures, gas, logs, README)
 
 ---
 
@@ -54,6 +54,7 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
 - Sprint 2 finish (PR #1): full `PLAN.md`, I6 fixture format, IDF-B Section 3 extended, Section 5 drafted
 - Sprint 3 (`ab52163`, on `main`): `deploy.js` deploys the real `Groth16Verifier` and grants `REGISTRAR_ROLE` to the deployer; `registry.e2e.test.js` with Maneesh's fixtures, 8 tests passing (21 with the mock suite); gas reporter covers `registerParcel`
 - Measured with the real verifier: `registerParcel` 448,564 gas (A, empty tree) and 415,048 gas (C after A); `verifyProof` alone about 228,500
+- Sprint 4 (branch `sarah/s4-evidence`): IDF-B Figs. 1 to 3 in `patent/figures/` (Fig. 3 drawn from the real parcels by `geo/scripts/figure_overlap.py`); `contracts/scripts/gas_bench.js` writes `bench/results/gas.json`; contract, geo and gas logs in `patent/figures/logs/`; README reproduction table; limitations in `bench/bench.md`
 - Patent: IDF-B Section 3 first pass
 
 **Maneesh** (branch `maneesh/s0-setup`)
@@ -72,7 +73,7 @@ Nothing running. Sprint 4 Maneesh benchmarks complete. IDF-B sections next.
 ### Not started
 
 - IDF-B Sections 1, 2, 4, 6 (Maneesh), 7 text to 10 (both)
-- README with reproduction steps and TRL 4 claim
+- TRL 4 claim in the IDF-B (after the circuit fix)
 - Circuit fixes to meet I1/I3 (see section 7), then rerun proofs, fixtures and benchmarks
 
 ---
@@ -131,7 +132,7 @@ Read these before touching circuits, proofs or the verifier.
 1. ~~Switch the deploy path to the real `Groth16Verifier`.~~ Done.
 2. ~~`contracts/test/registry.e2e.test.js` using Maneesh's fixtures.~~ Done, 8 tests.
 3. ~~Gas reporter on for `registerParcel`.~~ Done.
-4. IDF-B Section 7 figures in `patent/figures/` (Sprint 4 branch `sarah/s4-evidence`).
+4. ~~IDF-B Section 7 figures.~~ Done (Sprint 4).
 5. Finish IDF-B Section 3: read the claims of US20240202847A1.
 6. When Maneesh regenerates the verifier and fixtures after the circuit fixes, pull the new fixtures and rerun the e2e tests. Nothing in the tests should need to change.
 

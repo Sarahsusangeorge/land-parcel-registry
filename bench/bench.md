@@ -155,7 +155,23 @@ transition from 0 → newRoot writes a storage slot that is cold at deployment.
 No real-parcel overlap was found among the 30 Newton parcels (P01–P28 plus A and C).
 B is a synthetic fixture (A shifted 5 m east) and is the only overlap, as designed.
 
+## Contract: registerParcel gas with the real verifier (Sprint 4, Sarah)
+
+Run: `cd contracts && npx hardhat run scripts/gas_bench.js`. Raw: `bench/results/gas.json`.
+Fresh deployment, committed proof fixtures registered in order, gas from transaction receipts.
+
+| Registration | Gas used |
+|---|---|
+| A (first registration, empty tree) | 448,564 |
+| C after A | 415,048 |
+| `verifyProof` alone (estimate, incl. 21,000 base) | 228,528 |
+| Deployment: `Groth16Verifier` / `LandRegistry` | 385,561 / 1,561,293 |
+
+Cross-check: the full run's 30 registrations (`bench/results/full_run.json`) give mean 415,942, min 414,724, max 448,564; A is the same 448,564.
+
 ## Known limitations (so far)
 
 - Grid approximation: an overlap smaller than the gap between cell centres (res 12 edge about 9.4 m) can slip through.
 - Parcel size: at res 12, 2.4% of Newton parcels have more than 16 cells and 1.7% have none; both are flagged, not registered.
+- Registrar trust: the registrar certifies that the polygon matches the land and sees the exact polygon and fine cells. The proof guarantees consistency with the occupied-cell tree, not ground truth.
+- Trusted setup: the powers-of-tau file was generated locally by one contributor. Fine for a lab prototype; replace with a public ceremony file before any public use.

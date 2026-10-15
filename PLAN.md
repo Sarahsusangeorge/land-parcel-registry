@@ -443,7 +443,7 @@ Acceptance: all end-to-end tests pass against the real verifier. (Sarah lane don
 
 Patent lane
 
-- [ ] Sarah: IDF-B Section 7 figures (architecture, registration sequence, overlap rejection of B) in `patent/figures/`
+- [x] Sarah: IDF-B Section 7 figures (architecture, registration sequence, overlap rejection of B) in `patent/figures/`
 - [ ] Maneesh: IDF-B Section 7 text, including the privacy model and trust assumption
 
 Gate 3 (end of Sprint 3)
@@ -464,10 +464,10 @@ Maneesh lane
 
 Sarah lane
 
-- [ ] Gas for `registerParcel` (mean, min, max) from the gas reporter, written to `bench/results/gas.json`
+- [x] Gas for `registerParcel` (mean, min, max) from the gas reporter, written to `bench/results/gas.json` (from transaction receipts via `contracts/scripts/gas_bench.js`, because the reporter's row also counts the reverting test calls)
 - [x] Register all real parcels in sequence. Record pass and overlap counts. Any unexpected overlap between real neighbours goes in `bench.md` as a known limitation of the grid approximation. (Maneesh's full run: 30 registered, B the only overlap, no unexpected overlaps; `bench/results/full_run.json`)
-- [ ] Screenshots and logs: demo output, test run, gas table, saved in `patent/figures/`
-- [ ] README: clean-clone setup and the one-command demo
+- [x] Screenshots and logs: demo output, test run, gas table, saved in `patent/figures/` (`patent/figures/logs/`)
+- [x] README: clean-clone setup and the one-command demo
 
 Acceptance: `bench.md` has every number in the TRL 4 checklist, each traceable to a results file or log.
 
@@ -550,12 +550,12 @@ Measurements (all in `bench/bench.md`)
 - [x] Proving time, mean and max, with hardware noted
 - [x] Verification gas, mean (415,942 over 30 registrations)
 - [x] Cells per parcel at two fine resolutions, and share of parcels that fit N = 16 (res 11, 12 and 13 over 24,102 parcels)
-- [ ] Known limitations written down (grid approximation, parcel size limit, registrar trust)
+- [x] Known limitations written down (grid approximation, parcel size limit, registrar trust) (`bench/bench.md`)
 
 Documentation
 
-- [ ] README reproduces everything above
-- [ ] Screenshots and logs saved in `patent/figures/`
+- [x] README reproduces everything above (proving rows need the production zkey)
+- [x] Screenshots and logs saved in `patent/figures/`
 - [ ] IDF-B Sections 1 to 10 complete and sent to the mentor
 
 ## Decision log
@@ -598,6 +598,7 @@ Append new rows at the top. A decision that changes an interface needs both name
 
 | Date | Who | What changed |
 |---|---|---|
+| 2026-10-15 | Sarah | Sprint 4: IDF-B Figs. 1 to 3, `gas_bench.js` and `bench/results/gas.json`, evidence logs, README reproduction table, limitations in `bench.md` |
 | 2026-10-15 | Sarah | Merged `maneesh/s3-registrar` into `main`: folded Maneesh's Sprint 3 checklist and TRL 4 checklist into this file |
 | 2026-10-14 | Maneesh | Sprint 4: full real-parcel run (30/31 registered, B the only overlap), `bench.md` full-run section, evidence logs. Prove ms mean 10,102 / max 10,846; gas mean 415,942 / max 448,564 |
 | 2026-10-14 | Maneesh | Sprint 3: `register.js` I4 CLI, proof fixtures, `demo.sh`, Gate 3 clean-clone run. Demo prove times A 9,723 ms, C 9,631 ms |
