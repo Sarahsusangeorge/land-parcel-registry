@@ -151,3 +151,19 @@ def test_tiny_parcel_flagged_not_padded():
     rec = P.parcel_record("TINY", "synthetic", big_square(3))
     assert rec["num_fine_cells"] == 0 and rec["fine_cells"] == []
     assert rec["fits_batch"] is False
+
+
+@pytest.mark.parametrize("res", [11, 13])
+def test_other_resolution_keeps_same_parcels_and_i2_shape(res, doc):
+    other = P.build(json.loads(SAMPLE.read_text()), fine_res=res)
+    assert other["meta"]["fine_res"] == res
+    assert [p["parcel_id"] for p in other["parcels"]] == [p["parcel_id"] for p in doc["parcels"]]
+    assert [p["source_feature_id"] for p in other["parcels"]] == \
+           [p["source_feature_id"] for p in doc["parcels"]]
+    for p in other["parcels"]:
+        assert all(h3.get_resolution(c) == res for c in p["fine_cells"])
+        assert p["fits_batch"] == (1 <= p["num_fine_cells"] <= 16)
+
+
+def test_default_build_is_the_frozen_resolution(doc):
+    assert doc["meta"]["fine_res"] == P.FINE_RES == 12

@@ -55,6 +55,8 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
 - Sprint 3 (`ab52163`, on `main`): `deploy.js` deploys the real `Groth16Verifier` and grants `REGISTRAR_ROLE` to the deployer; `registry.e2e.test.js` with Maneesh's fixtures, 8 tests passing (21 with the mock suite); gas reporter covers `registerParcel`
 - Measured with the real verifier: `registerParcel` 448,564 gas (A, empty tree) and 415,048 gas (C after A); `verifyProof` alone about 228,500
 - Sprint 4 (branch `sarah/s4-evidence`): IDF-B Figs. 1 to 3 in `patent/figures/` (Fig. 3 drawn from the real parcels by `geo/scripts/figure_overlap.py`); `contracts/scripts/gas_bench.js` writes `bench/results/gas.json`; contract, geo and gas logs in `patent/figures/logs/`; README reproduction table; limitations in `bench/bench.md`
+- Resolution comparison input: `python src/parcels.py --fine-res 13 --out out/parcels_res13.json` (and res 11). Same 31 parcels; fit N = 16: res 11 19/31, res 12 31/31, res 13 0/31. Res 13 parcels cannot be proved with the N = 16 circuit, so compare cell counts, not proofs
+- IDF-B Section 8 drafted from `bench/`; circuit numbers marked provisional until the circuit fix
 - Patent: IDF-B Section 3 first pass
 
 **Maneesh** (branch `maneesh/s0-setup`)

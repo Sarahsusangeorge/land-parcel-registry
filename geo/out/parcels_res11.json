@@ -1,0 +1,538 @@
+{
+  "meta": {
+    "fine_res": 11,
+    "coarse_res": 9,
+    "cell_mode": "center",
+    "max_cells": 16,
+    "source": "City of Newton MA parcels (NewtonMAGIS/GISData, Property/Parcels.geojson) https://github.com/NewtonMAGIS/GISData/blob/master/Property/Parcels.geojson",
+    "generated_at": "2026-10-15T04:20:35+00:00"
+  },
+  "parcels": [
+    {
+      "parcel_id": "A",
+      "source_feature_id": "53009 0010",
+      "polygon_sha256": "22c9a6b0db3a0e062442122a7f640c1d5591a2d7dd2d80c02b53ff00d6ac2bf6",
+      "area_m2": 1832.0,
+      "fine_cells": [
+        "8b2a30653199fff"
+      ],
+      "fine_cells_dec": [
+        "626742545717239807"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "B",
+      "source_feature_id": "53009 0010+shift5mE",
+      "polygon_sha256": "1e7f4ff7384321c847ac275baf3952e9ff25ec3d7bbe4953caf495c5608b469e",
+      "area_m2": 1832.0,
+      "fine_cells": [
+        "8b2a30653199fff"
+      ],
+      "fine_cells_dec": [
+        "626742545717239807"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "C",
+      "source_feature_id": "53009 0011",
+      "polygon_sha256": "406d6a6c0081c707dea794a6c0b9368bf78defffae92e15343a5f1053c9756d2",
+      "area_m2": 1061.2,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P01",
+      "source_feature_id": "53010 0010",
+      "polygon_sha256": "f409f2bc8b6efb3dca7f31579f922520f19769bd7656bf02bb6a039a8d5feaad",
+      "area_m2": 1125.3,
+      "fine_cells": [
+        "8b2a30653198fff"
+      ],
+      "fine_cells_dec": [
+        "626742545717235711"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P02",
+      "source_feature_id": "53010 0011",
+      "polygon_sha256": "e13a6647cfe62f849a34cbc8d8205842d4bc0b787d6135f9560592ce28e86c6e",
+      "area_m2": 1114.3,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P03",
+      "source_feature_id": "53010 0009",
+      "polygon_sha256": "6603635149ebf48a97ae7979218b4534d2c2899385d60db03263d9c0e5868ed4",
+      "area_m2": 1010.1,
+      "fine_cells": [
+        "8b2a3065319dfff"
+      ],
+      "fine_cells_dec": [
+        "626742545717256191"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P04",
+      "source_feature_id": "53010 0005",
+      "polygon_sha256": "46fab4ab0cb64ad8bccdb32fe8a9e82f66a4ffd0ae03ceef77647f3991f6b08b",
+      "area_m2": 1333.1,
+      "fine_cells": [
+        "8b2a3065319cfff"
+      ],
+      "fine_cells_dec": [
+        "626742545717252095"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P05",
+      "source_feature_id": "53009 0009",
+      "polygon_sha256": "932c4e2fde888f7b25e36b7b415cdb885e30d0cc86b59a712d5c45e04c901a82",
+      "area_m2": 1346.3,
+      "fine_cells": [
+        "8b2a306530a6fff"
+      ],
+      "fine_cells_dec": [
+        "626742545716244479"
+      ],
+      "coarse_cells": [
+        "892a306530bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346461605887"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P06",
+      "source_feature_id": "53010 0004",
+      "polygon_sha256": "57b74e88c786762a218ce228a42d12615e446b7f0dfe0fdfadd386e7a5706032",
+      "area_m2": 1302.4,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P07",
+      "source_feature_id": "53010 0006",
+      "polygon_sha256": "c7423ced1ac866b995f913c7177f092c8a79924a39fef779a10728a51dc8edc4",
+      "area_m2": 1340.5,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P08",
+      "source_feature_id": "53010 0012",
+      "polygon_sha256": "fc177e95e5dbd08380cb2117f71cbcfb72f51a85c2e2c89ca38ac8014cb34c02",
+      "area_m2": 1121.7,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P09",
+      "source_feature_id": "53010 0003",
+      "polygon_sha256": "e468c1375cc75df7fb498c054fbc3bc0244a4e78503c456726daed5824a85be6",
+      "area_m2": 1330.0,
+      "fine_cells": [
+        "8b2a3065319efff"
+      ],
+      "fine_cells_dec": [
+        "626742545717260287"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P10",
+      "source_feature_id": "53010 0008",
+      "polygon_sha256": "1a745e5f744d0c6b33dfc3890acff27a286d9a7ca9eb4b82868b60dd2c9f948f",
+      "area_m2": 1502.5,
+      "fine_cells": [
+        "8b2a3065318afff"
+      ],
+      "fine_cells_dec": [
+        "626742545717178367"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P11",
+      "source_feature_id": "53009 0008",
+      "polygon_sha256": "a58b1e793ce2d3afd7d841f75dc5c8fbebd5916f4af4695a90ba462ffc857288",
+      "area_m2": 1530.5,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P12",
+      "source_feature_id": "53011 0002",
+      "polygon_sha256": "8af3accd2e8f9b474e2fbfb46a3d690c40f995bc4192649dc72b9c2d175a7635",
+      "area_m2": 1056.3,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P13",
+      "source_feature_id": "53011 0001",
+      "polygon_sha256": "a4963e03cd588d679219a68da70c5d685e87b2b4bf7e7147d258240d19b9c342",
+      "area_m2": 1246.0,
+      "fine_cells": [
+        "8b2a306530b4fff"
+      ],
+      "fine_cells_dec": [
+        "626742545716301823"
+      ],
+      "coarse_cells": [
+        "892a306530bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346461605887"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P14",
+      "source_feature_id": "53011 0003",
+      "polygon_sha256": "b06410838669de871adc71c57755192c1a78ba7b58c632edcdc217b718815d67",
+      "area_m2": 1101.9,
+      "fine_cells": [
+        "8b2a306530b5fff"
+      ],
+      "fine_cells_dec": [
+        "626742545716305919"
+      ],
+      "coarse_cells": [
+        "892a306530bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346461605887"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P15",
+      "source_feature_id": "53010 0007",
+      "polygon_sha256": "fd3774faa503a79acbcd33b0cc01eed04563eea9abfc29d1a8d7eb464ec24f39",
+      "area_m2": 1205.6,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P16",
+      "source_feature_id": "53009 0012",
+      "polygon_sha256": "cbee4e3c3e63dd8bc560ffd08dcebf008a0fea1318470e5c1db787c146cc383a",
+      "area_m2": 1450.6,
+      "fine_cells": [
+        "8b2a306530a4fff"
+      ],
+      "fine_cells_dec": [
+        "626742545716236287"
+      ],
+      "coarse_cells": [
+        "892a306530bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346461605887"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P17",
+      "source_feature_id": "53011 0004",
+      "polygon_sha256": "d8bdbcc9aff2cc5215c943eba7ee3185c4a695b638ae2bcf13a2effc869127e3",
+      "area_m2": 1205.4,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P18",
+      "source_feature_id": "53010 0002",
+      "polygon_sha256": "82463df43ddc1ab45a77a802662c7cd360afd5fb10fdfb734929b2355734c380",
+      "area_m2": 1375.4,
+      "fine_cells": [
+        "8b2a30653193fff"
+      ],
+      "fine_cells_dec": [
+        "626742545717215231"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P19",
+      "source_feature_id": "53010 0013",
+      "polygon_sha256": "7b219758a277b1630cb1f7f3df10e6223db07d1125af427d329f7314e3f3a651",
+      "area_m2": 1130.0,
+      "fine_cells": [
+        "8b2a3065356dfff"
+      ],
+      "fine_cells_dec": [
+        "626742545721253887"
+      ],
+      "coarse_cells": [
+        "892a3065357ffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346466586623"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P20",
+      "source_feature_id": "53009 0007",
+      "polygon_sha256": "aebf1dd2edbbf23ec0ed62d08e84a53cbb94f5ed176010daf6e6cb5594cddff4",
+      "area_m2": 1569.0,
+      "fine_cells": [
+        "8b2a306530a0fff"
+      ],
+      "fine_cells_dec": [
+        "626742545716219903"
+      ],
+      "coarse_cells": [
+        "892a306530bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346461605887"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P21",
+      "source_feature_id": "53011 0005",
+      "polygon_sha256": "2bf3ff5a707ff5a7a3ee28978ef276c98ff1bebd8109988e2f84ec45422d7024",
+      "area_m2": 1615.6,
+      "fine_cells": [
+        "8b2a306530a2fff"
+      ],
+      "fine_cells_dec": [
+        "626742545716228095"
+      ],
+      "coarse_cells": [
+        "892a306530bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346461605887"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P22",
+      "source_feature_id": "53005 0031",
+      "polygon_sha256": "cec204eeea315ac96a8fced77c987c5b1e8c52269384dee9f8864a6d8bf99305",
+      "area_m2": 1810.6,
+      "fine_cells": [
+        "8b2a30653191fff",
+        "8b2a30653195fff"
+      ],
+      "fine_cells_dec": [
+        "626742545717207039",
+        "626742545717223423"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 2,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P23",
+      "source_feature_id": "53005 0030",
+      "polygon_sha256": "098e9262919346c765c0459f4d2929174cd47be93b06652710500b67dd2be39c",
+      "area_m2": 1859.7,
+      "fine_cells": [
+        "8b2a30653182fff"
+      ],
+      "fine_cells_dec": [
+        "626742545717145599"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P24",
+      "source_feature_id": "53009 0013",
+      "polygon_sha256": "935a7ce6fe72bdee33f0bc1f0b20978a7c1040e6a1d4170a1d632218fa8e45fc",
+      "area_m2": 1589.3,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P25",
+      "source_feature_id": "53005 0032",
+      "polygon_sha256": "2041ee9776a188d205e4aa28e34d7cc3fa7eeea8b139f366da2f7b2802294fdb",
+      "area_m2": 1700.3,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P26",
+      "source_feature_id": "53005 0029",
+      "polygon_sha256": "b613798feb3b1818beafb5c2199a98c004bd965e9be4e2ae54e480046b914e46",
+      "area_m2": 2915.0,
+      "fine_cells": [
+        "8b2a30653186fff"
+      ],
+      "fine_cells_dec": [
+        "626742545717161983"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    },
+    {
+      "parcel_id": "P27",
+      "source_feature_id": "53011 0018",
+      "polygon_sha256": "16db8eccd985847edc6c382825efd347fd80e7795a711fd7947cd84071e22556",
+      "area_m2": 928.2,
+      "fine_cells": [],
+      "fine_cells_dec": [],
+      "coarse_cells": [],
+      "coarse_cells_dec": [],
+      "num_fine_cells": 0,
+      "fits_batch": false
+    },
+    {
+      "parcel_id": "P28",
+      "source_feature_id": "53005 0033",
+      "polygon_sha256": "5a4a2df360a5f3c2e1b675d1846e4c1bcef6aaa027c29d123e2a139dc5f41b65",
+      "area_m2": 1073.2,
+      "fine_cells": [
+        "8b2a30653190fff"
+      ],
+      "fine_cells_dec": [
+        "626742545717202943"
+      ],
+      "coarse_cells": [
+        "892a306531bffff"
+      ],
+      "coarse_cells_dec": [
+        "617735346462654463"
+      ],
+      "num_fine_cells": 1,
+      "fits_batch": true
+    }
+  ]
+}

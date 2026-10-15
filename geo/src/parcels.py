@@ -14,8 +14,15 @@ Fixtures (I2):
      with A or B: true neighbours must not collide
   P01.. every other sample parcel, for benchmarks
 
+Fixtures are always chosen at the frozen FINE_RES, so the same real parcels
+are A, B, C and P01.. in every output.
+
 Usage (from geo/):
     python src/parcels.py [--in data/raw/newton_sample.geojson] [--out out/parcels.json]
+
+    # Sprint 4 resolution comparison: same parcels, another fine resolution.
+    # Never overwrite out/parcels.json with this; it is the I2 interface file.
+    python src/parcels.py --fine-res 13 --out out/parcels_res13.json
 """
 import argparse
 import datetime
@@ -65,8 +72,8 @@ def shift_east(geom, metres):
     return mapping(affinity.translate(g, xoff=dlon))
 
 
-def parcel_record(parcel_id, source_feature_id, geom):
-    fine = polygon_cells(geom, FINE_RES, CELL_MODE)
+def parcel_record(parcel_id, source_feature_id, geom, fine_res=FINE_RES):
+    fine = polygon_cells(geom, fine_res, CELL_MODE)
     coarse = coarse_cells(fine, COARSE_RES)
     return {
         "parcel_id": parcel_id,
@@ -101,22 +108,22 @@ def pick_fixtures(feats):
     raise SystemExit("no A/C pair in the sample meets the fixture rules; widen the sample")
 
 
-def build(sample):
+def build(sample, fine_res=FINE_RES):
     feats = sample["features"]
     a, c = pick_fixtures(feats)
     a_id = a["properties"]["MAP_PAR_ID"]
     out = [
-        parcel_record("A", a_id, a["geometry"]),
-        parcel_record("B", f"{a_id}+shift{SHIFT_M:g}mE", shift_east(a["geometry"], SHIFT_M)),
-        parcel_record("C", c["properties"]["MAP_PAR_ID"], c["geometry"]),
+        parcel_record("A", a_id, a["geometry"], fine_res),
+        parcel_record("B", f"{a_id}+shift{SHIFT_M:g}mE", shift_east(a["geometry"], SHIFT_M), fine_res),
+        parcel_record("C", c["properties"]["MAP_PAR_ID"], c["geometry"], fine_res),
     ]
     rest = [f for f in feats if f is not a and f is not c]
     for i, f in enumerate(rest, 1):
-        out.append(parcel_record(f"P{i:02d}", f["properties"]["MAP_PAR_ID"], f["geometry"]))
+        out.append(parcel_record(f"P{i:02d}", f["properties"]["MAP_PAR_ID"], f["geometry"], fine_res))
     src = sample.get("source", {})
     return {
         "meta": {
-            "fine_res": FINE_RES,
+            "fine_res": fine_res,
             "coarse_res": COARSE_RES,
             "cell_mode": CELL_MODE,
             "max_cells": MAX_CELLS,
@@ -132,23 +139,27 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--in", dest="inp", type=pathlib.Path, default=DEFAULT_IN)
     ap.add_argument("--out", type=pathlib.Path, default=DEFAULT_OUT)
+    ap.add_argument("--fine-res", type=int, default=FINE_RES,
+                    help=f"fine H3 resolution (default {FINE_RES}, the frozen I1 value)")
     args = ap.parse_args()
+    if args.fine_res != FINE_RES and args.out.resolve() == DEFAULT_OUT.resolve():
+        sys.exit(f"--fine-res {args.fine_res} would overwrite the I2 file {DEFAULT_OUT}; pass --out")
 
     sample = json.loads(args.inp.read_text())
     print(f"read {len(sample['features'])} parcels from {args.inp}")
-    doc = build(sample)
+    doc = build(sample, args.fine_res)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(doc, indent=2) + "\n")
 
     ps = doc["parcels"]
     over = [p["parcel_id"] for p in ps if not p["fits_batch"]]
     counts = sorted(p["num_fine_cells"] for p in ps)
-    print(f"fixtures: A={ps[0]['source_feature_id']} ({ps[0]['num_fine_cells']} cells), "
+    print(f"fine_res {args.fine_res}. fixtures: A={ps[0]['source_feature_id']} ({ps[0]['num_fine_cells']} cells), "
           f"B=A shifted {SHIFT_M:g} m east ({ps[1]['num_fine_cells']} cells, "
           f"{len(set(ps[0]['fine_cells']) & set(ps[1]['fine_cells']))} shared with A), "
           f"C={ps[2]['source_feature_id']} ({ps[2]['num_fine_cells']} cells)")
     print(f"fine cells per parcel: median {counts[len(counts) // 2]}, max {counts[-1]}; "
-          f"fits_batch false: {over or 'none'}")
+          f"fit 1-{MAX_CELLS}: {len(ps) - len(over)}/{len(ps)}; fits_batch false: {over or 'none'}")
     print(f"wrote {args.out} ({len(ps)} parcels)")
 
 

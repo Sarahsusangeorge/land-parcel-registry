@@ -1,6 +1,6 @@
 # Invention Disclosure (IDF-B) Draft
 
-Version: 0.3 | Last updated: 2026-10-15 | Updated by: Sarah
+Version: 0.4 | Last updated: 2026-10-15 | Updated by: Sarah
 Inventors: (as agreed with mentor)
 
 ## 1. Title of the invention
@@ -75,16 +75,51 @@ Figs. 1 and 2 show the commitment with a salt, as specified in PLAN.md I1. The c
 Evidence logs: `patent/figures/logs/` (contract and geo test runs, gas report).
 
 ## 8. Experimental validation results
-<!-- Owner: Both | Sprint 4 | Status: Not started -->
+<!-- Owner: Both | Sprint 4 | Status: Draft (Sarah, 2026-10-15). Circuit numbers are provisional: they come from the circuit before the salt and active[0] fix and must be re-measured after it -->
 
-| Metric | Value | Source file |
+The prototype was validated on real parcel polygons from the City of Newton, Massachusetts (official municipal parcel layer, 24,102 parcels). A sample of 30 adjacent single-family parcels plus a synthetic re-registration (fixture B: parcel A shifted 5 m east) was registered end to end on a local Ethereum (Hardhat) chain with a real Groth16 verifier contract. Proofs were generated on a MacBook Pro M4 Pro with 24 GB RAM.
+
+### Overlap detection
+
+| Test | Result | Source |
 |---|---|---|
-| Constraint count | | bench/results/circuit.json |
-| Proving time (mean / max) | | bench/results/circuit.json |
-| Verification gas (mean) | | bench/results/gas.json |
-| Cells per parcel (median / max) | | bench/bench.md |
-| Overlap fixture B rejected | | demo log |
-| Real parcels registered without false overlap | | bench/bench.md |
+| Real parcels registered in sequence | 30 of 30 accepted, 0 errors | `bench/results/full_run.json` |
+| False overlaps between real neighbouring parcels | 0 | `bench/results/full_run.json` |
+| Re-registration of parcel A redrawn 5 m east (fixture B) | Rejected: 5 of its 6 cells already occupied by A; no valid proof can be produced | `patent/figures/logs/demo_run.txt`, Fig. 3 |
+| Neighbour C, sharing A's boundary, after A | Accepted, token 2 | `patent/figures/logs/demo_run.txt` |
+| Tampered public signal (new root or commitment changed) | Rejected by the contract (`InvalidProof`) | `contracts/test/registry.e2e.test.js` |
+| Replayed proof after the root moved | Rejected (`StaleRoot`) | `contracts/test/registry.e2e.test.js` |
+| Valid proof sent by an address without the registrar role | Rejected | `contracts/test/registry.e2e.test.js` |
+| Automated tests | 21 contract tests (8 with real proofs), 5 circuit tests, 25 geo tests passing | `patent/figures/logs/`, `registrar/test/circuit.test.js` |
+
+### Performance (provisional until the circuit fix)
+
+| Metric | Value | Source |
+|---|---|---|
+| Circuit size (N = 16 cells, tree depth 32) | 588,297 constraints | `bench/results/circuit_reg_prod.json` |
+| Proving time per parcel | mean 10,102 ms, max 10,846 ms (30 proofs) | `bench/results/full_run.json` |
+| Proof size | 719 bytes (JSON) | `bench/results/circuit_reg_prod.json` |
+| `registerParcel` gas, incl. on-chain proof verification | mean 415,942, max 448,564 (first registration), min 414,724 (30 registrations) | `bench/results/full_run.json`, `bench/results/gas.json` |
+| Proof verification alone | about 228,500 gas | `bench/results/gas.json` |
+
+### Grid resolution
+
+Share of parcels whose fine cells fit one proof (1 to 16 cells), centre rule:
+
+| H3 resolution | All 24,102 Newton parcels | 31-parcel test set | Median cells (test set) |
+|---|---|---|---|
+| 11 | 44.2% | 19 of 31 | 1 |
+| **12 (chosen)** | **95.9%** | **31 of 31** | **5** |
+| 13 | 37.2% | 0 of 31 | 30 |
+
+At resolution 12 no two real neighbouring parcels shared a cell across the whole city. Sources: `bench/results/cell_counts.json`, `geo/out/parcels*.json`.
+
+### Limitations observed
+
+- An overlap smaller than the spacing of cell centres (about 9.4 m at resolution 12) can go undetected.
+- 2.4% of Newton parcels need more than 16 cells and 1.7% are smaller than one cell; both are flagged and not registered in this prototype.
+- The registrar is trusted to certify that the polygon matches the land.
+- The trusted setup used a locally generated powers-of-tau file with one contributor.
 
 ## 9. Aspects of the invention that need protection
 <!-- Owner: Maneesh | Sprint 4 | Status: Not started -->
@@ -94,6 +129,7 @@ Evidence logs: `patent/figures/logs/` (contract and geo test runs, gas report).
 
 ## Changelog
 
+- 2026-10-15: Section 8 drafted from bench results; circuit numbers marked provisional (Sarah).
 - 2026-10-15: Section 3: US 2024/0202847 A1 claims read and row completed (Sarah).
 - 2026-10-15: Section 7 figures 1 to 3 added (Sarah).
 - 2026-10-14: Section 3 extended (ZKLP, ISPRS 2025) and search status recorded; Section 5 drafted (Sarah).

@@ -459,7 +459,7 @@ Maneesh lane
 - [x] Constraint count from `snarkjs r1cs info` (588,297)
 - [x] Proving time: mean and max over 5 runs for 3 parcels of different sizes. Note CPU and RAM. (measured as one run per parcel over all 31 parcels instead: mean 10,102 ms, max 10,846 ms, M4 Pro, 24 GB)
 - [x] Proof size and verification key size (719 bytes, 3.2 KB)
-- [ ] Resolution comparison: regenerate cells at two fine resolutions (from Sarah), report cells per parcel and how many parcels fit N = 16
+- [ ] Resolution comparison: regenerate cells at two fine resolutions (from Sarah), report cells per parcel and how many parcels fit N = 16 (Sarah's part done: `geo/out/parcels_res11.json` and `parcels_res13.json`, same parcels; fit N = 16: res 11 19/31, res 12 31/31, res 13 0/31)
 - [ ] Write results to `bench/results/circuit.json` and summarize in `bench/bench.md`
 
 Sarah lane
@@ -598,6 +598,7 @@ Append new rows at the top. A decision that changes an interface needs both name
 
 | Date | Who | What changed |
 |---|---|---|
+| 2026-10-15 | Sarah | `parcels.py --fine-res` for the resolution comparison (res 11 and 13 files); IDF-B Section 8 drafted, circuit numbers provisional |
 | 2026-10-15 | Sarah | Sprint 4: IDF-B Figs. 1 to 3, `gas_bench.js` and `bench/results/gas.json`, evidence logs, README reproduction table, limitations in `bench.md` |
 | 2026-10-15 | Sarah | Merged `maneesh/s3-registrar` into `main`: folded Maneesh's Sprint 3 checklist and TRL 4 checklist into this file |
 | 2026-10-14 | Maneesh | Sprint 4: full real-parcel run (30/31 registered, B the only overlap), `bench.md` full-run section, evidence logs. Prove ms mean 10,102 / max 10,846; gas mean 415,942 / max 448,564 |
