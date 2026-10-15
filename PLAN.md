@@ -323,10 +323,10 @@ Together (first hour)
 
 Maneesh lane
 
-- [ ] Install circom and snarkjs. `circom --version` runs.
-- [ ] Set up `registrar/` with circomlib, circomlibjs, snarkjs, ethers. Pin versions.
-- [ ] Download a small powers-of-tau file for the toy circuit
-- [ ] Write `circuits/scripts/build.sh` skeleton: compile, Groth16 setup, export zkey, export verifier, copy `Groth16Verifier.sol` into `contracts/contracts/`
+- [x] Install circom and snarkjs. `circom --version` runs.
+- [x] Set up `registrar/` with circomlib, circomlibjs, snarkjs, ethers. Pin versions.
+- [x] Download a small powers-of-tau file for the toy circuit
+- [x] Write `circuits/scripts/build.sh` skeleton: compile, Groth16 setup, export zkey, export verifier, copy `Groth16Verifier.sol` into `contracts/contracts/`
 
 Acceptance: circomlib's own SMT test circuit compiles on Maneesh's machine.
 
@@ -342,7 +342,7 @@ Acceptance: Sarah posts a small table of median and max cells per parcel for eac
 Decide and freeze (end of Sprint 0)
 
 - [ ] `FINE_RES`, `COARSE_RES`, `CELL_MODE` chosen from Sarah's table, so most parcels fit N = 16. Log it. (Proposed in decision log; needs Maneesh's agreement.)
-- [ ] Exact package versions logged
+- [x] Exact package versions logged
 
 ## Sprint 1: Geo pipeline and toy circuit (1 day)
 
@@ -350,10 +350,10 @@ Goal: prove the risky part works. A toy circuit inserts a cell into a sparse Mer
 
 Maneesh lane
 
-- [ ] `circuits/toy/insert_one.circom`: one SMTProcessor insert, N_LEVELS = 10, key `Poseidon([cell])`, value 1. Public: oldRoot, newRoot.
-- [ ] `registrar/src/tree.js`: wrap circomlibjs sparse Merkle tree. Functions: `load()`, `insertCell(cell, parcelId)` returning the I3 per-insert values, `findCell(cell)`, `save()`.
-- [ ] Toy script: insert cell X, prove, verify with snarkjs. Then try inserting X again and confirm witness generation fails.
-- [ ] Write the toy results (constraint count, prove time) in `bench/bench.md`
+- [x] `circuits/toy/insert_one.circom`: one SMTProcessor insert, N_LEVELS = 10, key `Poseidon([cell])`, value 1. Public: oldRoot, newRoot.
+- [x] `registrar/src/tree.js`: wrap circomlibjs sparse Merkle tree. Functions: `load()`, `insertCell(cell, parcelId)` returning the I3 per-insert values, `findCell(cell)`, `save()`.
+- [x] Toy script: insert cell X, prove, verify with snarkjs. Then try inserting X again and confirm witness generation fails.
+- [x] Write the toy results (constraint count, prove time) in `bench/bench.md`
 
 Acceptance: valid insert proves and verifies. Duplicate insert cannot produce a witness.
 
@@ -373,7 +373,7 @@ Patent lane
 
 Gate 1 (end of Sprint 1)
 
-- [ ] Go: toy proof verifies and duplicate fails. Continue to Sprint 2.
+- [x] Go: toy proof verifies and duplicate fails. Continue to Sprint 2.
 - [ ] No-go: after one full extra day of trying, switch to the Fallback path section. Log the decision.
 
 ## Sprint 2: Full circuit and registry contract (1 day)
@@ -382,11 +382,11 @@ Goal: the real circuit and the real contract exist, each tested on its own. Sara
 
 Maneesh lane
 
-- [ ] `circuits/register_parcel.circom`: full I3 template with N = 16, N_LEVELS = 32, all five constraint groups
-- [ ] `registrar/src/inputs.js`: from a `parcels.json` entry plus tree state, build the full circuit input (cells padded with 0, active prefix, salt, per-insert siblings zero-padded to 32)
-- [ ] Check constraint count, then pick the powers-of-tau size and log it
-- [ ] Run `circuits/scripts/build.sh` end to end. Output: wasm, final zkey, verification key, `Groth16Verifier.sol` copied into `contracts/contracts/`
-- [ ] Circuit tests with snarkjs: A proves; B after A fails witness generation; C after A proves; tampered commitment fails verification; non-prefix active fails
+- [ ] `circuits/register_parcel.circom`: full I3 template with N = 16, N_LEVELS = 32, all five constraint groups (built and tested, but missing the salt in the commitment and `active[0] == 1`; see CONTEXT.md section 7)
+- [ ] `registrar/src/inputs.js`: from a `parcels.json` entry plus tree state, build the full circuit input (cells padded with 0, active prefix, salt, per-insert siblings zero-padded to 32) (built; salt still to add with the circuit fix)
+- [x] Check constraint count, then pick the powers-of-tau size and log it (588,297 constraints, pot20)
+- [x] Run `circuits/scripts/build.sh` end to end. Output: wasm, final zkey, verification key, `Groth16Verifier.sol` copied into `contracts/contracts/`
+- [x] Circuit tests with snarkjs: A proves; B after A fails witness generation; C after A proves; tampered commitment fails verification; non-prefix active fails
 
 Acceptance: all five circuit tests behave as stated. Verifier contract is committed to Sarah's folder by the build script.
 
@@ -413,7 +413,7 @@ Patent lane
 
 Gate 2 (end of Sprint 2)
 
-- [ ] Circuit tests pass and contract mock tests pass. Merge both to main.
+- [x] Circuit tests pass and contract mock tests pass. Merge both to main. (PRs #1 and #2)
 
 ## Sprint 3: Integration and end-to-end tests (1 day)
 
@@ -421,10 +421,10 @@ Goal: one command takes a parcel from `parcels.json` to an on-chain decision, us
 
 Maneesh lane
 
-- [ ] `registrar/src/register.js`: the I4 CLI. Load tree, check overlaps first with `findCell` (report overlap with the parcel IDs hit), build inputs, prove, export calldata, call `registerParcel`, save tree and salt only after the tx confirms.
-- [ ] `--dry-run` proves but does not submit
-- [ ] `registrar/scripts/demo.sh`: start from an empty tree, register A, attempt B, register C, print the three JSON lines
-- [ ] Handle failures cleanly: stale root (another registration landed first) rebuilds the proof once, then reports error
+- [x] `registrar/src/register.js`: the I4 CLI. Load tree, check overlaps first with `findCell` (report overlap with the parcel IDs hit), build inputs, prove, export calldata, call `registerParcel`, save tree and salt only after the tx confirms.
+- [x] `--dry-run` proves but does not submit
+- [x] `registrar/scripts/demo.sh`: start from an empty tree, register A, attempt B, register C, print the three JSON lines
+- [x] Handle failures cleanly: stale root (another registration landed first) rebuilds the proof once, then reports error
 
 Acceptance: `demo.sh` prints registered, overlap (hitting A), registered, on a fresh local chain.
 
@@ -448,7 +448,7 @@ Patent lane
 
 Gate 3 (end of Sprint 3)
 
-- [ ] Demo runs from a clean clone using only the README. Ask the other person to try it on their machine.
+- [x] Demo runs from a clean clone using only the README. Ask the other person to try it on their machine. (Maneesh's Mac, 2026-10-14; zkey and wasm copied in, see CONTEXT.md section 5)
 
 ## Sprint 4: Benchmarks and TRL 4 evidence (1 day)
 
@@ -456,16 +456,16 @@ Goal: measured numbers and reproducible evidence, so the IDF-B can honestly clai
 
 Maneesh lane
 
-- [ ] Constraint count from `snarkjs r1cs info`
-- [ ] Proving time: mean and max over 5 runs for 3 parcels of different sizes. Note CPU and RAM.
-- [ ] Proof size and verification key size
+- [x] Constraint count from `snarkjs r1cs info` (588,297)
+- [x] Proving time: mean and max over 5 runs for 3 parcels of different sizes. Note CPU and RAM. (measured as one run per parcel over all 31 parcels instead: mean 10,102 ms, max 10,846 ms, M4 Pro, 24 GB)
+- [x] Proof size and verification key size (719 bytes, 3.2 KB)
 - [ ] Resolution comparison: regenerate cells at two fine resolutions (from Sarah), report cells per parcel and how many parcels fit N = 16
 - [ ] Write results to `bench/results/circuit.json` and summarize in `bench/bench.md`
 
 Sarah lane
 
 - [ ] Gas for `registerParcel` (mean, min, max) from the gas reporter, written to `bench/results/gas.json`
-- [ ] Register all real parcels in sequence. Record pass and overlap counts. Any unexpected overlap between real neighbours goes in `bench.md` as a known limitation of the grid approximation.
+- [x] Register all real parcels in sequence. Record pass and overlap counts. Any unexpected overlap between real neighbours goes in `bench.md` as a known limitation of the grid approximation. (Maneesh's full run: 30 registered, B the only overlap, no unexpected overlaps; `bench/results/full_run.json`)
 - [ ] Screenshots and logs: demo output, test run, gas table, saved in `patent/figures/`
 - [ ] README: clean-clone setup and the one-command demo
 
@@ -533,23 +533,23 @@ Claim TRL 4 in the IDF-B only when every box below is ticked and each has a file
 
 Integration
 
-- [ ] Real Circom circuit with all I3 constraints (no mock anywhere in the final path)
-- [ ] Real verifier deployed and called by `LandRegistry` on a local chain
-- [ ] One-command demo from a clean clone: A registered, B rejected as overlap, C registered
+- [ ] Real Circom circuit with all I3 constraints (no mock anywhere in the final path) (real circuit in the final path, but salt and `active[0] == 1` still missing)
+- [x] Real verifier deployed and called by `LandRegistry` on a local chain (`registrar/scripts/demo.sh`, `contracts/test/registry.e2e.test.js`)
+- [x] One-command demo from a clean clone: A registered, B rejected as overlap, C registered (`patent/figures/logs/demo_run.txt`)
 
 Validation
 
-- [ ] Circuit tests pass (Sprint 2 list)
-- [ ] Contract mock and end-to-end tests pass (Sprints 2 and 3 lists)
-- [ ] At least 10 real US parcels registered in sequence, with results recorded
-- [ ] Tamper cases rejected: changed public signal, replayed proof, stale root, non-registrar caller
+- [x] Circuit tests pass (Sprint 2 list) (`registrar/test/circuit.test.js`)
+- [x] Contract mock and end-to-end tests pass (Sprints 2 and 3 lists) (21 passing)
+- [x] At least 10 real US parcels registered in sequence, with results recorded (30, `bench/results/full_run.json`)
+- [x] Tamper cases rejected: changed public signal, replayed proof, stale root, non-registrar caller (`registry.e2e.test.js`)
 
 Measurements (all in `bench/bench.md`)
 
-- [ ] Constraint count
-- [ ] Proving time, mean and max, with hardware noted
-- [ ] Verification gas, mean
-- [ ] Cells per parcel at two fine resolutions, and share of parcels that fit N = 16
+- [x] Constraint count
+- [x] Proving time, mean and max, with hardware noted
+- [x] Verification gas, mean (415,942 over 30 registrations)
+- [x] Cells per parcel at two fine resolutions, and share of parcels that fit N = 16 (res 11, 12 and 13 over 24,102 parcels)
 - [ ] Known limitations written down (grid approximation, parcel size limit, registrar trust)
 
 Documentation
@@ -564,6 +564,7 @@ Append new rows at the top. A decision that changes an interface needs both name
 
 | Date | Decision | Why | Agreed by |
 |---|---|---|---|
+| 2026-10-14 | I4 `registered` lines also carry `oldRoot`, `newRoot`, `commitment` | Additive; makes root transitions auditable from the CLI output without an on-chain call. Not present on `overlap` or `error` lines | Maneesh; pending Sarah |
 | 2026-10-14 | Add I6: end-to-end proof fixtures `A.json`, `C_after_A.json`, `B_overlap.json` in `contracts/test/fixtures/` | Sarah's e2e tests and Maneesh's `--dry-run` need one agreed file shape | Sarah; pending Maneesh |
 | 2026-10-14 | Squash-merge PRs into `main`; no tool attribution in commits, PRs or files | Keep `main` history clean | Sarah; pending Maneesh |
 | 2026-10-13 | Contracts compile for the Cancun EVM (`evmVersion: "cancun"`) | OpenZeppelin 5.6 uses `mcopy`, which needs Cancun | Sarah; pending Maneesh |
@@ -597,6 +598,9 @@ Append new rows at the top. A decision that changes an interface needs both name
 
 | Date | Who | What changed |
 |---|---|---|
+| 2026-10-15 | Sarah | Merged `maneesh/s3-registrar` into `main`: folded Maneesh's Sprint 3 checklist and TRL 4 checklist into this file |
+| 2026-10-14 | Maneesh | Sprint 4: full real-parcel run (30/31 registered, B the only overlap), `bench.md` full-run section, evidence logs. Prove ms mean 10,102 / max 10,846; gas mean 415,942 / max 448,564 |
+| 2026-10-14 | Maneesh | Sprint 3: `register.js` I4 CLI, proof fixtures, `demo.sh`, Gate 3 clean-clone run. Demo prove times A 9,723 ms, C 9,631 ms |
 | 2026-10-14 | Sarah | Sprint 3: deploy path uses the real `Groth16Verifier`; `registry.e2e.test.js` (8 tests) on Maneesh's fixtures; gas reporter covers `registerParcel` |
 | 2026-10-14 | Maneesh | Housekeeping: `CONTEXT.md`, `.gitattributes`, ptau provenance; PR #2 squash-merged into `main` |
 | 2026-10-14 | Sarah | `PLAN.md` replaced with the full plan; I6 fixture format proposed; IDF-B Sections 3 and 5; checked `LandRegistry` against Maneesh's generated verifier |

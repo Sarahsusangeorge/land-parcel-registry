@@ -2,7 +2,7 @@
 
 Read this first, then PLAN.md. This file says where the project is right now. PLAN.md says what the project is and how it is built.
 
-Last updated: 2026-10-14, by Sarah (Sprint 3 contracts lane: real verifier deploy, e2e tests)
+Last updated: 2026-10-15, by Sarah (merged `maneesh/s3-registrar` into `main`; Sarah lane status)
 
 ---
 
@@ -51,8 +51,8 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
 - Sprint 0: repo skeleton, geo and contracts setup, cell-count script (`957d2c9`)
 - Sprint 1: geo pipeline, Newton parcels, fixtures A/B/C, `geo/out/parcels.json` per I2 (`0f0bb36`, `2214fad`)
 - Sprint 2: `LandRegistry.sol` per I5, `MockVerifier.sol`, 13 mock tests passing, deploy script (`76c584d`)
-- Sprint 2 finish (branch `sarah/s2-finish`, PR #1): full `PLAN.md`, I6 fixture format, IDF-B Section 3 extended, Section 5 drafted
-- Sprint 3 (branch `sarah/s3-e2e`, stacked on `sarah/s2-finish`): `deploy.js` deploys the real `Groth16Verifier` and grants `REGISTRAR_ROLE` to the deployer; `registry.e2e.test.js` with Maneesh's fixtures, 8 tests passing (21 with the mock suite); gas reporter covers `registerParcel`
+- Sprint 2 finish (PR #1): full `PLAN.md`, I6 fixture format, IDF-B Section 3 extended, Section 5 drafted
+- Sprint 3 (`ab52163`, on `main`): `deploy.js` deploys the real `Groth16Verifier` and grants `REGISTRAR_ROLE` to the deployer; `registry.e2e.test.js` with Maneesh's fixtures, 8 tests passing (21 with the mock suite); gas reporter covers `registerParcel`
 - Measured with the real verifier: `registerParcel` 448,564 gas (A, empty tree) and 415,048 gas (C after A); `verifyProof` alone about 228,500
 - Patent: IDF-B Section 3 first pass
 
@@ -62,16 +62,18 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
 - Sprint 2: `circuits/register_parcel.circom` (N=16, N_LEVELS=32), `circuits/register_parcel_dev.circom` (N=8, N_LEVELS=16), `registrar/src/inputs.js`, 5 circuit tests passing (`e369d49`)
 - Follow-up: constraint check, leftover processes killed, Sarah's 13 tests confirmed still passing, dev circuit decision logged (`85de2e6`)
   - Sprint 2 follow-up: production circuit built, Groth16Verifier.sol exported from the production zkey, 5/5 circuit tests and 13/13 contract tests pass, pushed (`1a47f53`)
+  - Sprint 3: `registrar/src/register.js` (I4 CLI), proof fixtures A/B/C, `demo.sh`. All three Sprint 3 Maneesh tasks done (`b793a88`, `f317ee2`).
+  - Sprint 4: full real-parcel run (`registrar/scripts/full_run.sh/js`), `bench/results/full_run.json`, `bench/bench.md` full-run section, `patent/figures/logs/` evidence logs, TRL 4 checklist in PLAN.md (`dbfc469`, `752d656`, `c4a9eb4`).
 
 ### In progress
 
-Nothing running. Sprint 2 closed for Maneesh. Next: Sprint 3 (register.js and proof fixtures).
+Nothing running. Sprint 4 Maneesh benchmarks complete. IDF-B sections next.
 
 ### Not started
 
-- Sprint 3 and Sprint 4 for both lanes
-- IDF-B Sections 1, 2, 4, 6 (Maneesh), 7 to 10 (both)
-- PR from `maneesh/s0-setup` into `main`
+- IDF-B Sections 1, 2, 4, 6 (Maneesh), 7 text to 10 (both)
+- README with reproduction steps and TRL 4 claim
+- Circuit fixes to meet I1/I3 (see section 7), then rerun proofs, fixtures and benchmarks
 
 ---
 
@@ -98,28 +100,40 @@ Read these before touching circuits, proofs or the verifier.
 | ptau provenance — pot19 | Locally generated (powersoftau new bn128 19 + contribute + prepare phase2). Not a public ceremony. Dev/test only. Confirmed: `pot19_0000.ptau` and `pot19_final.ptau` intermediates are present in `circuits/build/`. |
 | ptau provenance — pot20 | Locally generated (powersoftau new bn128 20 + contribute + prepare phase2). Not a public ceremony. Fine for TRL 4 prototype; must be replaced before any public or production use. Confirmed: `pot20_0000.ptau` and `pot20_final.ptau` intermediates are present in `circuits/build/ptau/`. |
 | Geo settings | FINE_RES 12, CELL_MODE center (from Sarah's bench). 95.9% of 24,102 Newton parcels fit 1–16 cells, zero neighbour collisions. Fixture C touches A but shares no cells. |
+| snarkjs process exit | snarkjs holds a background timer that prevents Node.js from exiting naturally. All scripts that call snarkjs.groth16.fullProve must end with `process.exit(0)` (or `.then(() => process.exit(0))`). |
+| Demo prove times | A: 9,723 ms, C: 9,631 ms (single uncontested run, M4 Pro, no competing node processes). |
+| I4 key names | register.js output uses `overlaps`, `tx_hash`, `token_id`, `prove_ms` (I4 frozen spec). Extra fields `oldRoot`, `newRoot`, `commitment` are present on `registered` lines; decision log in PLAN.md. |
+| Gate 3 clean-clone | Passed 2026-10-14. Clone from origin, checkout maneesh/s3-registrar, `npm ci` in registrar/ and contracts/, copy zkey/wasm/vkey from working machine, `bash registrar/scripts/demo.sh` → registered / overlap / registered ✓ (A 9800 ms, C 9848 ms). |
+| Full real-parcel run | 31 parcels, 30 registered, 1 overlap (B only). Prove ms: mean 10,102, max 10,846, min 9,760. Gas (real verifier): mean 415,942, max 448,564, min 414,724. No unintended overlaps. Raw: `bench/results/full_run.json`. |
+| Patent evidence logs | `patent/figures/logs/demo_run.txt` (demo re-run), `patent/figures/logs/full_run.txt` (full 31-parcel run). Plain-text stdout+stderr captures. |
 
 ---
 
 ## 6. Next tasks
 
-### Maneesh (Sprint 3)
+### Maneesh (Sprint 3) — DONE
 
-1. Confirm the production build finished and committed. Production `Groth16Verifier.sol` in `contracts/contracts/`.
-2. Push `maneesh/s0-setup`, open a PR into `main`, tell Sarah.
-3. `registrar/src/register.js`: the I4 CLI. Load tree, check overlap with `findCell` first, build inputs, prove, export calldata, call `registerParcel`, save tree and salt only after the tx confirms.
-4. `--dry-run`: prove without submitting. Use it to generate proof fixtures for A (valid), B (expected overlap) and C (valid after A). Commit them to `contracts/test/fixtures/`.
-5. `registrar/scripts/demo.sh`: fresh tree, register A, attempt B, register C. Expected output: `registered`, `overlap` (hitting A), `registered`.
-6. Stale root handling: rebuild the proof once, then report `error`.
+- [x] `registrar/src/register.js` (I4 CLI): overlap check, prove, tx submit, StaleRoot rebuild, save after confirm
+- [x] `--dry-run` mode; proof fixtures A.json, C_after_A.json, B_overlap.json committed to `contracts/test/fixtures/`
+- [x] `registrar/scripts/demo.sh`: registered / overlap (A) / registered ✓
+- [x] StaleRoot handling in register.js
+
+### Maneesh (Sprint 4) — benchmarks DONE
+
+- [x] Full real-parcel run: 30 registered, 1 overlap (B). `bench/results/full_run.json`
+- [x] `bench/bench.md` "Full real-parcel run" section with counts, prove ms, gas stats
+- [x] Patent evidence logs: `patent/figures/logs/demo_run.txt`, `patent/figures/logs/full_run.txt`
+- [x] TRL 4 checklist in `PLAN.md` — all evidenced items ticked, 6 remaining listed
+- [ ] IDF-B Sections 1, 2, 4, 6
 
 ### Sarah (Sprint 3)
 
 1. ~~Switch the deploy path to the real `Groth16Verifier`.~~ Done.
 2. ~~`contracts/test/registry.e2e.test.js` using Maneesh's fixtures.~~ Done, 8 tests.
 3. ~~Gas reporter on for `registerParcel`.~~ Done.
-4. IDF-B Section 7 figures in `patent/figures/`.
+4. IDF-B Section 7 figures in `patent/figures/` (Sprint 4 branch `sarah/s4-evidence`).
 5. Finish IDF-B Section 3: read the claims of US20240202847A1.
-6. When Maneesh regenerates the verifier and fixtures after the circuit fixes (salt in the commitment, `active[0] == 1`), pull the new fixtures and rerun the e2e tests. Nothing in the tests should need to change.
+6. When Maneesh regenerates the verifier and fixtures after the circuit fixes, pull the new fixtures and rerun the e2e tests. Nothing in the tests should need to change.
 
 ### Both (Sprint 4, after Gate 3)
 
@@ -129,6 +143,7 @@ Benchmarks, register all real parcels, screenshots and logs, README, IDF-B Secti
 
 ## 7. Open items
 
+- [ ] **Circuit does not yet meet I1/I3** (found in review, 2026-10-14): the commitment is `Poseidon(cells)` with no salt (I1 needs `Poseidon([Poseidon(cells), salt])`), and nothing forces `active[0] == 1`, so an all-empty parcel would prove and mint. Fix in `register_parcel.circom` and `inputs.js`, regenerate zkey and `Groth16Verifier.sol`, regenerate fixtures, rerun the full run. Do not claim TRL 4 in the IDF-B until this is done. Public signals stay `[oldRoot, newRoot, commitment]`.
 - [ ] Agree the four decision log rows still marked "Pending" in PLAN.md (tree key, cell mode, N and N_LEVELS, registrar holds cells).
 - [x] Add `.gitattributes` so Windows line endings do not break scripts.
 - [x] `NOTES-FOR-MANEESH.md` untracked from git and added to `.gitignore`. Local file kept.
