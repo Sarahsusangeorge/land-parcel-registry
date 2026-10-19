@@ -137,7 +137,7 @@ The ZK proof guarantees that the public signals are consistent with a valid witn
 
 ### Figures
 
-Figures to be added by Sarah (Sprint 3 task 4): system architecture diagram, registration flow diagram, SMT root chain diagram.
+See `patent/figures/architecture.mmd` (system architecture), `patent/figures/registration_flow.mmd` (registration sequence from parcel polygon to NFT mint), and `patent/figures/overlap_rejection.mmd` (parcel A registered, B rejected for overlap, C registered on A's root).
 
 ## 8. Experimental validation results
 <!-- Owner: Both | Sprint 4 | Status: Draft, needs Sarah review -->

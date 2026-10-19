@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant REG as Registrar
+    participant SMT as Sparse Merkle Tree
+    participant CONTRACT as LandRegistry.sol
+
+    Note over REG,CONTRACT: Parcel A registered first
+    REG->>SMT: insertCell(cells_A)
+    SMT-->>REG: witnesses, newRoot_A
+    REG->>CONTRACT: registerParcel(proof_A, [0, newRoot_A, commit_A])
+    CONTRACT-->>REG: token 1 minted, root = newRoot_A
+
+    Note over REG,SMT: Parcel B attempted (overlaps A)
+    REG->>SMT: findCell(cells_B)
+    SMT-->>REG: overlap detected (cell shared with A)
+    REG-->>REG: status = overlap, stop (no proof generated)
+
+    Note over REG,CONTRACT: Parcel C registered (no overlap with A)
+    REG->>SMT: insertCell(cells_C)
+    SMT-->>REG: witnesses, newRoot_C
+    REG->>CONTRACT: registerParcel(proof_C, [newRoot_A, newRoot_C, commit_C])
+    CONTRACT-->>REG: token 2 minted, root = newRoot_C
