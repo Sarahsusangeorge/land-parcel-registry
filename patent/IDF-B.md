@@ -57,7 +57,25 @@ The novelty is that this insert-based check is done inside a Groth16 zero-knowle
 This is the first system, to our knowledge, that combines H3 grid-cell decomposition, a sparse Merkle insert proof, a Groth16 ZK circuit, and an on-chain Solidity verifier to enforce physical non-overlap without publishing parcel geometry.
 
 ## 5. Objectives
-<!-- Owner: Sarah | Sprint 2 | Status: Not started -->
+<!-- Owner: Sarah | Sprint 2 | Status: Draft, needs Sarah review -->
+
+The primary objective of this work is to prevent the same physical land from being
+tokenized more than once on a blockchain-based land registry.
+
+Specifically, the system aims to:
+
+1. Enforce physical non-overlap automatically: any attempt to register a parcel whose
+   H3 grid cells overlap with an already-registered parcel is rejected by the smart
+   contract, without human review.
+2. Keep exact parcel boundaries private: the fine H3 cells that define a parcel's
+   spatial extent are never published on-chain or in the proof. Only a salted
+   Poseidon commitment and coarse parent cells at resolution 9 appear on-chain.
+3. Enforce non-overlap through the smart contract alone: the contract verifies a
+   Groth16 zero-knowledge proof and a Merkle root transition without relying on a
+   trusted off-chain oracle or administrator to confirm non-overlap.
+4. Demonstrate the approach on real parcel data: the prototype processes parcels from
+   the City of Newton, MA cadastral dataset, achieving 95.9% fit rate at H3 resolution
+   12 with zero neighbour collisions among real parcel boundaries.
 
 ## 6. Working principle
 <!-- Owner: Maneesh | Sprint 2 | Status: Draft, needs Maneesh review -->
