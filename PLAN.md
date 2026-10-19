@@ -184,7 +184,7 @@ claims (non-overlap enforcement) on real data, with measured performance.
 
 ### Still missing (as of 2026-10-15)
 
-- [x] E2E contract tests with real proof fixtures: `contracts/test/registry.e2e.test.js` — 7 tests pass (Step 3)
+- [x] E2E contract tests with real proof fixtures: `contracts/test/registry.e2e.test.js` -- 7 tests pass (Step 3)
 - [x] Gas reporter on `registerParcel` with real verifier in test suite (`REPORT_GAS=true npx hardhat test`)
 - [x] IDF-B Section 5 drafted (Step 4), Section 8 filled from bench data (Step 5)
 - [ ] README updated with reproduction steps and TRL 4 claim
