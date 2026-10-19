@@ -140,18 +140,67 @@ The ZK proof guarantees that the public signals are consistent with a valid witn
 Figures to be added by Sarah (Sprint 3 task 4): system architecture diagram, registration flow diagram, SMT root chain diagram.
 
 ## 8. Experimental validation results
-<!-- Owner: Both | Sprint 4 | Status: Not started -->
+<!-- Owner: Both | Sprint 4 | Status: Draft, needs Sarah review -->
 
-| Metric | Value | Source file |
+All measurements were taken on a MacBook Pro M4 Pro, 24 GB RAM, macOS.
+The powers-of-tau files (pot19 and pot20) were generated locally by one contributor
+(Maneesh) using `snarkjs powersoftau new` + `contribute` + `prepare phase2`. This is
+acceptable for a TRL 4 lab prototype; a public multi-party ceremony file is required
+before any deployment beyond a lab context.
+
+### Circuit and proving
+
+| Metric | Value | Source |
 |---|---|---|
-| Constraint count (post-fix) | 588,814 | bench/bench.md |
-| Proving time (mean / max, 31-parcel run, M4 Pro) | 10,104 ms / 10,482 ms | bench/results/full_run.json |
-| registerParcel gas, real verifier (mean / max) | 415,944 / 448,564 | bench/results/full_run.json |
-| Cells per parcel — median / max (res 12, center, Newton) | 3 / 10 (sample); 3 / 1,868 (full 24k) | bench/bench.md |
-| Overlap fixture B rejected | yes | patent/figures/logs/demo_run.txt |
-| Real parcels registered without false overlap | 30/30 (B is synthetic) | bench/results/full_run.json |
-| Circuit tests passing | 7/7 | registrar/test/circuit.test.js |
-| Contract tests passing (mock verifier) | 13/13 | contracts/test/registry.test.js |
+| Constraint count (production circuit, post-fix) | 588,814 | bench/bench.md |
+| Required trusted setup | pot20 (2^20 = 1,048,576 constraints capacity) | bench/bench.md |
+| Groth16 setup time | 42 s | bench/bench.md |
+| Prove time -- mean (31-parcel run, M4 Pro) | 10,104 ms | bench/results/full_run.json |
+| Prove time -- max (31-parcel run, M4 Pro) | 10,482 ms | bench/results/full_run.json |
+| Prove time -- min (31-parcel run, M4 Pro) | 9,950 ms | bench/results/full_run.json |
+| Proof size (JSON) | 719 bytes | bench/bench.md |
+| zkey size | 268.7 MB | CONTEXT.md |
+
+### Smart contract gas (real Groth16Verifier)
+
+| Metric | Value | Source |
+|---|---|---|
+| registerParcel gas -- mean | 415,944 | bench/results/full_run.json |
+| registerParcel gas -- max | 448,564 | bench/results/full_run.json |
+| registerParcel gas -- min | 414,700 | bench/results/full_run.json |
+
+Note: A's gas is higher (448,564) because it is the first registration and the SMT root
+transition from 0 writes a cold storage slot.
+
+### Geo pipeline (City of Newton, MA -- 24,102 parcels)
+
+| Metric | Value | Source |
+|---|---|---|
+| Resolution | 12 (fine), 9 (coarse) | bench/bench.md |
+| Mode | center | bench/bench.md |
+| Cells per parcel -- median | 3 | bench/bench.md |
+| Cells per parcel -- max | 1,868 | bench/bench.md |
+| Fit rate (1-16 cells per parcel) | 95.9% (23,105 of 24,102) | bench/bench.md |
+| Neighbour collisions | 0 | bench/bench.md |
+
+### Full real-parcel run
+
+| Metric | Value | Source |
+|---|---|---|
+| Total parcels | 31 (30 real Newton + fixture B) | bench/results/full_run.json |
+| Registered | 30 | bench/results/full_run.json |
+| Overlap rejections | 1 (fixture B, overlaps A as designed) | bench/results/full_run.json |
+| Errors | 0 | bench/results/full_run.json |
+| Unintended overlaps among real parcels | 0 | bench/results/full_run.json |
+
+### Test results
+
+| Suite | Result | File |
+|---|---|---|
+| Circuit tests (dev zkey, 7 tests) | 7/7 pass | registrar/test/circuit.test.js |
+| Contract tests -- mock verifier (13 tests) | 13/13 pass | contracts/test/registry.mock.test.js |
+| Contract tests -- real Groth16Verifier, real proofs (7 tests) | 7/7 pass | contracts/test/registry.e2e.test.js |
+| Clean-clone demo (Gate 3) | Pass (2026-10-14) | CONTEXT.md |
 
 ## 9. Aspects of the invention that need protection
 <!-- Owner: Maneesh | Sprint 4 | Status: Draft, needs Maneesh review -->
