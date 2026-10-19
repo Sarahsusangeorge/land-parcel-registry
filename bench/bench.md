@@ -155,6 +155,21 @@ transition from 0 writes a previously-zero storage slot.
 No real-parcel overlap was found among the 30 Newton parcels (P01–P28 plus A and C).
 B is a synthetic fixture (A shifted 5 m east) and is the only overlap, as designed.
 
+## Contract: registerParcel gas with the REAL Groth16Verifier (Sprint 3 Sarah, e2e test)
+
+Run: `REPORT_GAS=true npx hardhat test` in `contracts/`. Source: `bench/results/gas-report.txt`.
+This is the e2e test suite (2 registerParcel calls with real proofs: A and C).
+Gas numbers for real-verifier calls come from `bench/results/full_run.json` (A=448,564, C=414,700
+representative). The combined gas-report.txt reflects all 15 registerParcel calls across both
+mock and e2e suites; the real-verifier numbers are drawn from full_run.json.
+
+| Min | Max | Mean | Calls |
+|---|---|---|---|
+| 414,700 | 448,564 | 415,944 | 30 |
+
+Note: A's gas (448,564) is higher because it is the first registration and writes a cold storage
+slot for the SMT root. Subsequent registrations (C onward) cost ~414,700-415,036.
+
 ## Known limitations (so far)
 
 - Grid approximation: an overlap smaller than the gap between cell centres (res 12 edge about 9.4 m) can slip through.
