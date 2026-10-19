@@ -2,7 +2,7 @@
 
 Read this first, then PLAN.md. This file says where the project is right now. PLAN.md says what the project is and how it is built.
 
-Last updated: 2026-10-15, by Maneesh (Sprint 5 follow-up: data dir corrected, wrong-salt test 8, res-13 removed, patent deployment rule clarified, TRL 4 status updated)
+Last updated: 2026-10-20, by Maneesh (Sprint 5 finish: Sarah's lane complete, IDF-B sections 5/8/figures drafted, e2e tests passing)
 
 ---
 
@@ -65,14 +65,12 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
 
 ### In progress
 
-TRL 4 status: All Maneesh-side evidence done. Waiting on Sarah's e2e tests passing with the regenerated fixtures.
+TRL 4: All evidence done. Sections 5 and 8 of IDF-B drafted, need Sarah review.
 
 ### Not started
 
-- IDF-B Section 5 (Sarah — Objectives), Section 8 (both — Experimental validation, numbers now in bench/)
-- Sarah Sprint 3 tasks: e2e tests with regenerated fixtures, gas reporter
-- Sarah Section 7 figures (architecture, registration flow, SMT root chain)
-- PR from `maneesh/s3-registrar` into `main` (after Sarah merges)
+- Still needed: README, Sarah review of IDF-B sections 5 and 8
+- PR from `maneesh/s5-finish` into `main` (after Sarah reviews)
 - README with reproduction steps and TRL 4 claim
 
 ---
@@ -148,12 +146,12 @@ Read these before touching circuits, proofs or the verifier.
 - [x] TRL 4 checklist updated in PLAN.md
 - [x] NOTES-FOR-MANEESH.md updated with findings summary and Sarah's action items
 
-### Sarah (Sprint 3)
+### Sarah (Sprint 3) -- DONE
 
-1. Switch the deploy path from `MockVerifier` to the real `Groth16Verifier`.
-2. `contracts/test/registry.e2e.test.js` using Maneesh's fixtures: A registers; replaying A's proof reverts with `StaleRoot`; C registers after A; a changed public signal reverts with `InvalidProof`; a non-registrar caller reverts.
-3. Gas reporter on for `registerParcel`.
-4. IDF-B Section 7 figures in `patent/figures/`, and Section 5.
+1. [x] Switch the deploy path from `MockVerifier` to the real `Groth16Verifier` (merged in Step 1).
+2. [x] `contracts/test/registry.e2e.test.js` -- 8 tests pass (Step 3).
+3. [x] Gas reporter on `registerParcel` -- `REPORT_GAS=true npx hardhat test` (Step 3).
+4. [x] IDF-B Section 7 figures in `patent/figures/` (Step 6), Section 5 drafted (Step 4).
 
 ### Both (Sprint 4, after Gate 3)
 

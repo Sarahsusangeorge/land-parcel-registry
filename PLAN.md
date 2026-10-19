@@ -184,15 +184,15 @@ claims (non-overlap enforcement) on real data, with measured performance.
 
 ### Still missing (as of 2026-10-15)
 
-- [ ] E2E contract tests with real proof fixtures (Sarah, Sprint 3 task 2):
-      `contracts/test/registry.e2e.test.js` — not yet written
-- [ ] Gas reporter on `registerParcel` with real verifier in test suite (Sarah, Sprint 3 task 3)
-- [ ] IDF-B Section 5 (Sarah — Objectives), Section 8 (both — Experimental validation)
+- [x] E2E contract tests with real proof fixtures: `contracts/test/registry.e2e.test.js` — 7 tests pass (Step 3)
+- [x] Gas reporter on `registerParcel` with real verifier in test suite (`REPORT_GAS=true npx hardhat test`)
+- [x] IDF-B Section 5 drafted (Step 4), Section 8 filled from bench data (Step 5)
 - [ ] README updated with reproduction steps and TRL 4 claim
 - [ ] Public ptau ceremony file swap (required if/when deployment is ever permitted; public deployment is **forbidden until the provisional patent application is filed** -- this is not a TRL 4 requirement)
 
 ## Changelog
 
+- 2026-10-20 (Maneesh): Sprint 5 finish -- completed Sarah's lane items: deploy.js uses real Groth16Verifier, e2e tests pass (7/7), gas bench recorded, IDF-B sections 5 and 8 drafted, Mermaid figures created. Sarah needs to review IDF-B sections 5 and 8.
 - 2026-10-15 (Maneesh): Sprint 5 follow-up — data dir corrected (registrar/data/),
       wrong-salt test 8 added (8/8 pass), res-13 removed (cell_counts.json is the
       resolution comparison), testnet-deployment caveat removed (forbidden until patent
