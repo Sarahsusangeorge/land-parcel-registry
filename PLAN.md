@@ -96,6 +96,16 @@ writes a corrupt 12-byte zkey. `build.sh` handles the full sequence automaticall
       → registered / overlap (hits A) / registered ✓
 - [x] Prove times recorded in `bench/bench.md`
 
+### Commitment is computed in-circuit and exposed as a public output (Sprint 5)
+
+**Decision:** The circuit computes `commitment = Poseidon([Poseidon(cells), salt])` inside
+the ZK circuit and exposes it as `pubSignals[2]`. It is not passed in as an input.
+Interface I3 describes the commitment semantics correctly; the implementation computes it
+rather than accepting it. The public signal order `[oldRoot, newRoot, commitment]` is
+confirmed: A.pubSignals[0] = 0 (empty tree oldRoot) and C.pubSignals[0] = A.pubSignals[1]
+(C was proved against the root A produced).
+Agreed by: Maneesh.
+
 ### register.js "registered" output carries oldRoot, newRoot, commitment (Sprint 3)
 
 **Decision:** The I4 `registered` JSON line includes three fields beyond the frozen spec:
