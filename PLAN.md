@@ -341,7 +341,7 @@ Acceptance: Sarah posts a small table of median and max cells per parcel for eac
 
 Decide and freeze (end of Sprint 0)
 
-- [ ] `FINE_RES`, `COARSE_RES`, `CELL_MODE` chosen from Sarah's table, so most parcels fit N = 16. Log it. (Proposed in decision log; needs Maneesh's agreement.)
+- [x] `FINE_RES`, `COARSE_RES`, `CELL_MODE` chosen from Sarah's table, so most parcels fit N = 16. Log it. (12 / 9 / center; agreed by both, decision log)
 - [x] Exact package versions logged
 
 ## Sprint 1: Geo pipeline and toy circuit (1 day)
@@ -369,12 +369,12 @@ Acceptance: pytest passes and `parcels.json` holds A, B, C and at least 10 more 
 Patent lane
 
 - [x] Sarah: prior-art search (Google Patents, InPASS, Google Scholar, IEEE Xplore). Fill IDF-B Section 3 rows.
-- [ ] Maneesh: fill IDF-B Sections 1 and 2 (draft title and field)
+- [x] Maneesh: fill IDF-B Sections 1 and 2 (draft title and field)
 
 Gate 1 (end of Sprint 1)
 
 - [x] Go: toy proof verifies and duplicate fails. Continue to Sprint 2.
-- [ ] No-go: after one full extra day of trying, switch to the Fallback path section. Log the decision.
+- [x] No-go: after one full extra day of trying, switch to the Fallback path section. Log the decision. (Not needed: Gate 1 passed)
 
 ## Sprint 2: Full circuit and registry contract (1 day)
 
@@ -382,8 +382,8 @@ Goal: the real circuit and the real contract exist, each tested on its own. Sara
 
 Maneesh lane
 
-- [ ] `circuits/register_parcel.circom`: full I3 template with N = 16, N_LEVELS = 32, all five constraint groups (built and tested, but missing the salt in the commitment and `active[0] == 1`; see CONTEXT.md section 7)
-- [ ] `registrar/src/inputs.js`: from a `parcels.json` entry plus tree state, build the full circuit input (cells padded with 0, active prefix, salt, per-insert siblings zero-padded to 32) (built; salt still to add with the circuit fix)
+- [x] `circuits/register_parcel.circom`: full I3 template with N = 16, N_LEVELS = 32, all five constraint groups (salt and `active[0] == 1` added 2026-10-15, `9662f07`)
+- [x] `registrar/src/inputs.js`: from a `parcels.json` entry plus tree state, build the full circuit input (cells padded with 0, active prefix, salt, per-insert siblings zero-padded to 32) (salt added 2026-10-15)
 - [x] Check constraint count, then pick the powers-of-tau size and log it (588,297 constraints, pot20)
 - [x] Run `circuits/scripts/build.sh` end to end. Output: wasm, final zkey, verification key, `Groth16Verifier.sol` copied into `contracts/contracts/`
 - [x] Circuit tests with snarkjs: A proves; B after A fails witness generation; C after A proves; tampered commitment fails verification; non-prefix active fails
@@ -408,7 +408,7 @@ Acceptance: all mock tests pass. Deploy script works on `npx hardhat node`. (Don
 
 Patent lane
 
-- [ ] Maneesh: IDF-B Sections 4 (gap) and 6 (working principle)
+- [x] Maneesh: IDF-B Sections 4 (gap) and 6 (working principle)
 - [x] Sarah: IDF-B Section 5 (objectives) and finish Section 3
 
 Gate 2 (end of Sprint 2)
@@ -444,7 +444,7 @@ Acceptance: all end-to-end tests pass against the real verifier. (Sarah lane don
 Patent lane
 
 - [x] Sarah: IDF-B Section 7 figures (architecture, registration sequence, overlap rejection of B) in `patent/figures/`
-- [ ] Maneesh: IDF-B Section 7 text, including the privacy model and trust assumption
+- [x] Maneesh: IDF-B Section 7 text, including the privacy model and trust assumption
 
 Gate 3 (end of Sprint 3)
 
@@ -459,8 +459,8 @@ Maneesh lane
 - [x] Constraint count from `snarkjs r1cs info` (588,297)
 - [x] Proving time: mean and max over 5 runs for 3 parcels of different sizes. Note CPU and RAM. (measured as one run per parcel over all 31 parcels instead: mean 10,102 ms, max 10,846 ms, M4 Pro, 24 GB)
 - [x] Proof size and verification key size (about 720 bytes, 3.2 KB)
-- [ ] Resolution comparison: regenerate cells at two fine resolutions (from Sarah), report cells per parcel and how many parcels fit N = 16 (Sarah's part done: `geo/out/parcels_res11.json` and `parcels_res13.json`, same parcels; fit N = 16: res 11 19/31, res 12 31/31, res 13 0/31)
-- [ ] Write results to `bench/results/circuit.json` and summarize in `bench/bench.md`
+- [x] Resolution comparison: regenerate cells at two fine resolutions (from Sarah), report cells per parcel and how many parcels fit N = 16 (Sarah's part done: `geo/out/parcels_res11.json` and `parcels_res13.json`, same parcels; fit N = 16: res 11 19/31, res 12 31/31, res 13 0/31)
+- [x] Write results to `bench/results/circuit.json` and summarize in `bench/bench.md` (replaced by `bench/results/cell_counts.json` and `circuit_reg_prod.json`; res 13 needs more than N = 16 cells, so it cannot be proved with this circuit)
 
 Sarah lane
 
@@ -473,8 +473,8 @@ Acceptance: `bench.md` has every number in the TRL 4 checklist, each traceable t
 
 Patent lane
 
-- [ ] Both: IDF-B Section 8 (experimental results) from `bench.md`, numbers only from measured runs
-- [ ] Maneesh: IDF-B Section 9 (aspects to protect) and Section 10 (TRL)
+- [x] Both: IDF-B Section 8 (experimental results) from `bench.md`, numbers only from measured runs
+- [x] Maneesh: IDF-B Section 9 (aspects to protect) and Section 10 (TRL)
 - [ ] Maneesh: one full pass so the IDF-B reads in one voice. Send to the mentor.
 
 Gate 4 (end of Sprint 4)
@@ -567,20 +567,20 @@ Append new rows at the top. A decision that changes an interface needs both name
 | 2026-10-15 | Circuit fix: commitment is `Poseidon([Poseidon(cells[0..15]), salt])` with a fresh 248-bit private salt, and `active[0] === 1` | Implements I1 and I3 as frozen. Without the salt, anyone who guesses a cell set can confirm it from the public commitment; without `active[0]`, a zero-cell proof would mint a token covering no land | Maneesh (implements the frozen interface) |
 | 2026-10-15 | The commitment is computed inside the circuit and exposed as `pubSignals[2]`, not passed in | Signal order `[oldRoot, newRoot, commitment]` unchanged; the contract cannot be handed a commitment the cells do not produce | Maneesh |
 | 2026-10-14 | I4 `registered` lines also carry `oldRoot`, `newRoot`, `commitment` | Additive; makes root transitions auditable from the CLI output without an on-chain call. Not present on `overlap` or `error` lines | Maneesh; pending Sarah |
-| 2026-10-14 | Add I6: end-to-end proof fixtures `A.json`, `C_after_A.json`, `B_overlap.json` in `contracts/test/fixtures/` | Sarah's e2e tests and Maneesh's `--dry-run` need one agreed file shape | Sarah; pending Maneesh |
-| 2026-10-14 | Squash-merge PRs into `main`; no tool attribution in commits, PRs or files | Keep `main` history clean | Sarah; pending Maneesh |
-| 2026-10-13 | Contracts compile for the Cancun EVM (`evmVersion: "cancun"`) | OpenZeppelin 5.6 uses `mcopy`, which needs Cancun | Sarah; pending Maneesh |
-| 2026-10-13 | Fixture B = A shifted 5 m east | Resolves "roughly one cell width" (I2) vs "a few metres" (Sprint 1). 5 m is about half a res-12 edge; B shares 5 of A's cells | Sarah; pending Maneesh |
-| 2026-10-13 | Parcels with 0 fine cells are flagged `fits_batch: false`, not given a fallback cell | A fallback cell (the cell under a point inside the parcel) made 658 of 24,102 Newton parcels collide with a neighbour | Sarah; pending Maneesh |
+| 2026-10-14 | Add I6: end-to-end proof fixtures `A.json`, `C_after_A.json`, `B_overlap.json` in `contracts/test/fixtures/` | Sarah's e2e tests and Maneesh's `--dry-run` need one agreed file shape | Sarah, Maneesh |
+| 2026-10-14 | Squash-merge PRs into `main`; no tool attribution in commits, PRs or files | Keep `main` history clean | Sarah, Maneesh |
+| 2026-10-13 | Contracts compile for the Cancun EVM (`evmVersion: "cancun"`) | OpenZeppelin 5.6 uses `mcopy`, which needs Cancun | Sarah, Maneesh |
+| 2026-10-13 | Fixture B = A shifted 5 m east | Resolves "roughly one cell width" (I2) vs "a few metres" (Sprint 1). 5 m is about half a res-12 edge; B shares 5 of A's cells | Sarah, Maneesh |
+| 2026-10-13 | Parcels with 0 fine cells are flagged `fits_batch: false`, not given a fallback cell | A fallback cell (the cell under a point inside the parcel) made 658 of 24,102 Newton parcels collide with a neighbour | Sarah, Maneesh |
 | 2026-10-13 | `FINE_RES = 12`, `COARSE_RES = 9`, `CELL_MODE = center` | Res 12 center: 95.9% of 24,102 Newton parcels fit N = 16 and no neighbours collide. Res 11 leaves 55% with 0 cells; res 13 fits 37%; overlap mode makes nearly every neighbour collide (`bench/bench.md`) | Sarah, Maneesh |
-| 2026-10-13 | Parcel source: City of Newton, MA parcel layer (`NewtonMAGIS/GISData`, `Property/Parcels.geojson`), replacing Fairfax County, VA | Official city data, already WGS84; Fairfax's server was unreachable from the build environment. Committed sample drops owner names and values | Sarah; pending Maneesh |
+| 2026-10-13 | Parcel source: City of Newton, MA parcel layer (`NewtonMAGIS/GISData`, `Property/Parcels.geojson`), replacing Fairfax County, VA | Official city data, already WGS84; Fairfax's server was unreachable from the build environment. Committed sample drops owner names and values | Sarah, Maneesh |
 | 2026-10-13 | Production circuit uses pot20 | `snarkjs r1cs info`: 588,297 constraints (588,814 after the 2026-10-15 fix) > 2^19. Note: Maneesh's notes say a locally generated ptau needs `prepare phase2` before `groth16 setup` (else a corrupt zkey); keep that step | Maneesh |
 | 2026-10-13 | Keep `register_parcel_dev.circom` (N = 8, N_LEVELS = 16) for tests only | Fits pot19, so circuit tests do not wait on the production setup. Production verifier must come from the production zkey | Maneesh |
 | 2026-10-13 | Hardhat 2.29.1 (not 3.x) with hardhat-toolbox 5.0.0 | Toolbox 5 bundles hardhat-gas-reporter 1.0.10 and chai matchers used by the JS tests | Sarah |
-| 2026-10-12 | Tree key is `Poseidon([cell])`, not the raw H3 ID | Raw H3 IDs share long bit prefixes and would exceed tree depth | Pending |
+| 2026-10-12 | Tree key is `Poseidon([cell])`, not the raw H3 ID | Raw H3 IDs share long bit prefixes and would exceed tree depth | Maneesh; pending Sarah |
 | 2026-10-12 | `CELL_MODE` leans center | Real neighbours sharing a boundary must not count as overlaps | Sarah, Maneesh (settled by the 2026-10-13 row) |
-| 2026-10-12 | N = 16, N_LEVELS = 32 | Poseidon input limit in circomlib; depth leaves margin for hashed keys | Pending |
-| 2026-10-12 | Registrar holds fine cells and generates proofs | Proving needs the full tree; registrar already certifies parcels | Pending |
+| 2026-10-12 | N = 16, N_LEVELS = 32 | Poseidon input limit in circomlib; depth leaves margin for hashed keys | Maneesh; pending Sarah |
+| 2026-10-12 | Registrar holds fine cells and generates proofs | Proving needs the full tree; registrar already certifies parcels | Maneesh; pending Sarah |
 | 2026-10-12 | US county GIS parcels for the prototype | Public, digitized, standard GeoJSON. Mentor informed. | Maneesh, Sarah |
 | 2026-10-12 | Circom, snarkjs, Groth16, Hardhat, OpenZeppelin | Mature tooling, Solidity verifier export | Maneesh, Sarah |
 
@@ -706,6 +706,7 @@ Note: the dev-zkey verifier mentioned under `register_parcel_dev.circom` was rep
 
 | Date | Who | What changed |
 |---|---|---|
+| 2026-10-20 | Maneesh | Agreed the decision-log rows pending him (I6, squash-merge, Cancun, fixture B, zero-cell flagging, Newton source); agreed tree key, N/N_LEVELS and registrar-holds-cells (pending Sarah); ticked finished sprint boxes |
 | 2026-10-20 | Sarah | Merged `maneesh/s5-finish` onto `main` (branch `sarah/s5-merge`): kept the full plan, Section 3 and the figures from `main`; took the circuit fix, verifier, fixtures, run logs and IDF-B Sections 1, 2, 4, 6, 7, 9, 10 from Maneesh; folded his decision notes in above; ticked the circuit box in the TRL 4 checklist |
 | 2026-10-20 | Maneesh | `maneesh/s5-finish`: IDF-B Section 5 and 8 redrafts, Mermaid figure sources (`patent/figures/*.mmd`), TRL 4 checklist update |
 | 2026-10-15 | Maneesh | Sprint 5 follow-up: registrar data dir `registrar/data/`, wrong-salt circuit test (8/8 pass), testnet caveat (public deployment forbidden until the patent application is filed) |

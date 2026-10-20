@@ -174,7 +174,7 @@ Done, except the IDF-B review and send-off (section 4).
 ## 7. Open items
 
 - [x] **Circuit did not meet I1/I3** (found in review 2026-10-14; fixed 2026-10-15 in `9662f07`, verifier, fixtures and runs regenerated): the commitment is `Poseidon(cells)` with no salt (I1 needs `Poseidon([Poseidon(cells), salt])`), and nothing forces `active[0] == 1`, so an all-empty parcel would prove and mint. Fix in `register_parcel.circom` and `inputs.js`, regenerate zkey and `Groth16Verifier.sol`, regenerate fixtures, rerun the full run. Do not claim TRL 4 in the IDF-B until this is done. Public signals stay `[oldRoot, newRoot, commitment]`.
-- [ ] Agree the decision log rows still pending in PLAN.md: tree key, N and N_LEVELS, registrar holds cells (both); I6, squash-merge, Cancun, fixture B, zero-cell flagging, Newton source (Maneesh); I4 extra fields (Sarah).
+- [ ] Sarah to confirm the decision log rows still pending her in PLAN.md: tree key, N and N_LEVELS, registrar holds cells, I4 extra fields. (Maneesh agreed all his rows on 2026-10-20.)
 - [x] Add `.gitattributes` so Windows line endings do not break scripts.
 - [x] `NOTES-FOR-MANEESH.md` untracked from git and added to `.gitignore`. Local file kept.
 - [x] PLAN.md decision log: no "before mainnet" wording found — decision log already used "before Sprint 3 integration and before claiming TRL 4".
