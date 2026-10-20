@@ -104,7 +104,7 @@ Pre-fix numbers (Sprint 2) are superseded by the 2026-10-15 rebuild.
 | Groth16 setup time (Apple Silicon, rebuild) | ~42 s |
 | Prove time — mean (demo + full run, M4 Pro) | **~10,000 ms** |
 | Prove time — max (31-parcel full run) | **10,482 ms** |
-| Proof size (JSON) | 719 bytes |
+| Proof size (JSON) | about 720 bytes (719 to 723 across runs; digit counts vary) |
 | zkey size | ~282 MB |
 | vkey size | 3.2 KB |
 | Tests | 8/8 pass (5 original + salt binding, empty parcel, wrong salt; production zkey) |

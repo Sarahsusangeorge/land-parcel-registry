@@ -178,8 +178,8 @@ The powers-of-tau files (pot19 for tests of the small dev circuit, pot20 for pro
 | Circuit size (N = 16 cells, tree depth 32) | 588,814 constraints | `bench/bench.md` |
 | Trusted setup | pot20 (capacity 2^20 = 1,048,576); Groth16 setup about 42 s | `bench/bench.md` |
 | Proving time per parcel | mean 10,104 ms, max 10,482 ms, min 9,950 ms (30 proofs) | `bench/results/full_run.json` |
-| Proof size | 719 bytes (JSON) | `bench/bench.md` |
-| Proving key (zkey) size | 268.7 MiB (about 282 MB) | `bench/bench.md` |
+| Proof size | about 720 bytes (JSON; 719 to 723 across runs) | `bench/results/circuit_reg_prod.json` |
+| Proving key (zkey) size | 268.8 MiB (about 282 MB) | `bench/bench.md` |
 | `registerParcel` gas, incl. on-chain proof verification | mean 415,944, max 448,564 (first registration), min 414,700 (30 registrations) | `bench/results/full_run.json`, `bench/results/gas.json` |
 | Proof verification alone | about 228,500 gas | `bench/results/gas.json` |
 

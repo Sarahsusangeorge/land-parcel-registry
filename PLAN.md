@@ -458,7 +458,7 @@ Maneesh lane
 
 - [x] Constraint count from `snarkjs r1cs info` (588,297)
 - [x] Proving time: mean and max over 5 runs for 3 parcels of different sizes. Note CPU and RAM. (measured as one run per parcel over all 31 parcels instead: mean 10,102 ms, max 10,846 ms, M4 Pro, 24 GB)
-- [x] Proof size and verification key size (719 bytes, 3.2 KB)
+- [x] Proof size and verification key size (about 720 bytes, 3.2 KB)
 - [ ] Resolution comparison: regenerate cells at two fine resolutions (from Sarah), report cells per parcel and how many parcels fit N = 16 (Sarah's part done: `geo/out/parcels_res11.json` and `parcels_res13.json`, same parcels; fit N = 16: res 11 19/31, res 12 31/31, res 13 0/31)
 - [ ] Write results to `bench/results/circuit.json` and summarize in `bench/bench.md`
 

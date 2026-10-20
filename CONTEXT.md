@@ -99,7 +99,7 @@ Read these before touching circuits, proofs or the verifier.
 | Public signals | `[oldRoot, newRoot, commitment]`, as in I5. Unchanged. |
 | Large files | `*.ptau`, `*.zkey`, `circuits/build/` are gitignored. Never commit them. Share zkey and wasm through a private drive if needed. |
 | Proving speed | Expect tens of seconds per production proof with snarkjs. If it is too slow, reducing N_LEVELS from 32 to 24 cuts constraints a lot, but that is an interface change and needs both people to agree. |
-| Proof size | 719 bytes (JSON) |
+| Proof size | about 720 bytes (JSON; 719 to 723 across runs) |
 | zkey size | 268.7 MB |
 | Groth16 setup time | 42 s (production circuit, pot20_pp.ptau) |
 | pot20 prepare phase2 time | ~75 min (Apple Silicon) |
