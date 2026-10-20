@@ -169,7 +169,7 @@ The powers-of-tau files (pot19 for tests of the small dev circuit, pot20 for pro
 | Contract tests, mock verifier | 13 of 13 pass | `contracts/test/registry.mock.test.js` |
 | Contract tests, real `Groth16Verifier` and real proofs | 8 of 8 pass | `contracts/test/registry.e2e.test.js` |
 | Geo pipeline tests | 25 of 25 pass | `geo/tests/` |
-| Clean-clone demo (A registered, B overlap, C registered) | Pass | `patent/figures/logs/demo_run.txt`, `CONTEXT.md` |
+| Demo on the fixed circuit (A registered, B overlap, C registered) | Pass (2026-10-15); clean-clone run passed 2026-10-14 on the pre-fix circuit | `patent/figures/logs/demo_run.txt`, `CONTEXT.md` |
 
 ### Performance
 
@@ -211,11 +211,11 @@ The following specific mechanisms are the technical contribution of this work:
 
 1. **The use of a sparse Merkle tree insert proof as a physical-overlap check for land parcels.** Specifically: representing a parcel as a set of H3 hexagonal grid cells, inserting each cell as a key into a Poseidon SMT, and using a Groth16 proof of successful insertion (with no pre-existing key collisions) as the non-overlap certificate accepted by the smart contract.
 
-2. **The circuit constraint design that combines insert-based non-overlap enforcement (G4) with a salted commitment (G3) and an active-prefix gate (G1, I1) in a single Groth16 proof.** The circuit structure allows a single proof to cover a variable-length active cell list (padded to a fixed size N) without revealing the cell values or the number of active cells beyond the binary active/inactive flag.
+2. **The circuit constraint design that combines insert-based non-overlap enforcement (G4) with a salted commitment (G3) and an active-prefix gate (G1, I1) in a single Groth16 proof.** The circuit structure allows a single proof to cover a variable-length active cell list (padded to a fixed size N) without revealing the cell values or how many of the N slots are in use; the active flags are private.
 
 3. **The on-chain root-chain mechanism in LandRegistry.sol:** the contract maintains a single SMT root, requires that the proof's oldRoot matches the stored root before accepting a registration, and updates the root to newRoot on success. This ties every registration to a globally consistent state of occupied cells, enforced without an oracle.
 
-4. **The commitment binding: `commitment = Poseidon([Poseidon(cells[0..N-1]), salt])`** where salt is a fresh private random value. This makes the commitment unpredictable even to a party who knows the cell set, preventing commitment pre-image attacks and commitment grinding.
+4. **The commitment binding: `commitment = Poseidon([Poseidon(cells[0..N-1]), salt])`** where salt is a fresh private random value. Cell sets are small and guessable, so without the salt anyone could confirm a guessed cell set against the public commitment; with it, the commitment reveals nothing about the cells, and two registrations of the same cells give different commitments.
 
 We do not claim the H3 grid decomposition itself (Uber H3 is open-source), the Poseidon hash function, the SMT data structure, or Groth16 proving in isolation. The combination and the specific application to the land registration problem is the claimed contribution.
 
@@ -233,7 +233,7 @@ Evidence for TRL 4 as of 2026-10-20:
 - 31 parcels from a real cadastral dataset (City of Newton, MA) were processed: 30 registered without error, 1 rejected for overlap (fixture B, as designed). No unintended overlaps were detected.
 - Prove time: mean 10,104 ms, max 10,482 ms on a MacBook Pro M4 Pro, 24 GB RAM.
 - registerParcel gas: mean 415,944, max 448,564 (real Groth16Verifier).
-- A clean-clone reproducibility test (Gate 3) passed on 2026-10-14.
+- A clean-clone reproducibility test (Gate 3) passed on 2026-10-14 on the circuit before the salt fix; the A/B/C demo was re-run on the fixed circuit on 2026-10-15.
 
 **Known limitations at TRL 4:**
 
@@ -246,6 +246,7 @@ Evidence for TRL 4 as of 2026-10-20:
 
 ## Changelog
 
+- 2026-10-20: Review before merge to main (Sarah): Gate 3 date tied to the pre-fix circuit (8, 10); Section 9 items 2 and 4 reworded to what the circuit guarantees.
 - 2026-10-20: Merged Maneesh's v0.2 with Sarah's v0.4 (Sarah). Section 3 and 5 from Sarah; 1, 2, 4, 6, 7 text, 9, 10 from Maneesh; Section 8 combined, post-fix numbers only. Corrections: the salt is not published (4); parcel-size shares and contract check order (6, 10); event fields (7); circuit tests use the production zkey and number 8 (8, 10).
 - 2026-10-15: Maneesh drafted sections 1, 2, 4, 6, 7, 9, 10. Circuit fix applied (salt in commitment, active[0]===1). Circuit rebuilt, tests pass. Full 31-parcel run complete with fixed circuit.
 - 2026-10-15: Section 8 drafted from bench results; circuit numbers marked provisional (Sarah).
