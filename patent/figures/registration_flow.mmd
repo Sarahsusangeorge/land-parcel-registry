@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant GIS as GIS Source
+    participant GEO as Geo Pipeline
+    participant REG as Registrar
+    participant SMT as Sparse Merkle Tree
+    participant PROVER as Groth16 Prover
+    participant CONTRACT as LandRegistry.sol
+
+    GIS->>GEO: parcel polygon
+    GEO->>REG: fine cells (res 12), coarse cells (res 9)
+    REG->>SMT: findCell (overlap check)
+    SMT-->>REG: no overlap
+    REG->>SMT: insertCell for each fine cell
+    SMT-->>REG: Merkle witnesses, newRoot
+    REG->>PROVER: circuit inputs (cells, salt, witnesses)
+    PROVER-->>REG: proof, pubSignals [oldRoot, newRoot, commitment]
+    REG->>CONTRACT: registerParcel(proof, pubSignals, coarseCells, uri)
+    CONTRACT-->>REG: tx confirmed, tokenId minted, ParcelRegistered event

@@ -1,0 +1,16 @@
+graph LR
+    GEO["Geo pipeline\n(H3 cells from polygon)"]
+    REG["Registrar\n(tree.js, inputs.js,\nregister.js)"]
+    SMT["Sparse Merkle Tree\n(off-chain, Poseidon)"]
+    CIRC["Circuit + Prover\n(register_parcel.circom\nGroth16)"]
+    CONTRACT["LandRegistry.sol\n(ERC-721)"]
+    VERIF["Groth16Verifier.sol\n(on-chain)"]
+
+    GEO -->|"fine cells, coarse cells"| REG
+    REG -->|"cell inserts"| SMT
+    SMT -->|"Merkle witness,\noldRoot, newRoot"| CIRC
+    REG -->|"cells, salt"| CIRC
+    CIRC -->|"proof, pubSignals\n[oldRoot, newRoot, commitment]"| CONTRACT
+    CONTRACT -->|"verifyProof"| VERIF
+    VERIF -->|"true / false"| CONTRACT
+    CONTRACT -->|"mint NFT\nupdate root"| CONTRACT

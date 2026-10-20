@@ -70,46 +70,105 @@ Raw: `bench/results/circuit_toy.json`.
 ## Circuit: register_parcel_dev (Sprint 2, Maneesh)
 
 Circuit: `circuits/register_parcel_dev.circom` — N=8 cells, N_LEVELS=16, Groth16. (Dev/test
-version of `register_parcel.circom`; identical G1–G5 constraints, smaller params to fit pot19.)
+version of `register_parcel.circom`; identical constraint groups, smaller params to fit pot19.)
 Setup: locally generated pot19 (dev only, not a ceremony; powersoftau new + contribute + prepare phase2). Run: `npm test` in `registrar/`.
 Raw: `bench/results/circuit_reg_dev.json`.
 
+Pre-fix numbers (Sprint 2, no salt, no active[0] check) are superseded by the 2026-10-15 rebuild.
+
 | Metric | Value |
 |---|---|
-| Non-linear constraints | 79,330 |
-| Linear constraints | 79,134 |
-| Wires | 158,555 |
+| Non-linear constraints | ~~79,330~~ 79,556 (after salt + I1 fix, 2026-10-15) |
+| Linear constraints | ~~79,134~~ 79,425 |
+| Wires | ~~158,555~~ 159,072 |
+| snarkjs total constraints | 158,981 (well within pot19 capacity of 524,288) |
 | Groth16 setup time (Apple Silicon) | ~15 s |
-| Proving time – test 1 (A) | 3,422 ms |
-| Proving time – test 3 (C after A) | 5,928 ms (two proofs) |
-| Verification: valid proof (test 1, test 3) | pass |
-| Rejection: shared cells (test 2) | pass |
-| Rejection: tampered commitment (test 4) | pass |
-| Rejection: non-prefix active cells (test 5) | pass |
+| Tests | 7/7 pass (5 original + 2 new: test 6 salt binding, test 7 empty parcel) |
 
-## Circuit: register_parcel production (Sprint 2 follow-up, Maneesh)
+## Circuit: register_parcel production (Sprint 2 follow-up, Maneesh; rebuilt 2026-10-15 with salt + I1 fix)
 
 Circuit: `circuits/register_parcel.circom` — N=16 cells, N_LEVELS=32, Groth16.
-Setup: locally generated pot20 (powersoftau new + contribute + prepare phase2; ~75 min total).
-Prove bench: `node registrar/scripts/bench_prove.js 3` (3 runs, fixture A, Apple Silicon).
-Raw: `bench/results/circuit_reg_prod.json`.
+Setup: locally generated pot20 (pot20_pp.ptau cached from Sprint 2; ~75 min one-time cost).
+Prove bench: end-to-end demo and full real-parcel run (see sections below).
+
+Pre-fix numbers (Sprint 2) are superseded by the 2026-10-15 rebuild.
 
 | Metric | Value |
 |---|---|
-| Non-linear constraints | 588,297 |
-| Wires | 588,732 |
-| Required ptau | pot20 (2^20 = 1,048,576 > 588,297) |
-| pot20 prepare phase2 time (Apple Silicon) | ~75 min |
-| Groth16 setup time (Apple Silicon) | 42 s |
-| Prove time — mean (3 runs, fixture A) | **9,751 ms** |
-| Prove time — max (3 runs, fixture A) | **10,035 ms** |
+| Non-linear constraints | ~~287,745~~ 287,955 (after salt + I1 fix, 2026-10-15) |
+| Linear constraints | ~~300,594~~ 300,859 |
+| Wires | ~~588,732~~ 589,249 |
+| snarkjs total constraints | ~~588,297~~ **588,814** (still well within pot20 capacity of 1,048,576) |
+| Required ptau | pot20 (2^20 = 1,048,576 > 588,814) |
+| pot20 prepare phase2 time (Apple Silicon) | ~75 min (one-time; cached) |
+| Groth16 setup time (Apple Silicon, rebuild) | ~42 s |
+| Prove time — mean (demo + full run, M4 Pro) | **~10,000 ms** |
+| Prove time — max (31-parcel full run) | **10,482 ms** |
 | Proof size (JSON) | 719 bytes |
-| zkey size | 268.7 MB |
+| zkey size | ~282 MB |
 | vkey size | 3.2 KB |
-| Verification: valid proof | pass |
-| Rejection: shared cells (test 2) | pass |
-| Rejection: tampered commitment (test 4) | pass |
-| Rejection: non-prefix active cells (test 5) | pass |
+| Tests | 8/8 pass (5 original + salt binding, empty parcel, wrong salt; production zkey) |
+
+## End-to-end demo registration (Sprint 3; re-run 2026-10-15 with salt + I1 fix)
+
+Registrar: `registrar/src/register.js` (I4 CLI). Circuit: production (N=16, N_LEVELS=32).
+Setup: real Groth16Verifier deployed to local Hardhat node. Run: `bash registrar/scripts/demo.sh`.
+Log: `patent/figures/logs/demo_run.txt`.
+
+| Parcel | Status | Prove time | tokenId |
+|---|---|---|---|
+| A | registered | **9,983 ms** | 1 |
+| B | overlap (hits A) | — | — |
+| C | registered | **10,007 ms** | 2 |
+
+A newRoot = `1627276571125689245575422886857369656002719209654662685577916150576429071912`
+C oldRoot = A newRoot (root chain verified ✓)
+
+Machine: MacBook Pro M4 Pro, 24 GB RAM, macOS. Node: no competing processes.
+
+## Full real-parcel run (Sprint 4 + Sprint 5 re-run, Maneesh)
+
+All 31 parcels in `geo/out/parcels.json` registered against a fresh Hardhat node with the real
+`Groth16Verifier.sol` (production zkey, salt + I1 fix). Order: A first, B second, then C and
+P01–P28 in file order. Raw data: `bench/results/full_run.json`.
+Log: `patent/figures/logs/full_run.txt`.
+Run: `bash registrar/scripts/full_run.sh`.
+
+Machine: MacBook Pro M4 Pro, 24 GB RAM.
+
+| Metric | Value |
+|---|---|
+| Total parcels | 31 |
+| Registered | 30 |
+| Overlaps | 1 (B only — overlaps A as designed) |
+| Errors | 0 |
+| Prove time — mean | **10,104 ms** |
+| Prove time — max | **10,482 ms** |
+| Prove time — min | 9,950 ms |
+| registerParcel gas — mean (real Groth16Verifier) | **415,944** |
+| registerParcel gas — max | **448,564** (A, cold SMT root slot) |
+| registerParcel gas — min | **414,700** |
+
+Note: A's gas is higher (448,564) because it is the first registration and the SMT root
+transition from 0 writes a previously-zero storage slot.
+
+No real-parcel overlap was found among the 30 Newton parcels (P01–P28 plus A and C).
+B is a synthetic fixture (A shifted 5 m east) and is the only overlap, as designed.
+
+## Contract: registerParcel gas with the REAL Groth16Verifier (Sprint 3 Sarah, e2e test)
+
+Run: `REPORT_GAS=true npx hardhat test` in `contracts/`. Source: `bench/results/gas-report.txt`.
+This is the e2e test suite (2 registerParcel calls with real proofs: A and C).
+Gas numbers for real-verifier calls come from `bench/results/full_run.json` (A=448,564, C=414,700
+representative). The combined gas-report.txt reflects all 15 registerParcel calls across both
+mock and e2e suites; the real-verifier numbers are drawn from full_run.json.
+
+| Min | Max | Mean | Calls |
+|---|---|---|---|
+| 414,700 | 448,564 | 415,944 | 30 |
+
+Note: A's gas (448,564) is higher because it is the first registration and writes a cold storage
+slot for the SMT root. Subsequent registrations (C onward) cost ~414,700-415,036.
 
 ## End-to-end demo registration (Sprint 3, Maneesh)
 

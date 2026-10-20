@@ -1,21 +1,17 @@
 pragma circom 2.0.0;
 
-// register_parcel_dev.circom  –  DEV/TEST ONLY (Sprint 2)
+// register_parcel_dev.circom  --  DEV/TEST ONLY (Sprint 2); salt + I1 fix 2026-10-15
 //
-// Identical constraint groups G1–G5 as register_parcel.circom, but compiled
-// with smaller parameters so it fits under pot19 (2^19 = 524 288 SRS points):
+// Identical constraint groups as register_parcel.circom, but compiled with
+// smaller parameters so it fits under pot19 (2^19 = 524,288 SRS points):
 //
 //   N       =  8  (max active cells per parcel; A=5, B=6, C=3 all fit)
 //   N_LEVELS = 16  (tree depth; adequate for prototype with a handful of parcels)
 //
-// Production parameters (N=16, N_LEVELS=32) require pot21 (~2.1e6 SRS points).
-// See circuits/register_parcel.circom for the production version and
-// NOTES-FOR-MANEESH.md for the ptau sizing rationale.
-//
 // Public signals (same ordering as production):
 //   publicSignals[0] = oldRoot
 //   publicSignals[1] = newRoot
-//   publicSignals[2] = commitment
+//   publicSignals[2] = commitment   -- Poseidon([Poseidon(cells[0..N-1]), salt])
 
 include "circomlib/circuits/smt/smtprocessor.circom";
 include "circomlib/circuits/poseidon.circom";
@@ -27,6 +23,7 @@ template RegisterParcel(N, N_LEVELS) {
     signal input initialRoot;
     signal input cells[N];
     signal input n_cells;
+    signal input salt;                  // random 248-bit value; makes commitment unique
     signal input siblings[N][N_LEVELS];
     signal input oldKey[N];
     signal input oldValue[N];
@@ -34,7 +31,7 @@ template RegisterParcel(N, N_LEVELS) {
 
     signal output oldRoot;
     signal output newRoot;
-    signal output commitment;
+    signal output commitment;           // Poseidon([Poseidon(cells[0..N-1]), salt])
 
     // G5: bind public oldRoot to the private initialRoot
     oldRoot <== initialRoot;
@@ -56,14 +53,7 @@ template RegisterParcel(N, N_LEVELS) {
         key[i] <== keyHash[i].out;
     }
 
-    // G3: commitment
-    component commitHash = Poseidon(N);
-    for (var i = 0; i < N; i++) {
-        commitHash.inputs[i] <== cells[i];
-    }
-    commitment <== commitHash.out;
-
-    // G4: chained SMTProcessor inserts
+    // Ga: active flags
     component izCell[N];
     signal active[N];
     for (var i = 0; i < N; i++) {
@@ -72,6 +62,20 @@ template RegisterParcel(N, N_LEVELS) {
         active[i] <== 1 - izCell[i].out;
     }
 
+    // I1: reject empty parcels
+    active[0] === 1;
+
+    // G3: commitment with salt
+    component innerHash = Poseidon(N);
+    for (var i = 0; i < N; i++) {
+        innerHash.inputs[i] <== cells[i];
+    }
+    component commitHash = Poseidon(2);
+    commitHash.inputs[0] <== innerHash.out;
+    commitHash.inputs[1] <== salt;
+    commitment <== commitHash.out;
+
+    // G4: chained SMTProcessor inserts
     component proc[N];
     component rootMux[N];
     signal rootChain[N+1];

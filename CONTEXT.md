@@ -2,7 +2,7 @@
 
 Read this first, then PLAN.md. This file says where the project is right now. PLAN.md says what the project is and how it is built.
 
-Last updated: 2026-10-15, by Sarah (Sprint 4 Sarah lane: figures, gas, logs, README)
+Last updated: 2026-10-20, by Sarah (merged `maneesh/s5-finish` onto `main`: circuit fix in, TRL 4 evidence complete, IDF-B review next)
 
 ---
 
@@ -56,7 +56,8 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
 - Measured with the real verifier: `registerParcel` 448,564 gas (A, empty tree) and 415,048 gas (C after A); `verifyProof` alone about 228,500
 - Sprint 4 (branch `sarah/s4-evidence`): IDF-B Figs. 1 to 3 in `patent/figures/` (Fig. 3 drawn from the real parcels by `geo/scripts/figure_overlap.py`); `contracts/scripts/gas_bench.js` writes `bench/results/gas.json`; contract, geo and gas logs in `patent/figures/logs/`; README reproduction table; limitations in `bench/bench.md`
 - Resolution comparison input: `python src/parcels.py --fine-res 13 --out out/parcels_res13.json` (and res 11). Same 31 parcels; fit N = 16: res 11 19/31, res 12 31/31, res 13 0/31. Res 13 parcels cannot be proved with the N = 16 circuit, so compare cell counts, not proofs
-- IDF-B Section 8 drafted from `bench/`; circuit numbers marked provisional until the circuit fix
+- IDF-B Section 8 drafted from `bench/`; numbers refreshed from the post-fix runs when `maneesh/s5-finish` was merged (2026-10-20)
+- Merge of `maneesh/s5-finish` onto `main` (2026-10-20): e2e tests and gas bench rerun on the regenerated verifier and fixtures
 - Patent: IDF-B Section 3 first pass
 
 **Maneesh** (branch `maneesh/s0-setup`)
@@ -67,16 +68,16 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
   - Sprint 2 follow-up: production circuit built, Groth16Verifier.sol exported from the production zkey, 5/5 circuit tests and 13/13 contract tests pass, pushed (`1a47f53`)
   - Sprint 3: `registrar/src/register.js` (I4 CLI), proof fixtures A/B/C, `demo.sh`. All three Sprint 3 Maneesh tasks done (`b793a88`, `f317ee2`).
   - Sprint 4: full real-parcel run (`registrar/scripts/full_run.sh/js`), `bench/results/full_run.json`, `bench/bench.md` full-run section, `patent/figures/logs/` evidence logs, TRL 4 checklist in PLAN.md (`dbfc469`, `752d656`, `c4a9eb4`).
+  - Sprint 5: circuit fix (salt in commitment, active[0]===1), rebuild both circuits (588,814 constraints), 8/8 circuit tests (incl. wrong-salt test), regenerated fixtures, demo re-run, full 31-parcel run (30 registered, B only overlap), bench.md updated, IDF-B sections 1/2/4/6/7/9/10 drafted, PLAN.md decision log rows resolved (`9662f07`, `cf625e2`, `3f392ff`, ...).
 
 ### In progress
 
-Nothing running. Sprint 4 Maneesh benchmarks complete. IDF-B sections next.
+IDF-B review, section by section (both), then one read-through with Sarah.
 
 ### Not started
 
-- IDF-B Sections 1, 2, 4, 6 (Maneesh), 7 text to 10 (both)
-- TRL 4 claim in the IDF-B (after the circuit fix)
-- Circuit fixes to meet I1/I3 (see section 7), then rerun proofs, fixtures and benchmarks
+- Send the IDF-B to the faculty mentor and the IPR Cell (after the review)
+- InPASS / patent-agent search before filing
 
 ---
 
@@ -86,29 +87,35 @@ Read these before touching circuits, proofs or the verifier.
 
 | Topic | Fact |
 | --- | --- |
-| Constraint count | Production circuit: **588,297** (from `snarkjs r1cs info`). An earlier figure of 287k was wrong. Use 588,297 everywhere. |
+| Runtime state dir | Registrar writes `demo_state.json` and `full_run_state.json` to `registrar/data/`, not `registrar/state/`. `registrar/data/` is gitignored (holds salts and private cells). Nothing in it is git-tracked. |
+| Resolution comparison | `bench/results/cell_counts.json` has the parcel-fit counts for res 11, 12, and 13 across the 24,102 Newton parcels. Use this as the authoritative resolution comparison; no additional benchmark run needed. |
+| Public deployment | **Forbidden until the provisional patent application is filed.** No public demo, testnet deployment, or posting before that. This is not a TRL 4 caveat -- TRL 4 is lab validation only. |
+| Constraint count | Production circuit: **588,814** after the 2026-10-15 fix (588,297 before; from `snarkjs r1cs info`). An earlier figure of 287k was wrong. Note `bench/results/circuit_reg_prod.json` still holds the pre-fix build. |
 | Powers of tau | Production needs **pot20** (2^20). pot19 is too small. |
 | Hermez file | The public Hermez download is dead. The old Google Cloud bucket returns "Access denied". Do not retry that link. |
-| Our ptau | Generated locally on Maneesh's Mac, single contributor. Fine for the TRL 4 prototype. Must be swapped for a public ceremony file before any public or production use. Say which one was used in the IDF-B. |
+| Our ptau | Generated locally on Maneesh's Mac, single contributor. Fine for the TRL 4 prototype. Must be swapped for a public ceremony file if/when deployment is ever permitted (after patent filing). Say which one was used in the IDF-B. |
 | Dev circuit | `register_parcel_dev.circom`: N=8, N_LEVELS=16, about 79k constraints, fits pot19. Same public signals as production. **Tests only.** |
 | Current verifier | `Groth16Verifier.sol` is exported from the production zkey (N=16, N_LEVELS=32). The dev circuit is for fast tests only. |
 | Public signals | `[oldRoot, newRoot, commitment]`, as in I5. Unchanged. |
 | Large files | `*.ptau`, `*.zkey`, `circuits/build/` are gitignored. Never commit them. Share zkey and wasm through a private drive if needed. |
 | Proving speed | Expect tens of seconds per production proof with snarkjs. If it is too slow, reducing N_LEVELS from 32 to 24 cuts constraints a lot, but that is an interface change and needs both people to agree. |
-| Prove time (measured) | Mean **9,751 ms**, max **10,035 ms** (3 runs, fixture A, MacBook Pro M4 Pro, 24 GB RAM) |
 | Proof size | 719 bytes (JSON) |
 | zkey size | 268.7 MB |
 | Groth16 setup time | 42 s (production circuit, pot20_pp.ptau) |
 | pot20 prepare phase2 time | ~75 min (Apple Silicon) |
 | ptau provenance — pot19 | Locally generated (powersoftau new bn128 19 + contribute + prepare phase2). Not a public ceremony. Dev/test only. Confirmed: `pot19_0000.ptau` and `pot19_final.ptau` intermediates are present in `circuits/build/`. |
-| ptau provenance — pot20 | Locally generated (powersoftau new bn128 20 + contribute + prepare phase2). Not a public ceremony. Fine for TRL 4 prototype; must be replaced before any public or production use. Confirmed: `pot20_0000.ptau` and `pot20_final.ptau` intermediates are present in `circuits/build/ptau/`. |
+| ptau provenance — pot20 | Locally generated (powersoftau new bn128 20 + contribute + prepare phase2). Not a public ceremony. Fine for TRL 4 prototype; must be replaced if/when deployment is ever permitted (after patent filing). Confirmed: `pot20_0000.ptau` and `pot20_final.ptau` intermediates are present in `circuits/build/ptau/`. |
 | Geo settings | FINE_RES 12, CELL_MODE center (from Sarah's bench). 95.9% of 24,102 Newton parcels fit 1–16 cells, zero neighbour collisions. Fixture C touches A but shares no cells. |
 | snarkjs process exit | snarkjs holds a background timer that prevents Node.js from exiting naturally. All scripts that call snarkjs.groth16.fullProve must end with `process.exit(0)` (or `.then(() => process.exit(0))`). |
 | Demo prove times | A: 9,723 ms, C: 9,631 ms (single uncontested run, M4 Pro, no competing node processes). |
 | I4 key names | register.js output uses `overlaps`, `tx_hash`, `token_id`, `prove_ms` (I4 frozen spec). Extra fields `oldRoot`, `newRoot`, `commitment` are present on `registered` lines; decision log in PLAN.md. |
 | Gate 3 clean-clone | Passed 2026-10-14. Clone from origin, checkout maneesh/s3-registrar, `npm ci` in registrar/ and contracts/, copy zkey/wasm/vkey from working machine, `bash registrar/scripts/demo.sh` → registered / overlap / registered ✓ (A 9800 ms, C 9848 ms). |
-| Full real-parcel run | 31 parcels, 30 registered, 1 overlap (B only). Prove ms: mean 10,102, max 10,846, min 9,760. Gas (real verifier): mean 415,942, max 448,564, min 414,724. No unintended overlaps. Raw: `bench/results/full_run.json`. |
-| Patent evidence logs | `patent/figures/logs/demo_run.txt` (demo re-run), `patent/figures/logs/full_run.txt` (full 31-parcel run). Plain-text stdout+stderr captures. |
+| Full real-parcel run (post-fix) | 31 parcels, 30 registered, 1 overlap (B only). Prove ms: mean 10,104, max 10,482, min 9,950. Gas (real Groth16Verifier): mean 415,944, max 448,564, min 414,700. No unintended overlaps. Raw: `bench/results/full_run.json`. |
+| Patent evidence logs | `patent/figures/logs/demo_run.txt` (demo re-run 2026-10-15), `patent/figures/logs/full_run.txt` (full 31-parcel run 2026-10-15). Plain-text stdout+stderr captures with fixed circuit. |
+| Circuit fix (2026-10-15) | Salt added to commitment: `Poseidon([Poseidon(cells), salt])`. `active[0] === 1` constraint added. Both circuits rebuilt. New constraint counts: prod 588,814, dev 158,981. 8/8 tests pass (wrong-salt test added in the follow-up). See PLAN.md decision log for rationale. |
+| Prove time (measured, pre-fix) | Mean **9,751 ms**, max **10,035 ms** (3 runs, fixture A) — superseded by post-fix run below. |
+| Prove time (post-fix, 31-parcel run) | Mean **10,104 ms**, max **10,482 ms** (M4 Pro, 31 parcels). Salt adds negligible overhead. |
+| Commitment signal | Commitment is computed in-circuit and exposed as pubSignals[2]. Not passed in as an input. Public signal order [oldRoot, newRoot, commitment] confirmed: A.pubSignals[0]=0, C.pubSignals[0]=A.pubSignals[1]. |
 
 ---
 
@@ -121,33 +128,53 @@ Read these before touching circuits, proofs or the verifier.
 - [x] `registrar/scripts/demo.sh`: registered / overlap (A) / registered ✓
 - [x] StaleRoot handling in register.js
 
-### Maneesh (Sprint 4) — benchmarks DONE
+### Maneesh (Sprint 4) — DONE
 
 - [x] Full real-parcel run: 30 registered, 1 overlap (B). `bench/results/full_run.json`
 - [x] `bench/bench.md` "Full real-parcel run" section with counts, prove ms, gas stats
 - [x] Patent evidence logs: `patent/figures/logs/demo_run.txt`, `patent/figures/logs/full_run.txt`
-- [x] TRL 4 checklist in `PLAN.md` — all evidenced items ticked, 6 remaining listed
-- [ ] IDF-B Sections 1, 2, 4, 6
+- [x] TRL 4 checklist in `PLAN.md` -- all evidenced items ticked, remaining items listed
+- [x] IDF-B Sections 1, 2, 4, 6, 7, 9, 10 drafted
 
-### Sarah (Sprint 3)
+### Maneesh (Sprint 5) — DONE
 
-1. ~~Switch the deploy path to the real `Groth16Verifier`.~~ Done.
-2. ~~`contracts/test/registry.e2e.test.js` using Maneesh's fixtures.~~ Done, 8 tests.
-3. ~~Gas reporter on for `registerParcel`.~~ Done.
-4. ~~IDF-B Section 7 figures.~~ Done (Sprint 4).
-5. ~~Finish IDF-B Section 3.~~ Done (US 2024/0202847 A1 row completed).
-6. When Maneesh regenerates the verifier and fixtures after the circuit fixes, pull the new fixtures and rerun the e2e tests. Nothing in the tests should need to change.
+- [x] Circuit review: both findings confirmed (salt missing, empty parcel not rejected)
+- [x] Circuit fix: salt in commitment (I3), `active[0] === 1` (I1), both circuits
+- [x] Rebuild production circuit (588,814 constraints) and dev circuit (158,981 constraints)
+- [x] 8/8 circuit tests pass (5 original + test 6 salt binding + test 7 empty parcel + test 8 wrong salt)
+- [x] Regenerated proof fixtures A.json, C_after_A.json against new vkey
+- [x] 13/13 contract tests pass
+- [x] demo.sh: registered / overlap / registered (A 9983 ms, C 10007 ms)
+- [x] Full 31-parcel run: 30 registered, 1 overlap (B), 0 errors
+- [x] bench.md updated: pre-fix numbers superseded, post-fix numbers added
+- [x] PLAN.md decision log: geo settings and circuit fix rows added
+- [x] TRL 4 checklist updated in PLAN.md
+- [x] NOTES-FOR-MANEESH.md updated with findings summary and Sarah's action items
+
+### Sarah (Sprint 3) -- DONE
+
+1. [x] Switch the deploy path from `MockVerifier` to the real `Groth16Verifier` (merged in Step 1).
+2. [x] `contracts/test/registry.e2e.test.js` -- 8 tests pass (Step 3).
+3. [x] Gas reporter on `registerParcel` -- `REPORT_GAS=true npx hardhat test` (Step 3).
+4. [x] IDF-B Section 7 figures in `patent/figures/` (Step 6), Section 5 drafted (Step 4).
+
+### Sarah (Sprint 4) -- DONE
+
+1. [x] IDF-B Figs. 1 to 3 (`patent/figures/fig*`), gas bench (`bench/results/gas.json`), evidence logs, README reproduction table.
+2. [x] IDF-B Section 3 finished (US 2024/0202847 A1, ZKLP, ISPRS 2025 rows).
+3. [x] Resolution comparison inputs (`geo/out/parcels_res11.json`, `parcels_res13.json`).
+4. [x] After the circuit fix: e2e tests and gas bench rerun on the new fixtures (2026-10-20 merge).
 
 ### Both (Sprint 4, after Gate 3)
 
-Benchmarks, register all real parcels, screenshots and logs, README, IDF-B Sections 8 to 10, TRL 4 checklist in PLAN.md.
+Done, except the IDF-B review and send-off (section 4).
 
 ---
 
 ## 7. Open items
 
-- [ ] **Circuit does not yet meet I1/I3** (found in review, 2026-10-14): the commitment is `Poseidon(cells)` with no salt (I1 needs `Poseidon([Poseidon(cells), salt])`), and nothing forces `active[0] == 1`, so an all-empty parcel would prove and mint. Fix in `register_parcel.circom` and `inputs.js`, regenerate zkey and `Groth16Verifier.sol`, regenerate fixtures, rerun the full run. Do not claim TRL 4 in the IDF-B until this is done. Public signals stay `[oldRoot, newRoot, commitment]`.
-- [ ] Agree the four decision log rows still marked "Pending" in PLAN.md (tree key, cell mode, N and N_LEVELS, registrar holds cells).
+- [x] **Circuit did not meet I1/I3** (found in review 2026-10-14; fixed 2026-10-15 in `9662f07`, verifier, fixtures and runs regenerated): the commitment is `Poseidon(cells)` with no salt (I1 needs `Poseidon([Poseidon(cells), salt])`), and nothing forces `active[0] == 1`, so an all-empty parcel would prove and mint. Fix in `register_parcel.circom` and `inputs.js`, regenerate zkey and `Groth16Verifier.sol`, regenerate fixtures, rerun the full run. Do not claim TRL 4 in the IDF-B until this is done. Public signals stay `[oldRoot, newRoot, commitment]`.
+- [ ] Agree the decision log rows still pending in PLAN.md: tree key, N and N_LEVELS, registrar holds cells (both); I6, squash-merge, Cancun, fixture B, zero-cell flagging, Newton source (Maneesh); I4 extra fields (Sarah).
 - [x] Add `.gitattributes` so Windows line endings do not break scripts.
 - [x] `NOTES-FOR-MANEESH.md` untracked from git and added to `.gitignore`. Local file kept.
 - [x] PLAN.md decision log: no "before mainnet" wording found — decision log already used "before Sprint 3 integration and before claiming TRL 4".

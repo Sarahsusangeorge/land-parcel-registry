@@ -1,6 +1,5 @@
 # contracts: npx hardhat test (REPORT_GAS=true)
-# run: 2026-10-15T02:41Z, Hardhat 2.29.1, solc 0.8.28, Node v22.22.0
-
+# run: 2026-10-20T06:40Z, Hardhat 2.29.1, solc 0.8.28, Node v22.22.0; verifier and fixtures from the 2026-10-15 circuit (salt + active[0] fix)
 
   LandRegistry end to end (real Groth16Verifier, real proofs)
     ✔ fixtures chain: C was proved on the root A produces
@@ -28,5 +27,5 @@
     ✔ minting to the zero address reverts and leaves the root unchanged
 
 
-  21 passing (772ms)
+  21 passing (782ms)
 
