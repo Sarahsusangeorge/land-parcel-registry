@@ -566,7 +566,7 @@ Append new rows at the top. A decision that changes an interface needs both name
 |---|---|---|---|
 | 2026-10-15 | Circuit fix: commitment is `Poseidon([Poseidon(cells[0..15]), salt])` with a fresh 248-bit private salt, and `active[0] === 1` | Implements I1 and I3 as frozen. Without the salt, anyone who guesses a cell set can confirm it from the public commitment; without `active[0]`, a zero-cell proof would mint a token covering no land | Maneesh (implements the frozen interface) |
 | 2026-10-15 | The commitment is computed inside the circuit and exposed as `pubSignals[2]`, not passed in | Signal order `[oldRoot, newRoot, commitment]` unchanged; the contract cannot be handed a commitment the cells do not produce | Maneesh |
-| 2026-10-14 | I4 `registered` lines also carry `oldRoot`, `newRoot`, `commitment` | Additive; makes root transitions auditable from the CLI output without an on-chain call. Not present on `overlap` or `error` lines | Maneesh; pending Sarah |
+| 2026-10-14 | I4 `registered` lines also carry `oldRoot`, `newRoot`, `commitment` | Additive; makes root transitions auditable from the CLI output without an on-chain call. Not present on `overlap` or `error` lines | Maneesh, Sarah (Sarah's agreement relayed by Maneesh, 2026-10-21) |
 | 2026-10-14 | Add I6: end-to-end proof fixtures `A.json`, `C_after_A.json`, `B_overlap.json` in `contracts/test/fixtures/` | Sarah's e2e tests and Maneesh's `--dry-run` need one agreed file shape | Sarah, Maneesh |
 | 2026-10-14 | Squash-merge PRs into `main`; no tool attribution in commits, PRs or files | Keep `main` history clean | Sarah, Maneesh |
 | 2026-10-13 | Contracts compile for the Cancun EVM (`evmVersion: "cancun"`) | OpenZeppelin 5.6 uses `mcopy`, which needs Cancun | Sarah, Maneesh |
@@ -577,10 +577,10 @@ Append new rows at the top. A decision that changes an interface needs both name
 | 2026-10-13 | Production circuit uses pot20 | `snarkjs r1cs info`: 588,297 constraints (588,814 after the 2026-10-15 fix) > 2^19. Note: Maneesh's notes say a locally generated ptau needs `prepare phase2` before `groth16 setup` (else a corrupt zkey); keep that step | Maneesh |
 | 2026-10-13 | Keep `register_parcel_dev.circom` (N = 8, N_LEVELS = 16) for tests only | Fits pot19, so circuit tests do not wait on the production setup. Production verifier must come from the production zkey | Maneesh |
 | 2026-10-13 | Hardhat 2.29.1 (not 3.x) with hardhat-toolbox 5.0.0 | Toolbox 5 bundles hardhat-gas-reporter 1.0.10 and chai matchers used by the JS tests | Sarah |
-| 2026-10-12 | Tree key is `Poseidon([cell])`, not the raw H3 ID | Raw H3 IDs share long bit prefixes and would exceed tree depth | Maneesh; pending Sarah |
+| 2026-10-12 | Tree key is `Poseidon([cell])`, not the raw H3 ID | Raw H3 IDs share long bit prefixes and would exceed tree depth | Maneesh, Sarah (Sarah's agreement relayed by Maneesh, 2026-10-21) |
 | 2026-10-12 | `CELL_MODE` leans center | Real neighbours sharing a boundary must not count as overlaps | Sarah, Maneesh (settled by the 2026-10-13 row) |
-| 2026-10-12 | N = 16, N_LEVELS = 32 | Poseidon input limit in circomlib; depth leaves margin for hashed keys | Maneesh; pending Sarah |
-| 2026-10-12 | Registrar holds fine cells and generates proofs | Proving needs the full tree; registrar already certifies parcels | Maneesh; pending Sarah |
+| 2026-10-12 | N = 16, N_LEVELS = 32 | Poseidon input limit in circomlib; depth leaves margin for hashed keys | Maneesh, Sarah (Sarah's agreement relayed by Maneesh, 2026-10-21) |
+| 2026-10-12 | Registrar holds fine cells and generates proofs | Proving needs the full tree; registrar already certifies parcels | Maneesh, Sarah (Sarah's agreement relayed by Maneesh, 2026-10-21) |
 | 2026-10-12 | US county GIS parcels for the prototype | Public, digitized, standard GeoJSON. Mentor informed. | Maneesh, Sarah |
 | 2026-10-12 | Circom, snarkjs, Groth16, Hardhat, OpenZeppelin | Mature tooling, Solidity verifier export | Maneesh, Sarah |
 
@@ -706,6 +706,7 @@ Note: the dev-zkey verifier mentioned under `register_parcel_dev.circom` was rep
 
 | Date | Who | What changed |
 |---|---|---|
+| 2026-10-21 | Maneesh | Recorded Sarah's agreement (relayed on the 2026-10-21 call) to the last four decision rows: tree key, N/N_LEVELS, registrar holds cells, I4 extra fields. Decision log has no pending rows |
 | 2026-10-20 | Maneesh | Agreed the decision-log rows pending him (I6, squash-merge, Cancun, fixture B, zero-cell flagging, Newton source); agreed tree key, N/N_LEVELS and registrar-holds-cells (pending Sarah); ticked finished sprint boxes |
 | 2026-10-20 | Sarah | Merged `maneesh/s5-finish` onto `main` (branch `sarah/s5-merge`): kept the full plan, Section 3 and the figures from `main`; took the circuit fix, verifier, fixtures, run logs and IDF-B Sections 1, 2, 4, 6, 7, 9, 10 from Maneesh; folded his decision notes in above; ticked the circuit box in the TRL 4 checklist |
 | 2026-10-20 | Maneesh | `maneesh/s5-finish`: IDF-B Section 5 and 8 redrafts, Mermaid figure sources (`patent/figures/*.mmd`), TRL 4 checklist update |
