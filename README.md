@@ -93,7 +93,7 @@ holds it (Maneesh's). Everything else runs on any machine.
 | Evidence | Command (from the repo root unless noted) | Output | Needs the zkey |
 |---|---|---|---|
 | Cells per parcel, all 24,102 Newton parcels | `cd geo && python scripts/cell_count_table.py` | `bench/results/cell_counts.json` | No |
-| Geo tests (22) | `cd geo && pytest` | `patent/figures/logs/geo_tests.txt` | No |
+| Geo tests (25) | `cd geo && pytest` | `patent/figures/logs/geo_tests.txt` | No |
 | Contract tests (21, incl. real proofs) | `cd contracts && npx hardhat test` | `patent/figures/logs/contracts_tests.txt` | No |
 | `registerParcel` gas, real verifier | `cd contracts && npx hardhat run scripts/gas_bench.js` | `bench/results/gas.json` | No |
 | Demo: A registered, B overlap, C registered | `bash registrar/scripts/demo.sh` | `patent/figures/logs/demo_run.txt` | Yes |

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "measured_at": "2026-10-15T04:07:15.135Z",
+    "measured_at": "2026-10-20T06:38:41.514Z",
     "network": "hardhat",
     "verifier": "Groth16Verifier.sol (production zkey, N=16, N_LEVELS=32)",
     "method": "gasUsed from transaction receipts; fresh deployment; fixtures registered in order A, C_after_A"
@@ -25,7 +25,7 @@
   ],
   "verifyProof_alone_estimate": 228528,
   "deployment": {
-    "Groth16Verifier": 385561,
+    "Groth16Verifier": 385765,
     "LandRegistry": 1561293
   },
   "notes": [
@@ -36,9 +36,9 @@
     "source": "bench/results/full_run.json",
     "registered": 30,
     "gas_used": {
-      "mean": 415942,
+      "mean": 415944,
       "max": 448564,
-      "min": 414724
+      "min": 414700
     }
   }
 }

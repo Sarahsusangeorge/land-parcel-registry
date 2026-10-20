@@ -5,14 +5,14 @@ deployed Groth16Verifier at 0x5FbDB2315678afecb367f032d93F642f64180aa3
 deployed LandRegistry at 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512; registrar role -> 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
 wrote /Users/maneeshari/Desktop/land-parcel-registry/contracts/deployments/local.json
 [demo] Registering A…
-{"status":"registered","parcel_id":"A","token_id":1,"tx_hash":"0xad635497cd0838621499d0886e1d8e661c46d12579a6f344d7b34ff2c2f757b0","oldRoot":"0","newRoot":"1627276571125689245575422886857369656002719209654662685577916150576429071912","commitment":"15196078684380642966161433440366600286153328906093855048437110667085761691242","coarseCells":["617735346462654463"],"metadataURI":"ipfs://land-parcel-registry/A","prove_ms":9920}
-[demo] A: registered (9920 ms)
+{"status":"registered","parcel_id":"A","token_id":1,"tx_hash":"0x667d49962e5424f19c8e959964677ed6f0608df27be0f58c8d65a68adcc85ca8","oldRoot":"0","newRoot":"1627276571125689245575422886857369656002719209654662685577916150576429071912","commitment":"13759661455377890979439760728655711988074585978475098358094242612402882497657","coarseCells":["617735346462654463"],"metadataURI":"ipfs://land-parcel-registry/A","prove_ms":9983}
+[demo] A: registered (9983 ms)
 [demo] Attempting B…
 {"status":"overlap","parcel_id":"B","overlaps":["A"]}
 [demo] B: overlap (as expected)
 [demo] Registering C…
-{"status":"registered","parcel_id":"C","token_id":2,"tx_hash":"0x9c3cd3039fb47864971f40130d518492a9d101c375f2484d5b3c4975d5638af0","oldRoot":"1627276571125689245575422886857369656002719209654662685577916150576429071912","newRoot":"9584833624854658040203755910495783602263264932340255884103000315092558291369","commitment":"14330134198885641840868367350469833767161265079041280498476108804245879071490","coarseCells":["617735346461605887","617735346462654463"],"metadataURI":"ipfs://land-parcel-registry/C","prove_ms":9708}
-[demo] C: registered (9708 ms)
+{"status":"registered","parcel_id":"C","token_id":2,"tx_hash":"0xd0c442b89d592f00e23091f4799a0647995dbbaff1ef876ca8d3580811921c77","oldRoot":"1627276571125689245575422886857369656002719209654662685577916150576429071912","newRoot":"9584833624854658040203755910495783602263264932340255884103000315092558291369","commitment":"1366638760489942060082337018172931618099126965501363118223245667959702219677","coarseCells":["617735346461605887","617735346462654463"],"metadataURI":"ipfs://land-parcel-registry/C","prove_ms":10007}
+[demo] C: registered (10007 ms)
 [demo] Demo complete. registered / overlap / registered ✓
-{ "A_prove_ms": 9920, "C_prove_ms": 9708 }
-[demo] Stopping Hardhat node (PID 72287)…
+{ "A_prove_ms": 9983, "C_prove_ms": 10007 }
+[demo] Stopping Hardhat node (PID 80906)…

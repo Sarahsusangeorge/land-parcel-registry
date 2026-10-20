@@ -7,106 +7,106 @@ wrote /Users/maneeshari/Desktop/land-parcel-registry/contracts/deployments/local
 [full_run] Starting full registration pass (31 parcels)…
 [full_run] 31 parcels to process.
 [full_run] (1/31) A …
-[full_run]   → registered, 9760 ms, gas 448564
-{"parcel_id":"A","status":"registered","overlaps":[],"prove_ms":9760,"gas_used":448564}
+[full_run]   → registered, 9951 ms, gas 448564
+{"parcel_id":"A","status":"registered","overlaps":[],"prove_ms":9951,"gas_used":448564}
 [full_run] (2/31) B …
 [full_run]   → overlap, overlaps [A]
 {"parcel_id":"B","status":"overlap","overlaps":["A"],"prove_ms":null,"gas_used":null}
 [full_run] (3/31) C …
-[full_run]   → registered, 9841 ms, gas 415048
-{"parcel_id":"C","status":"registered","overlaps":[],"prove_ms":9841,"gas_used":415048}
+[full_run]   → registered, 10041 ms, gas 415036
+{"parcel_id":"C","status":"registered","overlaps":[],"prove_ms":10041,"gas_used":415036}
 [full_run] (4/31) P01 …
-[full_run]   → registered, 9861 ms, gas 414760
-{"parcel_id":"P01","status":"registered","overlaps":[],"prove_ms":9861,"gas_used":414760}
+[full_run]   → registered, 10043 ms, gas 414772
+{"parcel_id":"P01","status":"registered","overlaps":[],"prove_ms":10043,"gas_used":414772}
 [full_run] (5/31) P02 …
-[full_run]   → registered, 9984 ms, gas 414760
-{"parcel_id":"P02","status":"registered","overlaps":[],"prove_ms":9984,"gas_used":414760}
+[full_run]   → registered, 9996 ms, gas 414748
+{"parcel_id":"P02","status":"registered","overlaps":[],"prove_ms":9996,"gas_used":414748}
 [full_run] (6/31) P03 …
-[full_run]   → registered, 9980 ms, gas 414760
-{"parcel_id":"P03","status":"registered","overlaps":[],"prove_ms":9980,"gas_used":414760}
+[full_run]   → registered, 10051 ms, gas 414736
+{"parcel_id":"P03","status":"registered","overlaps":[],"prove_ms":10051,"gas_used":414736}
 [full_run] (7/31) P04 …
-[full_run]   → registered, 10026 ms, gas 414772
-{"parcel_id":"P04","status":"registered","overlaps":[],"prove_ms":10026,"gas_used":414772}
+[full_run]   → registered, 10038 ms, gas 414772
+{"parcel_id":"P04","status":"registered","overlaps":[],"prove_ms":10038,"gas_used":414772}
 [full_run] (8/31) P05 …
-[full_run]   → registered, 9987 ms, gas 414760
-{"parcel_id":"P05","status":"registered","overlaps":[],"prove_ms":9987,"gas_used":414760}
+[full_run]   → registered, 10119 ms, gas 414736
+{"parcel_id":"P05","status":"registered","overlaps":[],"prove_ms":10119,"gas_used":414736}
 [full_run] (9/31) P06 …
-[full_run]   → registered, 10365 ms, gas 414748
-{"parcel_id":"P06","status":"registered","overlaps":[],"prove_ms":10365,"gas_used":414748}
+[full_run]   → registered, 9970 ms, gas 414748
+{"parcel_id":"P06","status":"registered","overlaps":[],"prove_ms":9970,"gas_used":414748}
 [full_run] (10/31) P07 …
-[full_run]   → registered, 10134 ms, gas 414760
-{"parcel_id":"P07","status":"registered","overlaps":[],"prove_ms":10134,"gas_used":414760}
+[full_run]   → registered, 10047 ms, gas 414748
+{"parcel_id":"P07","status":"registered","overlaps":[],"prove_ms":10047,"gas_used":414748}
 [full_run] (11/31) P08 …
-[full_run]   → registered, 9831 ms, gas 414736
-{"parcel_id":"P08","status":"registered","overlaps":[],"prove_ms":9831,"gas_used":414736}
+[full_run]   → registered, 10218 ms, gas 414772
+{"parcel_id":"P08","status":"registered","overlaps":[],"prove_ms":10218,"gas_used":414772}
 [full_run] (12/31) P09 …
-[full_run]   → registered, 9975 ms, gas 414772
-{"parcel_id":"P09","status":"registered","overlaps":[],"prove_ms":9975,"gas_used":414772}
+[full_run]   → registered, 10036 ms, gas 414748
+{"parcel_id":"P09","status":"registered","overlaps":[],"prove_ms":10036,"gas_used":414748}
 [full_run] (13/31) P10 …
-[full_run]   → registered, 10089 ms, gas 414772
-{"parcel_id":"P10","status":"registered","overlaps":[],"prove_ms":10089,"gas_used":414772}
+[full_run]   → registered, 10021 ms, gas 414760
+{"parcel_id":"P10","status":"registered","overlaps":[],"prove_ms":10021,"gas_used":414760}
 [full_run] (14/31) P11 …
-[full_run]   → registered, 9934 ms, gas 414760
-{"parcel_id":"P11","status":"registered","overlaps":[],"prove_ms":9934,"gas_used":414760}
+[full_run]   → registered, 10219 ms, gas 414760
+{"parcel_id":"P11","status":"registered","overlaps":[],"prove_ms":10219,"gas_used":414760}
 [full_run] (15/31) P12 …
-[full_run]   → registered, 9951 ms, gas 415084
-{"parcel_id":"P12","status":"registered","overlaps":[],"prove_ms":9951,"gas_used":415084}
+[full_run]   → registered, 10098 ms, gas 415072
+{"parcel_id":"P12","status":"registered","overlaps":[],"prove_ms":10098,"gas_used":415072}
 [full_run] (16/31) P13 …
-[full_run]   → registered, 10078 ms, gas 415048
-{"parcel_id":"P13","status":"registered","overlaps":[],"prove_ms":10078,"gas_used":415048}
+[full_run]   → registered, 10085 ms, gas 415072
+{"parcel_id":"P13","status":"registered","overlaps":[],"prove_ms":10085,"gas_used":415072}
 [full_run] (17/31) P14 …
-[full_run]   → registered, 10135 ms, gas 414760
-{"parcel_id":"P14","status":"registered","overlaps":[],"prove_ms":10135,"gas_used":414760}
+[full_run]   → registered, 10104 ms, gas 414700
+{"parcel_id":"P14","status":"registered","overlaps":[],"prove_ms":10104,"gas_used":414700}
 [full_run] (18/31) P15 …
-[full_run]   → registered, 10846 ms, gas 414736
-{"parcel_id":"P15","status":"registered","overlaps":[],"prove_ms":10846,"gas_used":414736}
+[full_run]   → registered, 10063 ms, gas 414760
+{"parcel_id":"P15","status":"registered","overlaps":[],"prove_ms":10063,"gas_used":414760}
 [full_run] (19/31) P16 …
-[full_run]   → registered, 10570 ms, gas 415048
-{"parcel_id":"P16","status":"registered","overlaps":[],"prove_ms":10570,"gas_used":415048}
+[full_run]   → registered, 10154 ms, gas 415072
+{"parcel_id":"P16","status":"registered","overlaps":[],"prove_ms":10154,"gas_used":415072}
 [full_run] (20/31) P17 …
-[full_run]   → registered, 10138 ms, gas 414748
-{"parcel_id":"P17","status":"registered","overlaps":[],"prove_ms":10138,"gas_used":414748}
+[full_run]   → registered, 10041 ms, gas 414748
+{"parcel_id":"P17","status":"registered","overlaps":[],"prove_ms":10041,"gas_used":414748}
 [full_run] (21/31) P18 …
-[full_run]   → registered, 9987 ms, gas 415072
-{"parcel_id":"P18","status":"registered","overlaps":[],"prove_ms":9987,"gas_used":415072}
+[full_run]   → registered, 10482 ms, gas 415072
+{"parcel_id":"P18","status":"registered","overlaps":[],"prove_ms":10482,"gas_used":415072}
 [full_run] (22/31) P19 …
-[full_run]   → registered, 10157 ms, gas 414760
-{"parcel_id":"P19","status":"registered","overlaps":[],"prove_ms":10157,"gas_used":414760}
+[full_run]   → registered, 10238 ms, gas 414748
+{"parcel_id":"P19","status":"registered","overlaps":[],"prove_ms":10238,"gas_used":414748}
 [full_run] (23/31) P20 …
-[full_run]   → registered, 10593 ms, gas 414748
-{"parcel_id":"P20","status":"registered","overlaps":[],"prove_ms":10593,"gas_used":414748}
+[full_run]   → registered, 10110 ms, gas 414760
+{"parcel_id":"P20","status":"registered","overlaps":[],"prove_ms":10110,"gas_used":414760}
 [full_run] (24/31) P21 …
-[full_run]   → registered, 10521 ms, gas 414760
-{"parcel_id":"P21","status":"registered","overlaps":[],"prove_ms":10521,"gas_used":414760}
+[full_run]   → registered, 10156 ms, gas 414772
+{"parcel_id":"P21","status":"registered","overlaps":[],"prove_ms":10156,"gas_used":414772}
 [full_run] (25/31) P22 …
-[full_run]   → registered, 10253 ms, gas 414736
-{"parcel_id":"P22","status":"registered","overlaps":[],"prove_ms":10253,"gas_used":414736}
+[full_run]   → registered, 10231 ms, gas 414772
+{"parcel_id":"P22","status":"registered","overlaps":[],"prove_ms":10231,"gas_used":414772}
 [full_run] (26/31) P23 …
-[full_run]   → registered, 10215 ms, gas 414748
-{"parcel_id":"P23","status":"registered","overlaps":[],"prove_ms":10215,"gas_used":414748}
+[full_run]   → registered, 10225 ms, gas 414772
+{"parcel_id":"P23","status":"registered","overlaps":[],"prove_ms":10225,"gas_used":414772}
 [full_run] (27/31) P24 …
-[full_run]   → registered, 10065 ms, gas 415084
-{"parcel_id":"P24","status":"registered","overlaps":[],"prove_ms":10065,"gas_used":415084}
+[full_run]   → registered, 10115 ms, gas 415072
+{"parcel_id":"P24","status":"registered","overlaps":[],"prove_ms":10115,"gas_used":415072}
 [full_run] (28/31) P25 …
-[full_run]   → registered, 9904 ms, gas 414760
-{"parcel_id":"P25","status":"registered","overlaps":[],"prove_ms":9904,"gas_used":414760}
+[full_run]   → registered, 10126 ms, gas 414760
+{"parcel_id":"P25","status":"registered","overlaps":[],"prove_ms":10126,"gas_used":414760}
 [full_run] (29/31) P26 …
-[full_run]   → registered, 10169 ms, gas 414736
-{"parcel_id":"P26","status":"registered","overlaps":[],"prove_ms":10169,"gas_used":414736}
+[full_run]   → registered, 10203 ms, gas 414760
+{"parcel_id":"P26","status":"registered","overlaps":[],"prove_ms":10203,"gas_used":414760}
 [full_run] (30/31) P27 …
-[full_run]   → registered, 9796 ms, gas 414724
-{"parcel_id":"P27","status":"registered","overlaps":[],"prove_ms":9796,"gas_used":414724}
+[full_run]   → registered, 9950 ms, gas 414760
+{"parcel_id":"P27","status":"registered","overlaps":[],"prove_ms":9950,"gas_used":414760}
 [full_run] (31/31) P28 …
-[full_run]   → registered, 9910 ms, gas 414748
-{"parcel_id":"P28","status":"registered","overlaps":[],"prove_ms":9910,"gas_used":414748}
+[full_run]   → registered, 9993 ms, gas 414748
+{"parcel_id":"P28","status":"registered","overlaps":[],"prove_ms":9993,"gas_used":414748}
 
 [full_run] ── Summary ─────────────────────────────────
 [full_run]   Total:      31
 [full_run]   Registered: 30
 [full_run]   Overlaps:   1
 [full_run]   Errors:     0
-[full_run]   Prove ms:   mean 10102, max 10846, min 9760
-[full_run]   Gas used:   mean 415942, max 448564, min 414724
+[full_run]   Prove ms:   mean 10104, max 10482, min 9950
+[full_run]   Gas used:   mean 415944, max 448564, min 414700
 [full_run]   Written to: bench/results/full_run.json
 [full_run] Full run complete.
-[full_run] Stopping Hardhat node (PID 72431)…
+[full_run] Stopping Hardhat node (PID 81093)…

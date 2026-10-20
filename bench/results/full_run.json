@@ -1,6 +1,6 @@
 {
   "meta": {
-    "run_at": "2026-10-14T18:03:13.224Z",
+    "run_at": "2026-10-15T09:04:32.867Z",
     "hardware": "MacBook Pro M4 Pro, 24 GB RAM",
     "parcels_file": "geo/out/parcels.json",
     "circuit": "register_parcel.circom N=16 N_LEVELS=32",
@@ -14,14 +14,14 @@
     "overlaps": 1,
     "errors": 0,
     "prove_ms": {
-      "mean": 10102,
-      "max": 10846,
-      "min": 9760
+      "mean": 10104,
+      "max": 10482,
+      "min": 9950
     },
     "gas_used": {
-      "mean": 415942,
+      "mean": 415944,
       "max": 448564,
-      "min": 414724
+      "min": 414700
     }
   },
   "results": [
@@ -29,7 +29,7 @@
       "parcel_id": "A",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9760,
+      "prove_ms": 9951,
       "gas_used": 448564
     },
     {
@@ -45,203 +45,203 @@
       "parcel_id": "C",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9841,
-      "gas_used": 415048
+      "prove_ms": 10041,
+      "gas_used": 415036
     },
     {
       "parcel_id": "P01",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9861,
-      "gas_used": 414760
+      "prove_ms": 10043,
+      "gas_used": 414772
     },
     {
       "parcel_id": "P02",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9984,
-      "gas_used": 414760
+      "prove_ms": 9996,
+      "gas_used": 414748
     },
     {
       "parcel_id": "P03",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9980,
-      "gas_used": 414760
+      "prove_ms": 10051,
+      "gas_used": 414736
     },
     {
       "parcel_id": "P04",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10026,
+      "prove_ms": 10038,
       "gas_used": 414772
     },
     {
       "parcel_id": "P05",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9987,
-      "gas_used": 414760
+      "prove_ms": 10119,
+      "gas_used": 414736
     },
     {
       "parcel_id": "P06",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10365,
+      "prove_ms": 9970,
       "gas_used": 414748
     },
     {
       "parcel_id": "P07",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10134,
-      "gas_used": 414760
+      "prove_ms": 10047,
+      "gas_used": 414748
     },
     {
       "parcel_id": "P08",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9831,
-      "gas_used": 414736
+      "prove_ms": 10218,
+      "gas_used": 414772
     },
     {
       "parcel_id": "P09",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9975,
-      "gas_used": 414772
+      "prove_ms": 10036,
+      "gas_used": 414748
     },
     {
       "parcel_id": "P10",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10089,
-      "gas_used": 414772
+      "prove_ms": 10021,
+      "gas_used": 414760
     },
     {
       "parcel_id": "P11",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9934,
+      "prove_ms": 10219,
       "gas_used": 414760
     },
     {
       "parcel_id": "P12",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9951,
-      "gas_used": 415084
+      "prove_ms": 10098,
+      "gas_used": 415072
     },
     {
       "parcel_id": "P13",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10078,
-      "gas_used": 415048
+      "prove_ms": 10085,
+      "gas_used": 415072
     },
     {
       "parcel_id": "P14",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10135,
-      "gas_used": 414760
+      "prove_ms": 10104,
+      "gas_used": 414700
     },
     {
       "parcel_id": "P15",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10846,
-      "gas_used": 414736
+      "prove_ms": 10063,
+      "gas_used": 414760
     },
     {
       "parcel_id": "P16",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10570,
-      "gas_used": 415048
+      "prove_ms": 10154,
+      "gas_used": 415072
     },
     {
       "parcel_id": "P17",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10138,
+      "prove_ms": 10041,
       "gas_used": 414748
     },
     {
       "parcel_id": "P18",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9987,
+      "prove_ms": 10482,
       "gas_used": 415072
     },
     {
       "parcel_id": "P19",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10157,
-      "gas_used": 414760
+      "prove_ms": 10238,
+      "gas_used": 414748
     },
     {
       "parcel_id": "P20",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10593,
-      "gas_used": 414748
+      "prove_ms": 10110,
+      "gas_used": 414760
     },
     {
       "parcel_id": "P21",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10521,
-      "gas_used": 414760
+      "prove_ms": 10156,
+      "gas_used": 414772
     },
     {
       "parcel_id": "P22",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10253,
-      "gas_used": 414736
+      "prove_ms": 10231,
+      "gas_used": 414772
     },
     {
       "parcel_id": "P23",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10215,
-      "gas_used": 414748
+      "prove_ms": 10225,
+      "gas_used": 414772
     },
     {
       "parcel_id": "P24",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10065,
-      "gas_used": 415084
+      "prove_ms": 10115,
+      "gas_used": 415072
     },
     {
       "parcel_id": "P25",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9904,
+      "prove_ms": 10126,
       "gas_used": 414760
     },
     {
       "parcel_id": "P26",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 10169,
-      "gas_used": 414736
+      "prove_ms": 10203,
+      "gas_used": 414760
     },
     {
       "parcel_id": "P27",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9796,
-      "gas_used": 414724
+      "prove_ms": 9950,
+      "gas_used": 414760
     },
     {
       "parcel_id": "P28",
       "status": "registered",
       "overlaps": [],
-      "prove_ms": 9910,
+      "prove_ms": 9993,
       "gas_used": 414748
     }
   ]

@@ -533,13 +533,13 @@ Claim TRL 4 in the IDF-B only when every box below is ticked and each has a file
 
 Integration
 
-- [ ] Real Circom circuit with all I3 constraints (no mock anywhere in the final path) (real circuit in the final path, but salt and `active[0] == 1` still missing)
+- [x] Real Circom circuit with all I3 constraints (no mock anywhere in the final path) (salt and `active[0] == 1` added 2026-10-15; 588,814 constraints; verifier, fixtures, demo and full run regenerated)
 - [x] Real verifier deployed and called by `LandRegistry` on a local chain (`registrar/scripts/demo.sh`, `contracts/test/registry.e2e.test.js`)
 - [x] One-command demo from a clean clone: A registered, B rejected as overlap, C registered (`patent/figures/logs/demo_run.txt`)
 
 Validation
 
-- [x] Circuit tests pass (Sprint 2 list) (`registrar/test/circuit.test.js`)
+- [x] Circuit tests pass (Sprint 2 list plus salt, wrong-salt and empty-parcel tests: 8) (`registrar/test/circuit.test.js`)
 - [x] Contract mock and end-to-end tests pass (Sprints 2 and 3 lists) (21 passing)
 - [x] At least 10 real US parcels registered in sequence, with results recorded (30, `bench/results/full_run.json`)
 - [x] Tamper cases rejected: changed public signal, replayed proof, stale root, non-registrar caller (`registry.e2e.test.js`)
@@ -548,7 +548,7 @@ Measurements (all in `bench/bench.md`)
 
 - [x] Constraint count
 - [x] Proving time, mean and max, with hardware noted
-- [x] Verification gas, mean (415,942 over 30 registrations)
+- [x] Verification gas, mean (415,944 over 30 registrations, post-fix)
 - [x] Cells per parcel at two fine resolutions, and share of parcels that fit N = 16 (res 11, 12 and 13 over 24,102 parcels)
 - [x] Known limitations written down (grid approximation, parcel size limit, registrar trust) (`bench/bench.md`)
 
@@ -564,23 +564,131 @@ Append new rows at the top. A decision that changes an interface needs both name
 
 | Date | Decision | Why | Agreed by |
 |---|---|---|---|
+| 2026-10-15 | Circuit fix: commitment is `Poseidon([Poseidon(cells[0..15]), salt])` with a fresh 248-bit private salt, and `active[0] === 1` | Implements I1 and I3 as frozen. Without the salt, anyone who guesses a cell set can confirm it from the public commitment; without `active[0]`, a zero-cell proof would mint a token covering no land | Maneesh (implements the frozen interface) |
+| 2026-10-15 | The commitment is computed inside the circuit and exposed as `pubSignals[2]`, not passed in | Signal order `[oldRoot, newRoot, commitment]` unchanged; the contract cannot be handed a commitment the cells do not produce | Maneesh |
 | 2026-10-14 | I4 `registered` lines also carry `oldRoot`, `newRoot`, `commitment` | Additive; makes root transitions auditable from the CLI output without an on-chain call. Not present on `overlap` or `error` lines | Maneesh; pending Sarah |
 | 2026-10-14 | Add I6: end-to-end proof fixtures `A.json`, `C_after_A.json`, `B_overlap.json` in `contracts/test/fixtures/` | Sarah's e2e tests and Maneesh's `--dry-run` need one agreed file shape | Sarah; pending Maneesh |
 | 2026-10-14 | Squash-merge PRs into `main`; no tool attribution in commits, PRs or files | Keep `main` history clean | Sarah; pending Maneesh |
 | 2026-10-13 | Contracts compile for the Cancun EVM (`evmVersion: "cancun"`) | OpenZeppelin 5.6 uses `mcopy`, which needs Cancun | Sarah; pending Maneesh |
 | 2026-10-13 | Fixture B = A shifted 5 m east | Resolves "roughly one cell width" (I2) vs "a few metres" (Sprint 1). 5 m is about half a res-12 edge; B shares 5 of A's cells | Sarah; pending Maneesh |
 | 2026-10-13 | Parcels with 0 fine cells are flagged `fits_batch: false`, not given a fallback cell | A fallback cell (the cell under a point inside the parcel) made 658 of 24,102 Newton parcels collide with a neighbour | Sarah; pending Maneesh |
-| 2026-10-13 | `FINE_RES = 12`, `COARSE_RES = 9`, `CELL_MODE = center` | Res 12 center: 95.9% of 24,102 Newton parcels fit N = 16 and no neighbours collide. Res 11 leaves 55% with 0 cells; res 13 fits 37%; overlap mode makes nearly every neighbour collide (`bench/bench.md`) | Sarah; pending Maneesh |
+| 2026-10-13 | `FINE_RES = 12`, `COARSE_RES = 9`, `CELL_MODE = center` | Res 12 center: 95.9% of 24,102 Newton parcels fit N = 16 and no neighbours collide. Res 11 leaves 55% with 0 cells; res 13 fits 37%; overlap mode makes nearly every neighbour collide (`bench/bench.md`) | Sarah, Maneesh |
 | 2026-10-13 | Parcel source: City of Newton, MA parcel layer (`NewtonMAGIS/GISData`, `Property/Parcels.geojson`), replacing Fairfax County, VA | Official city data, already WGS84; Fairfax's server was unreachable from the build environment. Committed sample drops owner names and values | Sarah; pending Maneesh |
-| 2026-10-13 | Production circuit uses pot20 | `snarkjs r1cs info`: 588,297 constraints > 2^19. Note: Maneesh's notes say a locally generated ptau needs `prepare phase2` before `groth16 setup` (else a corrupt zkey); keep that step | Maneesh |
+| 2026-10-13 | Production circuit uses pot20 | `snarkjs r1cs info`: 588,297 constraints (588,814 after the 2026-10-15 fix) > 2^19. Note: Maneesh's notes say a locally generated ptau needs `prepare phase2` before `groth16 setup` (else a corrupt zkey); keep that step | Maneesh |
 | 2026-10-13 | Keep `register_parcel_dev.circom` (N = 8, N_LEVELS = 16) for tests only | Fits pot19, so circuit tests do not wait on the production setup. Production verifier must come from the production zkey | Maneesh |
 | 2026-10-13 | Hardhat 2.29.1 (not 3.x) with hardhat-toolbox 5.0.0 | Toolbox 5 bundles hardhat-gas-reporter 1.0.10 and chai matchers used by the JS tests | Sarah |
 | 2026-10-12 | Tree key is `Poseidon([cell])`, not the raw H3 ID | Raw H3 IDs share long bit prefixes and would exceed tree depth | Pending |
-| 2026-10-12 | `CELL_MODE` leans center | Real neighbours sharing a boundary must not count as overlaps | Pending |
+| 2026-10-12 | `CELL_MODE` leans center | Real neighbours sharing a boundary must not count as overlaps | Sarah, Maneesh (settled by the 2026-10-13 row) |
 | 2026-10-12 | N = 16, N_LEVELS = 32 | Poseidon input limit in circomlib; depth leaves margin for hashed keys | Pending |
 | 2026-10-12 | Registrar holds fine cells and generates proofs | Proving needs the full tree; registrar already certifies parcels | Pending |
 | 2026-10-12 | US county GIS parcels for the prototype | Public, digitized, standard GeoJSON. Mentor informed. | Maneesh, Sarah |
 | 2026-10-12 | Circom, snarkjs, Groth16, Hardhat, OpenZeppelin | Mature tooling, Solidity verifier export | Maneesh, Sarah |
+
+### Decision notes (Maneesh)
+
+Longer reasoning behind some rows above, as written on `maneesh/s5-finish`.
+
+#### Geo settings — FINE_RES 12, COARSE_RES 9, CELL_MODE center (Sprint 1)
+
+**Decision:** Use H3 resolution 12, center mode, with coarse resolution 9.
+Agreed by: Maneesh, Sarah.
+
+**Reason:** Res 12, center mode is the only setting where almost all parcels
+fit N=16 (95.9% of 24,102 Newton parcels have 1–16 fine cells) and no real
+neighbours share a cell (zero neighbour collisions). Res 11 center fits only
+44.2% of parcels. Res 13 center fits only 37.2% with N=16. Overlap mode at
+any resolution makes nearly every parcel collide with its neighbours, making
+the overlap check a false alarm for shared boundaries.
+
+**How to apply:** FINE_RES, COARSE_RES, and CELL_MODE are frozen in interface
+I1. Changing them changes the cell sets stored in parcels.json (I2), which
+breaks all existing proofs and the cell index. Requires agreement from both
+Maneesh and Sarah and a coordinated re-run of the geo pipeline, circuit, and
+all registrations.
+
+Resolution comparison (res 11, 12, 13) across all 24,102 Newton parcels is in
+`bench/results/cell_counts.json`. No additional benchmark run is planned.
+
+#### Circuit fix — salt in commitment and active[0]===1 constraint (Sprint 5, 2026-10-15)
+
+**Decision:** Add a private `salt` input to register_parcel.circom and change
+the commitment from `Poseidon(cells[0..N-1])` to `Poseidon([Poseidon(cells[0..N-1]), salt])`.
+Also add the constraint `active[0] === 1` (I1) to reject empty parcels.
+Agreed by: Maneesh (implementing), noted for Sarah.
+
+**Reason (salt):** Without salt, two identical cell sets produce the same
+commitment. A replayer who knows the cell list could construct an input that
+collides. Salt makes the commitment unpredictable and unique per registration
+even if the cell set is known to the registrar. This is the I3 spec.
+
+**Reason (active[0]):** Without the constraint, a proof for zero active cells
+is valid. The contract would accept the proof and mint a token covering no land.
+The I1 spec requires at least one active cell.
+
+**How to apply:** The salt is generated by inputs.js using crypto.randomBytes(31)
+(248-bit, fits BN128 field). It is a private circuit input; it does not appear
+in public signals. The commitment in public signals[2] now encodes both the cell
+set and the salt. Sarah's e2e tests load fixtures regenerated from the fixed
+circuit; no contract changes are needed.
+
+#### Commitment is computed in-circuit and exposed as a public output (Sprint 5)
+
+**Decision:** The circuit computes `commitment = Poseidon([Poseidon(cells), salt])` inside
+the ZK circuit and exposes it as `pubSignals[2]`. It is not passed in as an input.
+Interface I3 describes the commitment semantics correctly; the implementation computes it
+rather than accepting it. The public signal order `[oldRoot, newRoot, commitment]` is
+confirmed: A.pubSignals[0] = 0 (empty tree oldRoot) and C.pubSignals[0] = A.pubSignals[1]
+(C was proved against the root A produced).
+Agreed by: Maneesh.
+
+#### register.js "registered" output carries oldRoot, newRoot, commitment (Sprint 3)
+
+**Decision:** The I4 `registered` JSON line includes three fields beyond the frozen spec:
+`oldRoot`, `newRoot`, and `commitment`.
+
+**Reason:** The frozen I4 spec lists `parcel_id, status, overlaps, tx_hash, token_id, prove_ms`.
+These three extra fields duplicate what the contract already stores on-chain but surface them
+directly in the CLI output, making it easy to chain registrations, audit root transitions, and
+script against the proof without a separate on-chain call. They add no ambiguity to I4 because
+they are additive and do not rename any frozen key.
+
+**How to apply:** Consumers of the I4 output may rely on `oldRoot`, `newRoot`, `commitment`
+being present in `status:"registered"` lines from this registrar. They are omitted from
+`status:"overlap"` and `status:"error"` lines where they are not meaningful.
+
+#### circuits/register_parcel_dev.circom — test-only circuit (Sprint 2)
+
+**Decision:** Keep `register_parcel_dev.circom` (N=8, N_LEVELS=16) alongside the production
+`register_parcel.circom` (N=16, N_LEVELS=32).
+
+**Reason:** The production circuit has 588,297 constraints and requires pot20 (~500 MB
+Hermez download) for groth16 setup. The jest circuit tests in `registrar/test/circuit.test.js`
+need a compiled zkey to run. Rather than gate all sprint 2 tests on a 500 MB download, we
+compile a structurally identical circuit with smaller parameters that fits pot19 (already
+present in `circuits/build/`). All five constraint groups G1–G5 are exercised identically.
+
+**Scope:** `register_parcel_dev.circom` is for CI/sprint testing only. The `contracts/contracts/
+Groth16Verifier.sol` currently exported from the dev zkey must be regenerated from the
+production zkey (`bash circuits/scripts/build.sh`, no `--dev` flag) before Sprint 3
+integration and before claiming TRL 4.
+
+#### Production circuit uses pot20 (Sprint 2 follow-up)
+
+**Decision:** Production circuit (`register_parcel.circom`, N=16, N_LEVELS=32) requires
+`powersOfTau28_hez_final_20.ptau` (pot20), not pot19 or pot21.
+
+**Reason:** `snarkjs r1cs info` reports 588,297 constraints. snarkjs `groth16 setup`
+requires `2^k ≥ constraints`, so pot19 (2^19 = 524,288 < 588,297) is insufficient and
+pot20 (2^20 = 1,048,576 > 588,297) is the minimum. pot21 would also work but is
+unnecessarily large.
+
+**How to apply:** The build script attempts to download `powersOfTau28_hez_final_20.ptau`
+from the Hermez GCS mirror (now access-restricted). In practice: generate locally with
+`snarkjs powersoftau new bn128 20` + `contribute` + `prepare phase2`. The `prepare phase2`
+step is mandatory — passing a raw phase1 file to `groth16 setup` completes silently but
+writes a corrupt 12-byte zkey. `build.sh` handles the full sequence automatically.
+
+Note: the dev-zkey verifier mentioned under `register_parcel_dev.circom` was replaced by the production verifier in the Sprint 2 follow-up and again after the 2026-10-15 fix.
 
 ### Pinned versions
 
@@ -598,6 +706,10 @@ Append new rows at the top. A decision that changes an interface needs both name
 
 | Date | Who | What changed |
 |---|---|---|
+| 2026-10-20 | Sarah | Merged `maneesh/s5-finish` onto `main` (branch `sarah/s5-merge`): kept the full plan, Section 3 and the figures from `main`; took the circuit fix, verifier, fixtures, run logs and IDF-B Sections 1, 2, 4, 6, 7, 9, 10 from Maneesh; folded his decision notes in above; ticked the circuit box in the TRL 4 checklist |
+| 2026-10-20 | Maneesh | `maneesh/s5-finish`: IDF-B Section 5 and 8 redrafts, Mermaid figure sources (`patent/figures/*.mmd`), TRL 4 checklist update |
+| 2026-10-15 | Maneesh | Sprint 5 follow-up: registrar data dir `registrar/data/`, wrong-salt circuit test (8/8 pass), testnet caveat (public deployment forbidden until the patent application is filed) |
+| 2026-10-15 | Maneesh | Sprint 5 circuit fix (salt in commitment, `active[0] === 1`): rebuild (588,814 constraints), regenerated verifier and fixtures, demo and full 31-parcel run re-run (30/31, B only; prove mean 10,104 ms, max 10,482 ms; gas mean 415,944), `bench.md` updated, IDF-B Sections 1, 2, 4, 6, 7, 9, 10 drafted |
 | 2026-10-15 | Sarah | `parcels.py --fine-res` for the resolution comparison (res 11 and 13 files); IDF-B Section 8 drafted, circuit numbers provisional |
 | 2026-10-15 | Sarah | Sprint 4: IDF-B Figs. 1 to 3, `gas_bench.js` and `bench/results/gas.json`, evidence logs, README reproduction table, limitations in `bench.md` |
 | 2026-10-15 | Sarah | Merged `maneesh/s3-registrar` into `main`: folded Maneesh's Sprint 3 checklist and TRL 4 checklist into this file |
