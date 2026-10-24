@@ -1,6 +1,10 @@
 // Deploy the real Groth16Verifier and LandRegistry to a local Hardhat node,
-// grant REGISTRAR_ROLE to the deployer, and write addresses to
-// contracts/deployments/local.json.
+// grant REGISTRAR_ROLE to the deployer and to the registrar account, and write
+// addresses to contracts/deployments/local.json.
+//
+// The registrar account is the one registrar/src/register.js signs with: Hardhat
+// account 1 by default. Override with REGISTRAR_ADDRESS=<address>. If the network
+// has only one account, the deployer is the registrar.
 //
 //   npx hardhat node                                        # terminal 1
 //   npx hardhat run scripts/deploy.js --network localhost   # terminal 2
@@ -13,7 +17,10 @@ const path = require("path");
 const { ethers, network } = require("hardhat");
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  const signers = await ethers.getSigners();
+  const deployer = signers[0];
+  const registrarAddress =
+    process.env.REGISTRAR_ADDRESS || (signers[1] ? signers[1].address : deployer.address);
 
   const verifier = await (await ethers.getContractFactory("Groth16Verifier")).deploy();
   await verifier.waitForDeployment();
@@ -26,8 +33,13 @@ async function main() {
 
   const role = await registry.REGISTRAR_ROLE();
   await (await registry.grantRole(role, deployer.address)).wait();
-  if (!(await registry.hasRole(role, deployer.address))) {
-    throw new Error("REGISTRAR_ROLE was not granted to the deployer");
+  if (registrarAddress !== deployer.address) {
+    await (await registry.grantRole(role, registrarAddress)).wait();
+  }
+  for (const who of [deployer.address, registrarAddress]) {
+    if (!(await registry.hasRole(role, who))) {
+      throw new Error(`REGISTRAR_ROLE was not granted to ${who}`);
+    }
   }
 
   const out = {
@@ -36,7 +48,7 @@ async function main() {
     verifier: { name: "Groth16Verifier", address: verifierAddress },
     registry: registryAddress,
     admin: deployer.address,
-    registrar: deployer.address,
+    registrar: registrarAddress,
     deployedAt: new Date().toISOString(),
   };
   const file = path.join(__dirname, "..", "deployments", "local.json");
@@ -46,6 +58,7 @@ async function main() {
   console.log(`deployed Groth16Verifier at ${verifierAddress}`);
   console.log(`deployed LandRegistry at ${registryAddress}`);
   console.log(`granted REGISTRAR_ROLE to deployer ${deployer.address}`);
+  console.log(`granted REGISTRAR_ROLE to registrar ${registrarAddress}`);
   console.log(`wrote ${file}`);
 }
 

@@ -97,6 +97,7 @@ Read these before touching circuits, proofs or the verifier.
 | Dev circuit | `register_parcel_dev.circom`: N=8, N_LEVELS=16, about 79k constraints, fits pot19. Same public signals as production. **Tests only.** |
 | Current verifier | `Groth16Verifier.sol` is exported from the production zkey (N=16, N_LEVELS=32). The dev circuit is for fast tests only. |
 | Public signals | `[oldRoot, newRoot, commitment]`, as in I5. Unchanged. |
+| Registrar account | `deploy.js` grants `REGISTRAR_ROLE` to the deployer (Hardhat account 0) and to the registrar account (Hardhat account 1, or `REGISTRAR_ADDRESS`). `register.js` signs with account 1 by default, so without that second grant `demo.sh` and `full_run.sh` revert with `AccessControlUnauthorizedAccount`. |
 | Large files | `*.ptau`, `*.zkey`, `circuits/build/` are gitignored. Never commit them. Share zkey and wasm through a private drive if needed. |
 | Proving speed | Expect tens of seconds per production proof with snarkjs. If it is too slow, reducing N_LEVELS from 32 to 24 cuts constraints a lot, but that is an interface change and needs both people to agree. |
 | Proof size | about 720 bytes (JSON; 719 to 723 across runs) |
