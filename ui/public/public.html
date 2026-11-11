@@ -289,7 +289,7 @@ async function refresh() {
 
   setStatus(true, "Connected");
   document.getElementById("chain-root").textContent =
-    shortStr(data.occupiedRoot, 14);
+    data.occupiedRoot === "0" ? "0 (empty tree)" : shortStr(data.occupiedRoot, 14);
   document.getElementById("chain-root").title = data.occupiedRoot;
   document.getElementById("chain-count").textContent = data.tokenCount;
 
