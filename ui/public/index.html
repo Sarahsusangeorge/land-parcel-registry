@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Land Parcel Non-Overlap Registry | Demo</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #eceff1;
+         height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+  header { background: #263238; color: #fff; padding: 10px 20px;
+           display: flex; align-items: center; justify-content: space-between;
+           flex-shrink: 0; }
+  header h1 { font-size: 15px; font-weight: 600; letter-spacing: .01em; }
+  header .links { display: flex; gap: 16px; }
+  header a { color: #90caf9; font-size: 13px; text-decoration: none; }
+  header a:hover { text-decoration: underline; }
+
+  .split { display: flex; flex: 1; gap: 4px; padding: 4px; overflow: hidden; }
+
+  .pane { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; background: #fff;
+          border-radius: 4px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+
+  .pane-header { padding: 8px 14px; display: flex; align-items: baseline;
+                 justify-content: space-between; flex-shrink: 0; border-bottom: 1px solid #eee; }
+  .pane-title { font-size: 13px; font-weight: 600; color: #333; }
+  .pane-link { font-size: 12px; color: #1976d2; text-decoration: none; }
+  .pane-link:hover { text-decoration: underline; }
+
+  .pane-left  .pane-title { color: #1a237e; }
+  .pane-right .pane-title { color: #37474f; }
+
+  iframe { border: none; flex: 1; display: block; width: 100%; min-height: 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Land Parcel Non-Overlap Registry: Demo</h1>
+  <div class="links">
+    <a href="/registrar.html" target="_blank">Open registrar view ↗</a>
+    <a href="/public.html"    target="_blank">Open public view ↗</a>
+  </div>
+</header>
+<div class="split">
+  <div class="pane pane-left">
+    <div class="pane-header">
+      <span class="pane-title">Registrar view: exact cells (private)</span>
+      <a class="pane-link" href="/registrar.html" target="_blank">Full view ↗</a>
+    </div>
+    <iframe src="/registrar.html" title="Registrar view"></iframe>
+  </div>
+  <div class="pane pane-right">
+    <div class="pane-header">
+      <span class="pane-title">Public view: coarse cells only (on-chain)</span>
+      <a class="pane-link" href="/public.html" target="_blank">Full view ↗</a>
+    </div>
+    <iframe src="/public.html" title="Public view"></iframe>
+  </div>
+</div>
+</body>
+</html>
