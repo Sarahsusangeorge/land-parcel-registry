@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Public View — Land Parcel Registry</title>
+<title>Public view | Land Parcel Registry</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin>
 <style>
@@ -54,8 +54,8 @@
 </head>
 <body>
 <header>
-  <h1>Public view: what anyone reading the chain can see.</h1>
-  <span class="label">Exact boundaries are not stored on-chain.</span>
+  <h1>Public view</h1>
+  <span class="label">Only coarse cells are on the chain. Exact boundaries are not.</span>
 </header>
 <div class="layout">
   <div class="map-wrap"><div id="map"></div></div>
@@ -63,15 +63,15 @@
     <div class="chain-info" id="chain-info">
       <div class="chain-row">
         <span class="chain-label">Status</span>
-        <span class="chain-val" id="chain-status">—</span>
+        <span class="chain-val" id="chain-status">not connected</span>
       </div>
       <div class="chain-row">
         <span class="chain-label">Occupied root</span>
-        <span class="chain-val mono" id="chain-root" title="">—</span>
+        <span class="chain-val mono" id="chain-root" title="">none yet</span>
       </div>
       <div class="chain-row">
         <span class="chain-label">Tokens minted</span>
-        <span class="chain-val" id="chain-count">—</span>
+        <span class="chain-val" id="chain-count">0</span>
       </div>
     </div>
     <div class="refresh-note" id="refresh-note">Auto-refreshes every 3 s</div>
@@ -178,7 +178,7 @@ function drawCoarseCells(tokens) {
       try { boundary = h3.cellToBoundary(cellHex); } catch { continue; }
       const poly = L.polygon(boundary, style).addTo(map);
       poly.bindTooltip(
-        "Token #" + token.tokenId + " — coarse cell " + cellHex +
+        "Token #" + token.tokenId + ": coarse cell " + cellHex +
         "\nOwner: " + token.owner,
         { sticky: true }
       );
@@ -272,8 +272,8 @@ async function refresh() {
 
   if (data.error) {
     setStatus(false, data.error);
-    document.getElementById("chain-root").textContent = "—";
-    document.getElementById("chain-count").textContent = "—";
+    document.getElementById("chain-root").textContent = "none yet";
+    document.getElementById("chain-count").textContent = "0";
     currentTokens = [];
     buildTable([]);
     drawCoarseCells([]);

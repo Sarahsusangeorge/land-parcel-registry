@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registrar View — Land Parcel Registry</title>
+<title>Registrar view | Land Parcel Registry</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin>
 <style>
@@ -77,8 +77,8 @@
 </head>
 <body>
 <header>
-  <h1>Registrar view: sees exact cells</h1>
-  <span class="label">Fine H3 cells (resolution 12) — private to the registrar</span>
+  <h1>Registrar view</h1>
+  <span class="label">Exact cells (H3 resolution 12), private to the registrar</span>
 </header>
 <div class="layout">
   <div class="map-wrap"><div id="map"></div></div>
@@ -360,7 +360,7 @@ function showResult(parcelId, result) {
 
     rbox.appendChild(el("div", {
       style: "font-weight:600;color:#2e7d32;margin-bottom:6px;font-size:13px;"
-    }, ["✓ Parcel " + parcelId + " registered — token #" + result.token_id]));
+    }, ["✓ Parcel " + parcelId + " registered, token #" + result.token_id]));
 
     rbox.appendChild(row("Tx hash", shortHash(result.tx_hash, 10)));
     rbox.appendChild(row("Old root", shortHash(result.oldRoot, 10)));
@@ -503,7 +503,7 @@ async function startRegisterAll() {
         statusBox.innerHTML = "";
         statusBox.appendChild(el("div", {
           style: "font-size:13px;color:#555;"
-        }, ["Register all — parcel " + event.parcel_id +
+        }, ["Register all: parcel " + event.parcel_id +
             " (" + (event.index + 1) + "/" + event.total + ")"]));
         buildParcelList(parcels);
       } else if (event.type === "step") {

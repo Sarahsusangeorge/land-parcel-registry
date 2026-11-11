@@ -1,13 +1,13 @@
 "use strict";
 
-// ui/server.js — demo web server for the land parcel registry
+// ui/server.js: demo web server for the land parcel registry
 //
 // Endpoints:
-//   POST /api/reset                 — kill any running Hardhat node, start fresh, deploy
-//   POST /api/register/:parcelId    — run register.js; stream progress via SSE
-//   POST /api/register-all          — register every parcel in file order; stream results
-//   GET  /api/registrar/parcels     — parcels.json + registrar state
-//   GET  /api/chain/state           — occupiedRoot + tokens from the LandRegistry contract
+//   POST /api/reset                : kill any running Hardhat node, start fresh, deploy
+//   POST /api/register/:parcelId   : run register.js; stream progress via SSE
+//   POST /api/register-all         : register every parcel in file order; stream results
+//   GET  /api/registrar/parcels    : parcels.json + registrar state
+//   GET  /api/chain/state          : occupiedRoot + tokens from the LandRegistry contract
 //
 // Static files served from ui/public/.
 
@@ -30,7 +30,7 @@ const DEPLOY_FILE   = path.join(CONTRACTS_DIR, "deployments", "local.json");
 const PORT    = 3000;
 const RPC_URL = "http://127.0.0.1:8545";
 
-// Minimal ABI — only what the public chain queries need.
+// Minimal ABI: only what the public chain queries need.
 // Never reads parcels.json or registrar files.
 const REGISTRY_ABI = [
   "function occupiedRoot() view returns (uint256)",
@@ -118,7 +118,7 @@ function killPort8545() {
     execSync("lsof -ti tcp:8545 | xargs kill -TERM 2>/dev/null", {
       shell: "/bin/bash", stdio: "ignore"
     });
-  } catch (_) { /* nothing on the port — fine */ }
+  } catch (_) { /* nothing on the port: fine */ }
 }
 
 // Run one registration and call onStep / onResult.
