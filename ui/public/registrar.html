@@ -190,7 +190,7 @@ function drawParcels(parcelList) {
     for (const cell of p.fine_cells) {
       const boundary = h3.cellToBoundary(cell); // [[lat,lng],...]
       const poly = L.polygon(boundary, style).addTo(map);
-      poly.bindTooltip("Parcel " + p.parcel_id + ": cell " + cell, { sticky: true });
+      poly.bindTooltip("Parcel " + p.parcel_id, { sticky: false });
       poly.on("mouseover", function () { refreshHighlight(p.parcel_id); });
       poly.on("mouseout",  function () { refreshHighlight(null); });
       poly.on("click",     function () { selectParcel(p.parcel_id, false); });
@@ -266,7 +266,7 @@ function highlightOverlapCells(candidateParcelId, overlappingParcelIds) {
   for (const cell of sharedCells) {
     const boundary = h3.cellToBoundary(cell);
     const poly = L.polygon(boundary, C_OVERLAP).addTo(map);
-    poly.bindTooltip("Overlap cell: " + cell, { sticky: true });
+    poly.bindTooltip("Shared cell · Parcel " + candidateParcelId, { sticky: false });
     layers[candidateParcelId + "_overlap"].push(poly);
   }
 }
