@@ -141,6 +141,7 @@ let activeParcelId = null; // currently-being-registered parcel
 let registerAllRunning = false;
 let selectedId = null;     // parcel chosen by clicking in the list or on the map
 let lastSignature = "";   // redraw the map only when parcels or statuses change
+let overlapResults = {};   // parcelId → { sharedCells: string[] } persisted for redraw
 
 // Colours
 const C_UNREG   = { color: "#555", weight: 1, fillColor: "#9e9e9e", fillOpacity: 0.35 };
@@ -199,13 +200,23 @@ function drawParcels(parcelList) {
     }
   }
 
-  // Fit the view to every parcel the first time they are drawn.
+  // On first draw fit to fixtures A, B, C so individual res-12 cells are visible.
   if (!fitted && all.length) {
-    const latlngs = all.map(function (c) { return L.latLng(c[0], c[1]); });
-    const bounds = L.latLngBounds(latlngs);
+    const fixturePts = [];
+    for (const p of parcelList) {
+      if (p.parcel_id === "A" || p.parcel_id === "B" || p.parcel_id === "C") {
+        for (const cell of p.fine_cells) {
+          for (const v of h3.cellToBoundary(cell)) fixturePts.push(L.latLng(v[0], v[1]));
+        }
+      }
+    }
+    const pts = fixturePts.length
+      ? fixturePts
+      : all.map(function (c) { return L.latLng(c[0], c[1]); });
+    const bounds = L.latLngBounds(pts);
     if (bounds.isValid()) {
       map.invalidateSize();
-      map.fitBounds(bounds, { padding: [20, 20] });
+      map.fitBounds(bounds, { padding: [30, 30] });
       fitted = true;
     }
   }
@@ -242,6 +253,15 @@ function selectParcel(id, zoom) {
 function setParcelStyle(parcelId, style) {
   if (!layers[parcelId]) return;
   for (const l of layers[parcelId]) l.setStyle(style);
+}
+
+function fitToParcel(parcelId) {
+  if (!layers[parcelId] || !layers[parcelId].length) return;
+  const group = L.featureGroup(layers[parcelId]);
+  const bounds = group.getBounds();
+  if (bounds.isValid()) {
+    map.fitBounds(bounds, { padding: [60, 60], maxZoom: 18 });
+  }
 }
 
 function highlightOverlapCells(candidateParcelId, overlappingParcelIds) {
@@ -419,16 +439,16 @@ async function startRegister(parcelId) {
   activeParcelId = parcelId;
 
   // Visual state
-  setParcelStyle(parcelId, C_ACTIVE);
-  buildParcelList(parcels);
-  showSteps("checking overlap", parcelId);
-  startTimer();
-
-  // Clear any previous overlap highlights for this parcel.
+  delete overlapResults[parcelId];
   if (layers[parcelId + "_overlap"]) {
     for (const l of layers[parcelId + "_overlap"]) map.removeLayer(l);
     delete layers[parcelId + "_overlap"];
   }
+  setParcelStyle(parcelId, C_ACTIVE);
+  fitToParcel(parcelId);
+  buildParcelList(parcels);
+  showSteps("checking overlap", parcelId);
+  startTimer();
 
   const response = await fetch("/api/register/" + parcelId, { method: "POST" });
   const reader  = response.body.getReader();
@@ -463,12 +483,12 @@ function handleRegistrationEvent(parcelId, event) {
     const result = event.result;
     if (result.status === "registered") {
       setParcelStyle(parcelId, C_REG);
-      // Update local state immediately
       const p = parcels.find(function (x) { return x.parcel_id === parcelId; });
       if (p) p.status = "registered";
+      fitToParcel(parcelId);
     } else if (result.status === "overlap") {
-      setParcelStyle(parcelId, C_UNREG);
       highlightOverlapCells(parcelId, result.overlaps || []);
+      fitToParcel(parcelId);
     }
     showResult(parcelId, result);
   }
@@ -504,7 +524,13 @@ async function startRegisterAll() {
 
       if (event.type === "start") {
         activeParcelId = event.parcel_id;
+        delete overlapResults[event.parcel_id];
+        if (layers[event.parcel_id + "_overlap"]) {
+          for (const l of layers[event.parcel_id + "_overlap"]) map.removeLayer(l);
+          delete layers[event.parcel_id + "_overlap"];
+        }
         setParcelStyle(event.parcel_id, C_ACTIVE);
+        fitToParcel(event.parcel_id);
         const statusBox = document.getElementById("status-box");
         statusBox.innerHTML = "";
         statusBox.appendChild(el("div", {
@@ -520,12 +546,15 @@ async function startRegisterAll() {
         const p = parcels.find(function (x) { return x.parcel_id === result.parcel_id; });
         if (result.status === "registered") {
           if (p) p.status = "registered";
-          if (result.parcel_id) setParcelStyle(result.parcel_id, C_REG);
+          if (result.parcel_id) {
+            setParcelStyle(result.parcel_id, C_REG);
+            fitToParcel(result.parcel_id);
+          }
           registered++;
         } else if (result.status === "overlap") {
           if (result.parcel_id) {
-            setParcelStyle(result.parcel_id, C_UNREG);
             highlightOverlapCells(result.parcel_id, result.overlaps || []);
+            fitToParcel(result.parcel_id);
           }
           overlap++;
         } else {
@@ -555,7 +584,8 @@ async function resetChain() {
   document.getElementById("btn-register-all").disabled = true;
   showIdle("Resetting chain… (starting Hardhat node and deploying, ~15 s)");
 
-  // Clear overlap highlights
+  // Clear all overlap state
+  overlapResults = {};
   for (const key of Object.keys(layers)) {
     if (key.endsWith("_overlap")) {
       for (const l of layers[key]) map.removeLayer(l);
