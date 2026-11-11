@@ -74,6 +74,10 @@
   .btn-register:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; }
   .no-fit { color: #ccc; font-size: 11px; margin-left: auto; }
   .register-all-progress { font-size: 12px; padding: 4px 0; color: #555; }
+  .fixture-badge { display:flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:50%;background:#263238;color:#fff;
+    font-size:11px;font-weight:700;line-height:1;
+    box-shadow:0 1px 3px rgba(0,0,0,.45);pointer-events:none;user-select:none; }
 </style>
 </head>
 <body>
@@ -141,15 +145,18 @@ let activeParcelId = null; // currently-being-registered parcel
 let registerAllRunning = false;
 let selectedId = null;     // parcel chosen by clicking in the list or on the map
 let lastSignature = "";   // redraw the map only when parcels or statuses change
-let overlapResults = {};   // parcelId → { sharedCells: string[] } persisted for redraw
+let overlapResults  = {};   // parcelId → { sharedCells: string[] } persisted for redraw
+let fixtureMarkers  = [];   // permanent A/B/C label markers
 
 // Colours
-const C_UNREG   = { color: "#555", weight: 1, fillColor: "#9e9e9e", fillOpacity: 0.35 };
-const C_REG     = { color: "#0d47a1", weight: 1, fillColor: "#1976d2", fillOpacity: 0.5 };
-const C_ACTIVE  = { color: "#e65100", weight: 2, fillColor: "#ff9800", fillOpacity: 0.3,
+const C_UNREG   = { color: "#bdbdbd", weight: 1,   fillColor: "#eeeeee", fillOpacity: 0.5 };
+const C_REG     = { color: "#0d47a1", weight: 1.5, fillColor: "#1565c0", fillOpacity: 0.5 };
+const C_ACTIVE  = { color: "#e65100", weight: 2,   fillColor: "#ff9800", fillOpacity: 0.3,
                     dashArray: "5 4" };
-const C_HILITE  = { color: "#e65100", weight: 3, fillColor: "#ff6f00", fillOpacity: 0.7 };
-const C_OVERLAP = { color: "#b71c1c", weight: 2, fillColor: "#ef5350", fillOpacity: 0.55 };
+const C_HILITE  = { color: "#e65100", weight: 3,   fillColor: "#ff6f00", fillOpacity: 0.7 };
+const C_REJECT  = { color: "#c62828", weight: 2,   fillColor: "#ef5350", fillOpacity: 0.1,
+                    dashArray: "6 4" };
+const C_SHARED  = { color: "#b71c1c", weight: 2,   fillColor: "#ef5350", fillOpacity: 0.8 };
 
 // ── utilities ─────────────────────────────────────────────────────────────────
 function shortHash(s, n) {
@@ -172,8 +179,9 @@ function el(tag, attrs, children) {
 
 // ── layer helpers ─────────────────────────────────────────────────────────────
 function styleForParcel(parcel) {
-  if (parcel.parcel_id === activeParcelId) return C_ACTIVE;
-  if (parcel.status === "registered")     return C_REG;
+  if (parcel.parcel_id === activeParcelId)      return C_ACTIVE;
+  if (parcel.status === "registered")           return C_REG;
+  if (overlapResults[parcel.parcel_id])         return C_REJECT;
   return C_UNREG;
 }
 
@@ -220,6 +228,20 @@ function drawParcels(parcelList) {
       fitted = true;
     }
   }
+
+  // Re-apply overlap shared-cell highlights that survived a redraw.
+  for (const pid of Object.keys(overlapResults)) {
+    layers[pid + "_overlap"] = [];
+    for (const cell of overlapResults[pid].sharedCells) {
+      const boundary = h3.cellToBoundary(cell);
+      const poly = L.polygon(boundary, C_SHARED).addTo(map);
+      poly.bindTooltip("Shared cell · Parcel " + pid, { sticky: false });
+      layers[pid + "_overlap"].push(poly);
+    }
+  }
+
+  // Permanent A / B / C labels.
+  addFixtureLabels(parcelList);
 }
 
 function parcelById(id) {
@@ -264,8 +286,34 @@ function fitToParcel(parcelId) {
   }
 }
 
+function addFixtureLabels(parcelList) {
+  for (const m of fixtureMarkers) map.removeLayer(m);
+  fixtureMarkers = [];
+  for (const fid of ["A", "B", "C"]) {
+    const p = parcelList.find(function (x) { return x.parcel_id === fid; });
+    if (!p || !p.fine_cells.length) continue;
+    let lat = 0, lng = 0;
+    for (const cell of p.fine_cells) {
+      const c = h3.cellToLatLng(cell);
+      lat += c[0]; lng += c[1];
+    }
+    lat /= p.fine_cells.length;
+    lng /= p.fine_cells.length;
+    const m = L.marker([lat, lng], {
+      icon: L.divIcon({
+        html: '<div class="fixture-badge">' + fid + '</div>',
+        className: "",
+        iconSize: [22, 22],
+        iconAnchor: [11, 11]
+      }),
+      interactive: false,
+      zIndexOffset: 1000
+    }).addTo(map);
+    fixtureMarkers.push(m);
+  }
+}
+
 function highlightOverlapCells(candidateParcelId, overlappingParcelIds) {
-  // Find the cells of the candidate that are shared with overlapping parcels.
   const candidate = parcels.find(function (p) { return p.parcel_id === candidateParcelId; });
   if (!candidate) return;
 
@@ -279,13 +327,20 @@ function highlightOverlapCells(candidateParcelId, overlappingParcelIds) {
     }
   }
 
-  // Add red overlap polygons on top of the existing layers.
-  if (!layers[candidateParcelId + "_overlap"]) {
-    layers[candidateParcelId + "_overlap"] = [];
+  // Persist so redraw can restore the styles.
+  overlapResults[candidateParcelId] = { sharedCells: Array.from(sharedCells) };
+
+  // Dashed red outline on the entire rejected parcel.
+  setParcelStyle(candidateParcelId, C_REJECT);
+
+  // Solid red fill on shared cells (on top of the dashed outline).
+  if (layers[candidateParcelId + "_overlap"]) {
+    for (const l of layers[candidateParcelId + "_overlap"]) map.removeLayer(l);
   }
+  layers[candidateParcelId + "_overlap"] = [];
   for (const cell of sharedCells) {
     const boundary = h3.cellToBoundary(cell);
-    const poly = L.polygon(boundary, C_OVERLAP).addTo(map);
+    const poly = L.polygon(boundary, C_SHARED).addTo(map);
     poly.bindTooltip("Shared cell · Parcel " + candidateParcelId, { sticky: false });
     layers[candidateParcelId + "_overlap"].push(poly);
   }
