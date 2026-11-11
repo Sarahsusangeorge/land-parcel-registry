@@ -78,6 +78,15 @@
     width:22px;height:22px;border-radius:50%;background:#263238;color:#fff;
     font-size:11px;font-weight:700;line-height:1;
     box-shadow:0 1px 3px rgba(0,0,0,.45);pointer-events:none;user-select:none; }
+  .map-legend { background:rgba(255,255,255,.92);padding:7px 10px;border-radius:4px;
+    box-shadow:0 1px 4px rgba(0,0,0,.2);font-size:11px;line-height:1; }
+  .map-legend .legend-title { font-weight:600;color:#444;margin-bottom:5px;font-size:11px; }
+  .legend-item { display:flex;align-items:center;gap:5px;padding:2px 0; }
+  .legend-swatch { display:inline-block;width:16px;height:10px;border-radius:2px;flex-shrink:0; }
+  .ls-unreg  { background:#eeeeee;border:1px solid #bdbdbd; }
+  .ls-reg    { background:#1565c0;border:1px solid #0d47a1; }
+  .ls-reject { background:rgba(239,83,80,.1);border:2px dashed #c62828; }
+  .ls-shared { background:#ef5350;border:1px solid #b71c1c; }
 </style>
 </head>
 <body>
@@ -137,6 +146,22 @@ window.addEventListener("load", function () {
 if (typeof ResizeObserver !== "undefined") {
   new ResizeObserver(refreshMapSize).observe(document.querySelector(".map-wrap"));
 }
+
+// ── legend ────────────────────────────────────────────────────────────────────
+(function () {
+  const ctrl = L.control({ position: "bottomleft" });
+  ctrl.onAdd = function () {
+    const div = L.DomUtil.create("div", "map-legend");
+    div.innerHTML =
+      '<div class="legend-title">Legend</div>' +
+      '<div class="legend-item"><span class="legend-swatch ls-unreg"></span>Unregistered</div>' +
+      '<div class="legend-item"><span class="legend-swatch ls-reg"></span>Registered</div>' +
+      '<div class="legend-item"><span class="legend-swatch ls-reject"></span>Rejected</div>' +
+      '<div class="legend-item"><span class="legend-swatch ls-shared"></span>Shared cell</div>';
+    return div;
+  };
+  ctrl.addTo(map);
+}());
 
 // ── state ─────────────────────────────────────────────────────────────────────
 let parcels = [];          // from /api/registrar
