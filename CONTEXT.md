@@ -70,6 +70,8 @@ Shared files: `PLAN.md`, `CONTEXT.md`, `patent/IDF-B.md`, `bench/`.
   - Sprint 4: full real-parcel run (`registrar/scripts/full_run.sh/js`), `bench/results/full_run.json`, `bench/bench.md` full-run section, `patent/figures/logs/` evidence logs, TRL 4 checklist in PLAN.md (`dbfc469`, `752d656`, `c4a9eb4`).
   - Sprint 5: circuit fix (salt in commitment, active[0]===1), rebuild both circuits (588,814 constraints), 8/8 circuit tests (incl. wrong-salt test), regenerated fixtures, demo re-run, full 31-parcel run (30 registered, B only overlap), bench.md updated, IDF-B sections 1/2/4/6/7/9/10 drafted, PLAN.md decision log rows resolved (`9662f07`, `cf625e2`, `3f392ff`, ...).
 
+- Demo UI (`ui/`) added on branch `ui-demo`: local web interface that drives the existing pieces for demos and IDF-B screenshots; it is a demo layer only and does not change any contract, circuit, registrar or geo code.
+
 ### In progress
 
 IDF-B review, section by section (both), then one read-through with Sarah.

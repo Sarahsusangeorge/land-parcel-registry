@@ -85,6 +85,32 @@ Expected stdout (one JSON line per parcel):
 {"status":"registered","parcel_id":"C","token_id":2,"tx_hash":"0x…",…}
 ```
 
+## Demo interface
+
+A local web interface for running registrations interactively and capturing IDF-B screenshots.
+It drives the existing pieces — it does not change how the system works.
+
+**Start** (from the repo root; requires the production zkey and wasm to be present):
+
+```bash
+cd ui && npm ci   # first time only
+npm run ui        # from repo root
+```
+
+Then open **http://localhost:3000**.
+
+| View | URL | What it shows |
+|---|---|---|
+| Landing page | http://localhost:3000/ | Registrar and public views side by side |
+| Registrar view | http://localhost:3000/registrar.html | Fine H3 cells (private), Register buttons, live step/timer |
+| Public view | http://localhost:3000/public.html | Coarse H3 cells from the chain, occupied-root, token table |
+
+**Workflow:**
+1. Click **Reset chain** — starts a fresh Hardhat node and deploys the contracts (~15 s).
+2. Click **Register** next to a parcel — streams live steps: checking overlap → generating proof → submitting transaction.
+3. Parcel B will fail with an overlap; the shared cells turn red on the map.
+4. The public view polls the chain every 3 s and shows only coarse cells; exact boundaries are never displayed there.
+
 ## Reproducing the TRL 4 evidence
 
 Proving needs the production zkey (269 MB, gitignored), so the two proving rows run on the machine that
