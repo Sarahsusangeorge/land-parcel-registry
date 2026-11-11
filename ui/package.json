@@ -1,0 +1,14 @@
+{
+  "name": "land-parcel-registry-ui",
+  "version": "1.0.0",
+  "description": "Demo web interface for the land parcel non-overlap registry.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "ui": "node server.js"
+  },
+  "dependencies": {
+    "ethers": "6.17.0",
+    "express": "4.21.2"
+  }
+}
