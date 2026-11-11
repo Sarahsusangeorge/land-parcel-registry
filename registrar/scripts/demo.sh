@@ -45,9 +45,20 @@ for i in $(seq 1 30); do
   sleep 1
 done
 
+# ── derive registrar address from register.js's signing key ───────────────────
+REGISTRAR_ADDRESS=$(cd "$REGISTRAR_DIR" && node -e "
+const fs = require('fs');
+const src = fs.readFileSync('src/register.js', 'utf8');
+const m = src.match(/HH_REGISTRAR_KEY\s*=\s*['\"]([^'\"]+)['\"]/);
+if (!m) { process.stderr.write('could not find HH_REGISTRAR_KEY in register.js\n'); process.exit(1); }
+const { ethers } = require('ethers');
+console.log(new ethers.Wallet(m[1]).address);
+")
+echo "[demo] Registrar address: $REGISTRAR_ADDRESS" >&2
+
 # ── deploy real Groth16Verifier + LandRegistry ─────────────────────────────────
 echo "[demo] Deploying real Groth16Verifier and LandRegistry…" >&2
-USE_MOCK_VERIFIER=0 npx hardhat run scripts/deploy.js --network localhost >&2
+USE_MOCK_VERIFIER=0 REGISTRAR_ADDRESS="$REGISTRAR_ADDRESS" npx hardhat run scripts/deploy.js --network localhost >&2
 
 # ── register A ────────────────────────────────────────────────────────────────
 echo "[demo] Registering A…" >&2

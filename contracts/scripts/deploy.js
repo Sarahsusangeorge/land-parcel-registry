@@ -25,9 +25,10 @@ async function main() {
   const registryAddress = await registry.getAddress();
 
   const role = await registry.REGISTRAR_ROLE();
-  await (await registry.grantRole(role, deployer.address)).wait();
-  if (!(await registry.hasRole(role, deployer.address))) {
-    throw new Error("REGISTRAR_ROLE was not granted to the deployer");
+  const registrarAddress = process.env.REGISTRAR_ADDRESS || deployer.address;
+  await (await registry.grantRole(role, registrarAddress)).wait();
+  if (!(await registry.hasRole(role, registrarAddress))) {
+    throw new Error(`REGISTRAR_ROLE was not granted to ${registrarAddress}`);
   }
 
   const out = {
@@ -36,7 +37,7 @@ async function main() {
     verifier: { name: "Groth16Verifier", address: verifierAddress },
     registry: registryAddress,
     admin: deployer.address,
-    registrar: deployer.address,
+    registrar: registrarAddress,
     deployedAt: new Date().toISOString(),
   };
   const file = path.join(__dirname, "..", "deployments", "local.json");
@@ -45,7 +46,7 @@ async function main() {
 
   console.log(`deployed Groth16Verifier at ${verifierAddress}`);
   console.log(`deployed LandRegistry at ${registryAddress}`);
-  console.log(`granted REGISTRAR_ROLE to deployer ${deployer.address}`);
+  console.log(`granted REGISTRAR_ROLE to ${registrarAddress}${registrarAddress === deployer.address ? " (deployer)" : " (REGISTRAR_ADDRESS)"}`);
   console.log(`wrote ${file}`);
 }
 

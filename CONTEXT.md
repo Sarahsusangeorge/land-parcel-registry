@@ -116,6 +116,7 @@ Read these before touching circuits, proofs or the verifier.
 | Prove time (measured, pre-fix) | Mean **9,751 ms**, max **10,035 ms** (3 runs, fixture A) — superseded by post-fix run below. |
 | Prove time (post-fix, 31-parcel run) | Mean **10,104 ms**, max **10,482 ms** (M4 Pro, 31 parcels). Salt adds negligible overhead. |
 | Commitment signal | Commitment is computed in-circuit and exposed as pubSignals[2]. Not passed in as an input. Public signal order [oldRoot, newRoot, commitment] confirmed: A.pubSignals[0]=0, C.pubSignals[0]=A.pubSignals[1]. |
+| Registrar address | `deploy.js` grants `REGISTRAR_ROLE` to `REGISTRAR_ADDRESS` env var if set, otherwise to the deployer. `demo.sh` and `full_run.sh` derive `REGISTRAR_ADDRESS` from `HH_REGISTRAR_KEY` in `register.js` (Hardhat account #1, `0x70997970C51812dc3A010C7d01b50e0d17dc79C8`), so the signer and the role holder always agree. |
 
 ---
 
