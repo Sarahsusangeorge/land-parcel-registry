@@ -60,6 +60,9 @@ let registrationLock = false;  // true while any registration is in progress
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+// Local copies of the pinned map libraries, used if the CDN is unreachable.
+app.use("/vendor/leaflet", express.static(path.join(__dirname, "node_modules", "leaflet", "dist")));
+app.use("/vendor/h3-js",   express.static(path.join(__dirname, "node_modules", "h3-js", "dist")));
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -408,16 +411,22 @@ app.get(["/api/registrar", "/api/registrar/parcels"], function (req, res) {
 // ── GET /api/chain/state ──────────────────────────────────────────────────────
 // Reads ONLY from the deployed LandRegistry contract.
 // Never reads parcels.json or registrar state files.
+// Before the first reset there is no chain. That is a normal state, so answer
+// 200 with an empty view instead of an HTTP error.
+function NOT_RUNNING(message) {
+  return { connected: false, message: message, occupiedRoot: null, tokenCount: 0, tokens: [] };
+}
+
 app.get(["/api/chain", "/api/chain/state"], async function (req, res) {
+  let provider = null;
   try {
     const deployment = readDeployment();
     if (!deployment) {
-      return res.status(503).json({
-        error: "Chain not deployed yet. Click Reset first."
-      });
+      return res.json(NOT_RUNNING("Chain not deployed yet. Click Reset chain on the registrar view."));
     }
 
-    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    // staticNetwork: skip network auto-detection, so an unreachable node fails fast.
+    provider = new ethers.JsonRpcProvider(RPC_URL, undefined, { staticNetwork: true });
     const registry = new ethers.Contract(deployment.registry, REGISTRY_ABI, provider);
 
     const occupiedRoot = (await registry.occupiedRoot()).toString();
@@ -456,12 +465,12 @@ app.get(["/api/chain", "/api/chain/state"], async function (req, res) {
     });
   } catch (err) {
     const msg = err.message || String(err);
-    if (msg.includes("ECONNREFUSED") || msg.includes("connect")) {
-      return res.status(503).json({
-        error: "Chain not running. Click Reset to start the Hardhat node."
-      });
+    if (msg.includes("ECONNREFUSED") || msg.includes("connect") || msg.includes("network")) {
+      return res.json(NOT_RUNNING("Chain not running. Click Reset chain on the registrar view."));
     }
     res.status(500).json({ error: msg });
+  } finally {
+    if (provider) provider.destroy();
   }
 });
 
