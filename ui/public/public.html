@@ -145,16 +145,12 @@ if (typeof ResizeObserver !== "undefined") {
 }());
 
 // ── state ─────────────────────────────────────────────────────────────────────
-let currentTokens = [];
-let coarseLayers  = {};   // tokenId → array of Leaflet layers
-let fitDone       = false;
+let currentTokens    = [];
+let coarseLayers     = {};   // tokenId → array of Leaflet layers
+let tokenLabelLayers = [];   // permanent "Token N" tooltip layers
+let fitDone          = false;
 
-const COARSE_STYLE = {
-  color: "#0d47a1", weight: 1,
-  fillColor: "#1976d2", fillOpacity: 0.4
-};
-
-// Token colours cycle through a palette so each parcel has a distinct shade.
+// Token colours cycle through a palette so each token has a distinct shade.
 const PALETTE = [
   "#1976d2", "#388e3c", "#7b1fa2", "#0097a7",
   "#f57c00", "#c62828", "#00695c", "#5e35b1"
@@ -162,7 +158,7 @@ const PALETTE = [
 
 function tokenStyle(index) {
   const c = PALETTE[index % PALETTE.length];
-  return { color: c, weight: 1, fillColor: c, fillOpacity: 0.35 };
+  return { color: c, weight: 1.5, fillColor: c, fillOpacity: 0.2 };
 }
 
 // ── utilities ─────────────────────────────────────────────────────────────────
@@ -191,11 +187,13 @@ function el(tag, attrs, children) {
 
 // ── draw coarse cells on map ──────────────────────────────────────────────────
 function drawCoarseCells(tokens) {
-  // Remove all existing coarse layers.
+  // Remove all existing coarse layers and token labels.
   for (const id of Object.keys(coarseLayers)) {
     for (const l of coarseLayers[id]) map.removeLayer(l);
   }
   coarseLayers = {};
+  for (const tt of tokenLabelLayers) map.removeLayer(tt);
+  tokenLabelLayers = [];
 
   const allPoints = [];
 
@@ -204,19 +202,35 @@ function drawCoarseCells(tokens) {
     const style = tokenStyle(i);
     coarseLayers[token.tokenId] = [];
 
+    let cLat = 0, cLng = 0, cCount = 0;
+
     for (const cellDec of token.coarseCells) {
       let cellHex;
       try { cellHex = decToH3(cellDec); } catch { continue; }
       let boundary;
       try { boundary = h3.cellToBoundary(cellHex); } catch { continue; }
       const poly = L.polygon(boundary, style).addTo(map);
-      poly.bindTooltip(
-        "Token #" + token.tokenId + ": coarse cell " + cellHex +
-        "\nOwner: " + token.owner,
-        { sticky: true }
-      );
+      poly.bindTooltip("Token " + token.tokenId, { sticky: false });
       coarseLayers[token.tokenId].push(poly);
       allPoints.push(...boundary);
+
+      // Accumulate centroid
+      let center;
+      try { center = h3.cellToLatLng(cellHex); } catch { continue; }
+      cLat += center[0]; cLng += center[1]; cCount++;
+    }
+
+    // "Token N" permanent label at the centroid of all coarse cells.
+    if (cCount > 0) {
+      const tt = L.tooltip({
+        permanent: true,
+        direction: "center",
+        className: "token-label-tt",
+        opacity: 1
+      }).setContent("Token " + token.tokenId)
+        .setLatLng([cLat / cCount, cLng / cCount]);
+      map.addLayer(tt);
+      tokenLabelLayers.push(tt);
     }
   }
 
