@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registrar View — Land Parcel Registry</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; font-size: 14px;
+         background: #f5f5f5; color: #222; height: 100vh; display: flex;
+         flex-direction: column; }
+  header { background: #1a237e; color: #fff; padding: 10px 16px;
+           display: flex; align-items: baseline; gap: 12px; flex-shrink: 0; }
+  header h1 { font-size: 16px; font-weight: 600; }
+  header .label { font-size: 12px; opacity: .75; }
+  .layout { display: flex; flex: 1; overflow: hidden; }
+  #map { flex: 1; height: 100%; }
+  .panel { width: 340px; flex-shrink: 0; display: flex; flex-direction: column;
+           background: #fff; border-left: 1px solid #ddd; overflow: hidden; }
+  .panel-actions { padding: 10px 12px; display: flex; gap: 8px;
+                   border-bottom: 1px solid #eee; flex-shrink: 0; }
+  button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer;
+           font-size: 13px; transition: background .15s; }
+  #btn-reset { background: #ef5350; color: #fff; }
+  #btn-reset:hover { background: #c62828; }
+  #btn-reset:disabled { background: #bbb; cursor: not-allowed; }
+  #btn-register-all { background: #1976d2; color: #fff; }
+  #btn-register-all:hover { background: #0d47a1; }
+  #btn-register-all:disabled { background: #bbb; cursor: not-allowed; }
+  .status-box { padding: 10px 12px; border-bottom: 1px solid #eee;
+                flex-shrink: 0; min-height: 60px; }
+  .status-idle { color: #888; font-size: 13px; }
+  .steps { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
+  .step { font-size: 12px; padding: 3px 8px; border-radius: 3px; display: flex;
+          align-items: center; gap: 6px; }
+  .step.pending  { color: #aaa; }
+  .step.active   { background: #fff9c4; color: #555; font-weight: 500; }
+  .step.done     { background: #e8f5e9; color: #2e7d32; }
+  .step .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .timer { font-size: 13px; color: #555; }
+  .result-box { font-size: 12px; padding: 6px 0; }
+  .result-box .row { display: flex; gap: 6px; padding: 2px 0; }
+  .result-box .key { color: #888; min-width: 90px; }
+  .result-box .val { font-family: monospace; word-break: break-all; color: #222; }
+  .result-box .val.link { color: #1976d2; cursor: pointer; text-decoration: underline; }
+  .result-error { color: #c62828; font-size: 12px; }
+  .result-overlap { color: #c62828; font-size: 12px; }
+  .parcel-list { flex: 1; overflow-y: auto; }
+  .parcel-row { display: flex; align-items: center; gap: 6px; padding: 7px 12px;
+                border-bottom: 1px solid #f0f0f0; transition: background .1s; }
+  .parcel-row:hover { background: #f9f9f9; }
+  .parcel-row.active-row { background: #fff9c4; }
+  .pid { font-weight: 600; min-width: 28px; color: #333; }
+  .cell-count { color: #888; font-size: 12px; min-width: 48px; }
+  .status-badge { font-size: 11px; padding: 1px 7px; border-radius: 10px;
+                  font-weight: 500; min-width: 82px; text-align: center; }
+  .badge-unregistered { background: #f0f0f0; color: #777; }
+  .badge-registered   { background: #e3f2fd; color: #1565c0; }
+  .badge-overlap      { background: #fce4ec; color: #c62828; }
+  .badge-active       { background: #fff9c4; color: #f57f17; }
+  .btn-register { margin-left: auto; padding: 4px 10px; font-size: 12px;
+                  background: #e3f2fd; color: #1565c0; border-radius: 3px; }
+  .btn-register:hover { background: #bbdefb; }
+  .btn-register:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; }
+  .no-fit { color: #ccc; font-size: 11px; margin-left: auto; }
+  .register-all-progress { font-size: 12px; padding: 4px 0; color: #555; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Registrar view: sees exact cells</h1>
+  <span class="label">Fine H3 cells (resolution 12) — private to the registrar</span>
+</header>
+<div class="layout">
+  <div id="map"></div>
+  <div class="panel">
+    <div class="panel-actions">
+      <button id="btn-reset">Reset chain</button>
+      <button id="btn-register-all">Register all</button>
+    </div>
+    <div class="status-box" id="status-box">
+      <div class="status-idle">Ready. Click Reset to start a fresh chain.</div>
+    </div>
+    <div class="parcel-list" id="parcel-list"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN2GqnE=" crossorigin></script>
+<script src="https://unpkg.com/h3-js@4.1.0/dist/h3-js.umd.js"></script>
+<script>
+"use strict";
+// ── map setup ─────────────────────────────────────────────────────────────────
+const map = L.map("map").setView([42.332, -71.207], 15);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: "© OpenStreetMap contributors"
+}).addTo(map);
+
+// ── state ─────────────────────────────────────────────────────────────────────
+let parcels = [];          // from /api/registrar/parcels
+let layers  = {};          // parcel_id → array of Leaflet polygon layers
+let activeParcelId = null; // currently-being-registered parcel
+let registerAllRunning = false;
+
+// Colours
+const C_UNREG   = { color: "#555", weight: 1, fillColor: "#9e9e9e", fillOpacity: 0.35 };
+const C_REG     = { color: "#0d47a1", weight: 1, fillColor: "#1976d2", fillOpacity: 0.5 };
+const C_ACTIVE  = { color: "#e65100", weight: 2, fillColor: "#ff9800", fillOpacity: 0.3,
+                    dashArray: "5 4" };
+const C_OVERLAP = { color: "#b71c1c", weight: 2, fillColor: "#ef5350", fillOpacity: 0.55 };
+
+// ── utilities ─────────────────────────────────────────────────────────────────
+function shortHash(s, n) {
+  n = n || 10;
+  if (s.length <= n * 2 + 2) return s;
+  return s.slice(0, n) + "…" + s.slice(-6);
+}
+
+function el(tag, attrs, children) {
+  const e = document.createElement(tag);
+  if (attrs) Object.assign(e, attrs);
+  if (children) {
+    for (const c of children) {
+      if (typeof c === "string") e.appendChild(document.createTextNode(c));
+      else if (c) e.appendChild(c);
+    }
+  }
+  return e;
+}
+
+// ── layer helpers ─────────────────────────────────────────────────────────────
+function styleForParcel(parcel) {
+  if (parcel.parcel_id === activeParcelId) return C_ACTIVE;
+  if (parcel.status === "registered")     return C_REG;
+  return C_UNREG;
+}
+
+function drawParcels(parcelList) {
+  // Remove old layers
+  for (const id of Object.keys(layers)) {
+    for (const l of layers[id]) map.removeLayer(l);
+  }
+  layers = {};
+
+  const all = [];
+  for (const p of parcelList) {
+    layers[p.parcel_id] = [];
+    const style = styleForParcel(p);
+    for (const cell of p.fine_cells) {
+      const boundary = h3.cellToBoundary(cell); // [[lat,lng],...]
+      const poly = L.polygon(boundary, style).addTo(map);
+      poly.bindTooltip("Parcel " + p.parcel_id + " — cell " + cell, { sticky: true });
+      layers[p.parcel_id].push(poly);
+      all.push(...boundary);
+    }
+  }
+
+  // Fit map to data bounds on first load
+  if (all.length && Object.keys(layers).length) {
+    const latlngs = all.map(function (c) { return L.latLng(c[0], c[1]); });
+    const bounds = L.latLngBounds(latlngs);
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [20, 20] });
+  }
+}
+
+function setParcelStyle(parcelId, style) {
+  if (!layers[parcelId]) return;
+  for (const l of layers[parcelId]) l.setStyle(style);
+}
+
+function highlightOverlapCells(candidateParcelId, overlappingParcelIds) {
+  // Find the cells of the candidate that are shared with overlapping parcels.
+  const candidate = parcels.find(function (p) { return p.parcel_id === candidateParcelId; });
+  if (!candidate) return;
+
+  const sharedCells = new Set();
+  for (const otherId of overlappingParcelIds) {
+    const other = parcels.find(function (p) { return p.parcel_id === otherId; });
+    if (!other) continue;
+    const otherSet = new Set(other.fine_cells);
+    for (const cell of candidate.fine_cells) {
+      if (otherSet.has(cell)) sharedCells.add(cell);
+    }
+  }
+
+  // Add red overlap polygons on top of the existing layers.
+  if (!layers[candidateParcelId + "_overlap"]) {
+    layers[candidateParcelId + "_overlap"] = [];
+  }
+  for (const cell of sharedCells) {
+    const boundary = h3.cellToBoundary(cell);
+    const poly = L.polygon(boundary, C_OVERLAP).addTo(map);
+    poly.bindTooltip("Overlap cell: " + cell, { sticky: true });
+    layers[candidateParcelId + "_overlap"].push(poly);
+  }
+}
+
+// ── parcel list ───────────────────────────────────────────────────────────────
+function buildParcelList(parcelList) {
+  const container = document.getElementById("parcel-list");
+  container.innerHTML = "";
+  for (const p of parcelList) {
+    const badgeClass = p.parcel_id === activeParcelId ? "badge-active"
+      : p.status === "registered" ? "badge-registered" : "badge-unregistered";
+    const badgeText = p.parcel_id === activeParcelId ? "registering…"
+      : p.status === "registered" ? "registered" : "unregistered";
+
+    const row = el("div", { className: "parcel-row" + (p.parcel_id === activeParcelId ? " active-row" : "") });
+    row.dataset.parcelId = p.parcel_id;
+    row.appendChild(el("span", { className: "pid" }, [p.parcel_id]));
+    row.appendChild(el("span", { className: "cell-count" }, [p.num_fine_cells + " cells"]));
+    row.appendChild(el("span", { className: "status-badge " + badgeClass }, [badgeText]));
+
+    if (p.fits_batch) {
+      const btn = el("button", {
+        className: "btn-register",
+        disabled: !!(activeParcelId || registerAllRunning)
+      });
+      btn.textContent = "Register";
+      btn.addEventListener("click", function () { startRegister(p.parcel_id); });
+      row.appendChild(btn);
+    } else {
+      row.appendChild(el("span", { className: "no-fit" }, ["too large"]));
+    }
+
+    container.appendChild(row);
+  }
+}
+
+// ── status panel ──────────────────────────────────────────────────────────────
+const STEPS_ORDER = ["checking overlap", "generating proof", "submitting transaction"];
+
+let timerInterval = null;
+let timerStart    = null;
+
+function showSteps(currentStep, parcelId) {
+  const box = document.getElementById("status-box");
+  box.innerHTML = "";
+
+  const header = el("div", { style: "font-weight:600;margin-bottom:6px;font-size:13px;" },
+    ["Registering " + parcelId + "…"]);
+  box.appendChild(header);
+
+  const stepsDiv = el("div", { className: "steps" });
+  for (const s of STEPS_ORDER) {
+    const state = STEPS_ORDER.indexOf(s) < STEPS_ORDER.indexOf(currentStep) ? "done"
+      : s === currentStep ? "active" : "pending";
+    const row = el("div", { className: "step " + state });
+    row.appendChild(el("span", { className: "dot" }));
+    row.appendChild(document.createTextNode(s));
+    stepsDiv.appendChild(row);
+  }
+  box.appendChild(stepsDiv);
+
+  const timerEl = el("div", { className: "timer", id: "timer-el" }, ["0.0 s"]);
+  box.appendChild(timerEl);
+}
+
+function startTimer() {
+  timerStart = Date.now();
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(function () {
+    const el = document.getElementById("timer-el");
+    if (el) el.textContent = ((Date.now() - timerStart) / 1000).toFixed(1) + " s";
+  }, 100);
+}
+
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function showResult(parcelId, result) {
+  stopTimer();
+  const box = document.getElementById("status-box");
+  box.innerHTML = "";
+
+  if (result.status === "registered") {
+    const rbox = el("div", { className: "result-box" });
+
+    function row(key, val, cls) {
+      const r = el("div", { className: "row" });
+      r.appendChild(el("span", { className: "key" }, [key]));
+      r.appendChild(el("span", { className: "val " + (cls || "") }, [val]));
+      return r;
+    }
+
+    rbox.appendChild(el("div", {
+      style: "font-weight:600;color:#2e7d32;margin-bottom:6px;font-size:13px;"
+    }, ["✓ Parcel " + parcelId + " registered — token #" + result.token_id]));
+
+    rbox.appendChild(row("Tx hash", shortHash(result.tx_hash, 10)));
+    rbox.appendChild(row("Old root", shortHash(result.oldRoot, 10)));
+    rbox.appendChild(row("New root", shortHash(result.newRoot, 10)));
+    rbox.appendChild(row("Prove time", (result.prove_ms || 0).toLocaleString() + " ms"));
+
+    box.appendChild(rbox);
+  } else if (result.status === "overlap") {
+    const obox = el("div", { className: "result-overlap" });
+    obox.appendChild(el("div", {
+      style: "font-weight:600;margin-bottom:4px;"
+    }, ["✗ Overlap: parcel " + parcelId]));
+    obox.appendChild(el("div", {},
+      ["Conflicts with: " + (result.overlaps || []).join(", ")]));
+    obox.appendChild(el("div", {
+      style: "margin-top:4px;font-size:11px;color:#999;"
+    }, ["Shared cells highlighted in red on the map."]));
+    box.appendChild(obox);
+  } else {
+    box.appendChild(el("div", { className: "result-error" },
+      ["Error: " + (result.reason || JSON.stringify(result))]));
+  }
+}
+
+function showIdle(msg) {
+  const box = document.getElementById("status-box");
+  box.innerHTML = "";
+  box.appendChild(el("div", { className: "status-idle" }, [msg || "Ready."]));
+}
+
+// ── load & refresh ────────────────────────────────────────────────────────────
+async function loadParcels() {
+  const resp = await fetch("/api/registrar/parcels");
+  const data = await resp.json();
+  if (data.error) return;
+  parcels = data.parcels;
+  drawParcels(parcels);
+  buildParcelList(parcels);
+}
+
+// ── register one parcel ───────────────────────────────────────────────────────
+async function startRegister(parcelId) {
+  if (activeParcelId || registerAllRunning) return;
+  activeParcelId = parcelId;
+
+  // Visual state
+  setParcelStyle(parcelId, C_ACTIVE);
+  buildParcelList(parcels);
+  showSteps("checking overlap", parcelId);
+  startTimer();
+
+  // Clear any previous overlap highlights for this parcel.
+  if (layers[parcelId + "_overlap"]) {
+    for (const l of layers[parcelId + "_overlap"]) map.removeLayer(l);
+    delete layers[parcelId + "_overlap"];
+  }
+
+  const response = await fetch("/api/register/" + parcelId, { method: "POST" });
+  const reader  = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer    = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const parts = buffer.split("\n\n");
+    buffer = parts.pop();
+    for (const part of parts) {
+      const line = part.trim();
+      if (!line.startsWith("data: ")) continue;
+      let event;
+      try { event = JSON.parse(line.slice(6)); } catch { continue; }
+      handleRegistrationEvent(parcelId, event);
+    }
+  }
+
+  // Final refresh
+  await loadParcels();
+  activeParcelId = null;
+  buildParcelList(parcels);
+}
+
+function handleRegistrationEvent(parcelId, event) {
+  if (event.type === "step") {
+    showSteps(event.step, parcelId);
+  } else if (event.type === "result") {
+    const result = event.result;
+    if (result.status === "registered") {
+      setParcelStyle(parcelId, C_REG);
+      // Update local state immediately
+      const p = parcels.find(function (x) { return x.parcel_id === parcelId; });
+      if (p) p.status = "registered";
+    } else if (result.status === "overlap") {
+      setParcelStyle(parcelId, C_UNREG);
+      highlightOverlapCells(parcelId, result.overlaps || []);
+    }
+    showResult(parcelId, result);
+  }
+}
+
+// ── register all ─────────────────────────────────────────────────────────────
+async function startRegisterAll() {
+  if (activeParcelId || registerAllRunning) return;
+  registerAllRunning = true;
+
+  document.getElementById("btn-register-all").disabled = true;
+  document.getElementById("btn-reset").disabled = true;
+  buildParcelList(parcels);
+
+  let registered = 0, overlap = 0, errors = 0;
+
+  const response = await fetch("/api/register-all", { method: "POST" });
+  const reader   = response.body.getReader();
+  const decoder  = new TextDecoder();
+  let buffer     = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const parts = buffer.split("\n\n");
+    buffer = parts.pop();
+    for (const part of parts) {
+      const line = part.trim();
+      if (!line.startsWith("data: ")) continue;
+      let event;
+      try { event = JSON.parse(line.slice(6)); } catch { continue; }
+
+      if (event.type === "start") {
+        activeParcelId = event.parcel_id;
+        setParcelStyle(event.parcel_id, C_ACTIVE);
+        const statusBox = document.getElementById("status-box");
+        statusBox.innerHTML = "";
+        statusBox.appendChild(el("div", {
+          style: "font-size:13px;color:#555;"
+        }, ["Register all — parcel " + event.parcel_id +
+            " (" + (event.index + 1) + "/" + event.total + ")"]));
+        buildParcelList(parcels);
+      } else if (event.type === "step") {
+        // Update the row badge
+        buildParcelList(parcels);
+      } else if (event.type === "result") {
+        const result = event.result;
+        const p = parcels.find(function (x) { return x.parcel_id === result.parcel_id; });
+        if (result.status === "registered") {
+          if (p) p.status = "registered";
+          if (result.parcel_id) setParcelStyle(result.parcel_id, C_REG);
+          registered++;
+        } else if (result.status === "overlap") {
+          if (result.parcel_id) {
+            setParcelStyle(result.parcel_id, C_UNREG);
+            highlightOverlapCells(result.parcel_id, result.overlaps || []);
+          }
+          overlap++;
+        } else {
+          errors++;
+        }
+        activeParcelId = null;
+        buildParcelList(parcels);
+      } else if (event.type === "done") {
+        showIdle("Register all complete: " + event.registered + " registered, " +
+                 event.overlap + " overlap, " + event.errors + " errors.");
+      }
+    }
+  }
+
+  await loadParcels();
+  activeParcelId = null;
+  registerAllRunning = false;
+  document.getElementById("btn-register-all").disabled = false;
+  document.getElementById("btn-reset").disabled = false;
+  buildParcelList(parcels);
+}
+
+// ── reset chain ───────────────────────────────────────────────────────────────
+async function resetChain() {
+  if (activeParcelId || registerAllRunning) return;
+  document.getElementById("btn-reset").disabled = true;
+  document.getElementById("btn-register-all").disabled = true;
+  showIdle("Resetting chain… (starting Hardhat node and deploying, ~15 s)");
+
+  // Clear overlap highlights
+  for (const key of Object.keys(layers)) {
+    if (key.endsWith("_overlap")) {
+      for (const l of layers[key]) map.removeLayer(l);
+      delete layers[key];
+    }
+  }
+
+  try {
+    const resp = await fetch("/api/reset", { method: "POST" });
+    const data = await resp.json();
+    if (data.error) {
+      showIdle("Reset failed: " + data.error);
+    } else {
+      showIdle("Chain reset. Registrar: " + data.registrar.slice(0, 10) + "…");
+    }
+  } catch (e) {
+    showIdle("Reset failed: " + e.message);
+  }
+
+  await loadParcels();
+  document.getElementById("btn-reset").disabled = false;
+  document.getElementById("btn-register-all").disabled = false;
+}
+
+// ── poll for state changes ────────────────────────────────────────────────────
+setInterval(async function () {
+  if (activeParcelId || registerAllRunning) return;
+  await loadParcels();
+}, 3000);
+
+// ── wire up buttons ───────────────────────────────────────────────────────────
+document.getElementById("btn-reset").addEventListener("click", resetChain);
+document.getElementById("btn-register-all").addEventListener("click", startRegisterAll);
+
+// ── initial load ──────────────────────────────────────────────────────────────
+loadParcels();
+</script>
+</body>
+</html>
