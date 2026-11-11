@@ -23,7 +23,7 @@
   .map-error { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex;
                align-items: center; justify-content: center; padding: 24px;
                text-align: center; color: #c62828; background: #fff; z-index: 500; }
-  .panel { width: 380px; flex-shrink: 0; display: flex; flex-direction: column;
+  .panel { width: 310px; flex-shrink: 0; display: flex; flex-direction: column;
            background: #fff; border-left: 1px solid #ddd; overflow: hidden; }
   .chain-info { padding: 10px 14px; border-bottom: 1px solid #eee; flex-shrink: 0; }
   .chain-row { display: flex; gap: 8px; align-items: baseline; padding: 2px 0; }
@@ -274,7 +274,7 @@ function buildTable(tokens) {
     const ownerSpan = el("span", {
       className: "mono commitment-cell",
       title: t.owner
-    }, [shortStr(t.owner, 8)]);
+    }, [shortStr(t.owner, 5)]);
     ownerTd.appendChild(ownerSpan);
     tr.appendChild(ownerTd);
 
@@ -283,7 +283,7 @@ function buildTable(tokens) {
     const cmtSpan = el("span", {
       className: "mono commitment-cell",
       title: "Full commitment: " + t.commitment
-    }, [shortStr(t.commitment, 8)]);
+    }, [shortStr(t.commitment, 5)]);
     cmtTd.appendChild(cmtSpan);
     tr.appendChild(cmtTd);
 

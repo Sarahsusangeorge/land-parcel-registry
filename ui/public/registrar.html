@@ -377,9 +377,13 @@ function buildParcelList(parcelList) {
   container.innerHTML = "";
   for (const p of parcelList) {
     const badgeClass = p.parcel_id === activeParcelId ? "badge-active"
-      : p.status === "registered" ? "badge-registered" : "badge-unregistered";
+      : p.status === "registered"    ? "badge-registered"
+      : overlapResults[p.parcel_id]  ? "badge-overlap"
+      : "badge-unregistered";
     const badgeText = p.parcel_id === activeParcelId ? "registering…"
-      : p.status === "registered" ? "registered" : "unregistered";
+      : p.status === "registered"    ? "registered"
+      : overlapResults[p.parcel_id]  ? "overlap"
+      : "unregistered";
 
     const row = el("div", { className: "parcel-row" + (p.parcel_id === activeParcelId ? " active-row" : "") });
     row.dataset.parcelId = p.parcel_id;
