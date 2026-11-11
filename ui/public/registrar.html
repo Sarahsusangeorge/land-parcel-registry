@@ -57,6 +57,8 @@
                 border-bottom: 1px solid #f0f0f0; transition: background .1s; }
   .parcel-row:hover { background: #f9f9f9; }
   .parcel-row.active-row { background: #fff9c4; }
+  .parcel-row { cursor: pointer; }
+  .parcel-row.selected-row { background: #ffe0b2; }
   .pid { font-weight: 600; min-width: 28px; color: #333; }
   .cell-count { color: #888; font-size: 12px; min-width: 48px; }
   .status-badge { font-size: 11px; padding: 1px 7px; border-radius: 10px;
@@ -131,6 +133,7 @@ let parcels = [];          // from /api/registrar
 let layers  = {};          // parcel_id → array of Leaflet polygon layers
 let activeParcelId = null; // currently-being-registered parcel
 let registerAllRunning = false;
+let selectedId = null;     // parcel chosen by clicking in the list or on the map
 let lastSignature = "";   // redraw the map only when parcels or statuses change
 
 // Colours
@@ -138,6 +141,7 @@ const C_UNREG   = { color: "#555", weight: 1, fillColor: "#9e9e9e", fillOpacity:
 const C_REG     = { color: "#0d47a1", weight: 1, fillColor: "#1976d2", fillOpacity: 0.5 };
 const C_ACTIVE  = { color: "#e65100", weight: 2, fillColor: "#ff9800", fillOpacity: 0.3,
                     dashArray: "5 4" };
+const C_HILITE  = { color: "#e65100", weight: 3, fillColor: "#ff6f00", fillOpacity: 0.7 };
 const C_OVERLAP = { color: "#b71c1c", weight: 2, fillColor: "#ef5350", fillOpacity: 0.55 };
 
 // ── utilities ─────────────────────────────────────────────────────────────────
@@ -180,7 +184,10 @@ function drawParcels(parcelList) {
     for (const cell of p.fine_cells) {
       const boundary = h3.cellToBoundary(cell); // [[lat,lng],...]
       const poly = L.polygon(boundary, style).addTo(map);
-      poly.bindTooltip("Parcel " + p.parcel_id + " — cell " + cell, { sticky: true });
+      poly.bindTooltip("Parcel " + p.parcel_id + ": cell " + cell, { sticky: true });
+      poly.on("mouseover", function () { refreshHighlight(p.parcel_id); });
+      poly.on("mouseout",  function () { refreshHighlight(null); });
+      poly.on("click",     function () { selectParcel(p.parcel_id, false); });
       layers[p.parcel_id].push(poly);
       all.push(...boundary);
     }
@@ -195,6 +202,34 @@ function drawParcels(parcelList) {
       map.fitBounds(bounds, { padding: [20, 20] });
       fitted = true;
     }
+  }
+}
+
+function parcelById(id) {
+  return parcels.find(function (p) { return p.parcel_id === id; });
+}
+
+// Re-apply the normal style, then add the hover/selected highlight on top.
+function refreshHighlight(hoverId) {
+  for (const p of parcels) {
+    const hot = p.parcel_id === hoverId || p.parcel_id === selectedId;
+    setParcelStyle(p.parcel_id, hot ? C_HILITE : styleForParcel(p));
+    if (hot && layers[p.parcel_id]) {
+      for (const l of layers[p.parcel_id]) l.bringToFront();
+    }
+  }
+  for (const row of document.querySelectorAll(".parcel-row")) {
+    row.classList.toggle("selected-row", row.dataset.parcelId === selectedId);
+  }
+}
+
+function selectParcel(id, zoom) {
+  selectedId = (selectedId === id && !zoom) ? null : id;
+  refreshHighlight(null);
+  const row = document.querySelector('.parcel-row[data-parcel-id="' + id + '"]');
+  if (row && selectedId) row.scrollIntoView({ block: "nearest" });
+  if (zoom && selectedId && layers[id] && layers[id].length) {
+    map.fitBounds(L.featureGroup(layers[id]).getBounds(), { padding: [60, 60], maxZoom: 18 });
   }
 }
 
@@ -242,6 +277,10 @@ function buildParcelList(parcelList) {
 
     const row = el("div", { className: "parcel-row" + (p.parcel_id === activeParcelId ? " active-row" : "") });
     row.dataset.parcelId = p.parcel_id;
+    if (p.parcel_id === selectedId) row.classList.add("selected-row");
+    row.addEventListener("mouseenter", function () { refreshHighlight(p.parcel_id); });
+    row.addEventListener("mouseleave", function () { refreshHighlight(null); });
+    row.addEventListener("click", function () { selectParcel(p.parcel_id, true); });
     row.appendChild(el("span", { className: "pid" }, [p.parcel_id]));
     row.appendChild(el("span", { className: "cell-count" }, [p.num_fine_cells + " cells"]));
     row.appendChild(el("span", { className: "status-badge " + badgeClass }, [badgeText]));
@@ -252,7 +291,7 @@ function buildParcelList(parcelList) {
         disabled: !!(activeParcelId || registerAllRunning)
       });
       btn.textContent = "Register";
-      btn.addEventListener("click", function () { startRegister(p.parcel_id); });
+      btn.addEventListener("click", function (ev) { ev.stopPropagation(); startRegister(p.parcel_id); });
       row.appendChild(btn);
     } else {
       row.appendChild(el("span", { className: "no-fit" }, ["too large"]));
@@ -364,6 +403,7 @@ async function loadParcels() {
   if (changed) {
     drawParcels(parcels);
     buildParcelList(parcels);
+    refreshHighlight(null);
   }
 }
 
