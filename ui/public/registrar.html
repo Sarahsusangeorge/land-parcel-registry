@@ -15,8 +15,13 @@
            display: flex; align-items: baseline; gap: 12px; flex-shrink: 0; }
   header h1 { font-size: 16px; font-weight: 600; }
   header .label { font-size: 12px; opacity: .75; }
-  .layout { display: flex; flex: 1; overflow: hidden; }
-  #map { flex: 1; height: 100%; }
+  .layout { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+  .map-wrap { flex: 1; min-width: 0; position: relative; min-height: 320px; }
+  #map { position: absolute; top: 0; right: 0; bottom: 0; left: 0; height: 100%;
+         min-height: 320px; background: #dde3e8; }
+  .map-error { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex;
+               align-items: center; justify-content: center; padding: 24px;
+               text-align: center; color: #c62828; background: #fff; z-index: 500; }
   .panel { width: 340px; flex-shrink: 0; display: flex; flex-direction: column;
            background: #fff; border-left: 1px solid #ddd; overflow: hidden; }
   .panel-actions { padding: 10px 12px; display: flex; gap: 8px;
@@ -74,7 +79,7 @@
   <span class="label">Fine H3 cells (resolution 12) — private to the registrar</span>
 </header>
 <div class="layout">
-  <div id="map"></div>
+  <div class="map-wrap"><div id="map"></div></div>
   <div class="panel">
     <div class="panel-actions">
       <button id="btn-reset">Reset chain</button>
@@ -93,17 +98,40 @@
 <script>
 "use strict";
 // ── map setup ─────────────────────────────────────────────────────────────────
+if (typeof L === "undefined" || typeof h3 === "undefined") {
+  const box = document.createElement("div");
+  box.className = "map-error";
+  box.textContent = "The map libraries did not load. Check the internet connection and reload.";
+  document.querySelector(".map-wrap").appendChild(box);
+  throw new Error("Leaflet or h3-js failed to load");
+}
 const map = L.map("map").setView([42.332, -71.207], 15);
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
-  attribution: "© OpenStreetMap contributors"
+  attribution: "&copy; OpenStreetMap contributors"
 }).addTo(map);
 
+// The map must be told when its box changes size (side-by-side panels,
+// iframe layout, window resize), otherwise Leaflet keeps a zero-size canvas.
+let fitted = false;
+function refreshMapSize() {
+  map.invalidateSize();
+}
+window.addEventListener("resize", refreshMapSize);
+window.addEventListener("load", function () {
+  refreshMapSize();
+  setTimeout(refreshMapSize, 300);
+});
+if (typeof ResizeObserver !== "undefined") {
+  new ResizeObserver(refreshMapSize).observe(document.querySelector(".map-wrap"));
+}
+
 // ── state ─────────────────────────────────────────────────────────────────────
-let parcels = [];          // from /api/registrar/parcels
+let parcels = [];          // from /api/registrar
 let layers  = {};          // parcel_id → array of Leaflet polygon layers
 let activeParcelId = null; // currently-being-registered parcel
 let registerAllRunning = false;
+let lastSignature = "";   // redraw the map only when parcels or statuses change
 
 // Colours
 const C_UNREG   = { color: "#555", weight: 1, fillColor: "#9e9e9e", fillOpacity: 0.35 };
@@ -158,11 +186,15 @@ function drawParcels(parcelList) {
     }
   }
 
-  // Fit map to data bounds on first load
-  if (all.length && Object.keys(layers).length) {
+  // Fit the view to every parcel the first time they are drawn.
+  if (!fitted && all.length) {
     const latlngs = all.map(function (c) { return L.latLng(c[0], c[1]); });
     const bounds = L.latLngBounds(latlngs);
-    if (bounds.isValid()) map.fitBounds(bounds, { padding: [20, 20] });
+    if (bounds.isValid()) {
+      map.invalidateSize();
+      map.fitBounds(bounds, { padding: [20, 20] });
+      fitted = true;
+    }
   }
 }
 
@@ -322,12 +354,17 @@ function showIdle(msg) {
 
 // ── load & refresh ────────────────────────────────────────────────────────────
 async function loadParcels() {
-  const resp = await fetch("/api/registrar/parcels");
+  const resp = await fetch("/api/registrar");
   const data = await resp.json();
   if (data.error) return;
+  const sig = JSON.stringify(data.parcels.map(function (p) { return [p.parcel_id, p.status]; }));
+  const changed = sig !== lastSignature;
+  lastSignature = sig;
   parcels = data.parcels;
-  drawParcels(parcels);
-  buildParcelList(parcels);
+  if (changed) {
+    drawParcels(parcels);
+    buildParcelList(parcels);
+  }
 }
 
 // ── register one parcel ───────────────────────────────────────────────────────

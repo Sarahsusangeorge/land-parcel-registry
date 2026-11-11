@@ -15,8 +15,13 @@
            display: flex; align-items: baseline; gap: 12px; flex-shrink: 0; }
   header h1 { font-size: 16px; font-weight: 600; }
   header .label { font-size: 12px; opacity: .75; }
-  .layout { display: flex; flex: 1; overflow: hidden; }
-  #map { flex: 1; height: 100%; }
+  .layout { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+  .map-wrap { flex: 1; min-width: 0; position: relative; min-height: 320px; }
+  #map { position: absolute; top: 0; right: 0; bottom: 0; left: 0; height: 100%;
+         min-height: 320px; background: #dde3e8; }
+  .map-error { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex;
+               align-items: center; justify-content: center; padding: 24px;
+               text-align: center; color: #c62828; background: #fff; z-index: 500; }
   .panel { width: 380px; flex-shrink: 0; display: flex; flex-direction: column;
            background: #fff; border-left: 1px solid #ddd; overflow: hidden; }
   .chain-info { padding: 10px 14px; border-bottom: 1px solid #eee; flex-shrink: 0; }
@@ -53,7 +58,7 @@
   <span class="label">Exact boundaries are not stored on-chain.</span>
 </header>
 <div class="layout">
-  <div id="map"></div>
+  <div class="map-wrap"><div id="map"></div></div>
   <div class="panel">
     <div class="chain-info" id="chain-info">
       <div class="chain-row">
@@ -82,11 +87,29 @@
 <script>
 "use strict";
 // ── map setup ─────────────────────────────────────────────────────────────────
+if (typeof L === "undefined" || typeof h3 === "undefined") {
+  const box = document.createElement("div");
+  box.className = "map-error";
+  box.textContent = "The map libraries did not load. Check the internet connection and reload.";
+  document.querySelector(".map-wrap").appendChild(box);
+  throw new Error("Leaflet or h3-js failed to load");
+}
 const map = L.map("map").setView([42.332, -71.207], 14);
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
-  attribution: "© OpenStreetMap contributors"
+  attribution: "&copy; OpenStreetMap contributors"
 }).addTo(map);
+
+// Tell Leaflet when its box changes size (side-by-side panels, iframe, resize).
+function refreshMapSize() { map.invalidateSize(); }
+window.addEventListener("resize", refreshMapSize);
+window.addEventListener("load", function () {
+  refreshMapSize();
+  setTimeout(refreshMapSize, 300);
+});
+if (typeof ResizeObserver !== "undefined") {
+  new ResizeObserver(refreshMapSize).observe(document.querySelector(".map-wrap"));
+}
 
 // ── state ─────────────────────────────────────────────────────────────────────
 let currentTokens = [];
@@ -167,7 +190,11 @@ function drawCoarseCells(tokens) {
   if (!fitDone && allPoints.length) {
     const latlngs = allPoints.map(function (c) { return L.latLng(c[0], c[1]); });
     const bounds = L.latLngBounds(latlngs);
-    if (bounds.isValid()) { map.fitBounds(bounds, { padding: [20, 20] }); fitDone = true; }
+    if (bounds.isValid()) {
+      map.invalidateSize();
+      map.fitBounds(bounds, { padding: [20, 20] });
+      fitDone = true;
+    }
   }
 }
 
@@ -236,7 +263,7 @@ function buildTable(tokens) {
 async function refresh() {
   let data;
   try {
-    const resp = await fetch("/api/chain/state");
+    const resp = await fetch("/api/chain");
     data = await resp.json();
   } catch (e) {
     setStatus(false, "Network error: " + e.message);
@@ -247,6 +274,7 @@ async function refresh() {
     setStatus(false, data.error);
     document.getElementById("chain-root").textContent = "—";
     document.getElementById("chain-count").textContent = "—";
+    currentTokens = [];
     buildTable([]);
     drawCoarseCells([]);
     return;

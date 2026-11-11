@@ -345,7 +345,7 @@ app.post("/api/register-all", async function (req, res) {
 
 // ── GET /api/registrar/parcels ────────────────────────────────────────────────
 // Reads geo/out/parcels.json and the registrar's demo state.
-app.get("/api/registrar/parcels", function (req, res) {
+app.get(["/api/registrar", "/api/registrar/parcels"], function (req, res) {
   try {
     const { parcels, meta } = readParcels();
     const state = readState();
@@ -380,7 +380,7 @@ app.get("/api/registrar/parcels", function (req, res) {
 // ── GET /api/chain/state ──────────────────────────────────────────────────────
 // Reads ONLY from the deployed LandRegistry contract.
 // Never reads parcels.json or registrar state files.
-app.get("/api/chain/state", async function (req, res) {
+app.get(["/api/chain", "/api/chain/state"], async function (req, res) {
   try {
     const deployment = readDeployment();
     if (!deployment) {
