@@ -88,13 +88,14 @@ Expected stdout (one JSON line per parcel):
 ## Demo interface
 
 A local web interface for running registrations interactively and capturing IDF-B screenshots.
-It drives the existing pieces — it does not change how the system works.
+It drives the existing pieces and does not change how the system works.
 
-**Start** (from the repo root; requires the production zkey and wasm to be present):
+**Start** (from the repo root; registering needs the production zkey and wasm, but the pages, Reset chain and the public view do not):
 
 ```bash
-cd ui && npm ci   # first time only
-npm run ui        # from repo root
+cd ui && npm ci          # first time only
+cd ../contracts && npm ci   # first time only (Reset chain starts Hardhat from here)
+cd .. && npm run ui      # from the repo root
 ```
 
 Then open **http://localhost:3000**.
@@ -102,14 +103,18 @@ Then open **http://localhost:3000**.
 | View | URL | What it shows |
 |---|---|---|
 | Landing page | http://localhost:3000/ | Registrar and public views side by side |
-| Registrar view | http://localhost:3000/registrar.html | Fine H3 cells (private), Register buttons, live step/timer |
-| Public view | http://localhost:3000/public.html | Coarse H3 cells from the chain, occupied-root, token table |
+| Registrar view | http://localhost:3000/registrar.html | All parcels and their exact cells (private), parcel list, Register buttons, live step and timer |
+| Public view | http://localhost:3000/public.html | Coarse cells from the chain, occupied root, token table |
 
 **Workflow:**
-1. Click **Reset chain** — starts a fresh Hardhat node and deploys the contracts (~15 s).
-2. Click **Register** next to a parcel — streams live steps: checking overlap → generating proof → submitting transaction.
-3. Parcel B will fail with an overlap; the shared cells turn red on the map.
+1. Click **Reset chain**: starts a fresh Hardhat node and deploys the contracts (~15 s).
+2. Click **Register** next to a parcel. Live steps: checking overlap, generating proof, submitting transaction.
+3. Parcel B fails with an overlap; the shared cells turn red on the map.
 4. The public view polls the chain every 3 s and shows only coarse cells; exact boundaries are never displayed there.
+
+Hover a parcel in the list to highlight it on the map; click it to zoom to it.
+
+**Windows:** the server starts Hardhat and the deploy script through Node directly (no bash, `npx` or `lsof`), so Reset chain does not need WSL or Git Bash. Registering a parcel runs a full proof and is meant for a machine with enough memory and the zkey.
 
 ## Reproducing the TRL 4 evidence
 

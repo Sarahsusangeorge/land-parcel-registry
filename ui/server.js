@@ -14,7 +14,7 @@
 const path       = require("path");
 const fs         = require("fs");
 const http       = require("http");
-const { spawn, execSync } = require("child_process");
+const { spawn, execFileSync } = require("child_process");
 const express    = require("express");
 const { ethers } = require("ethers");
 
@@ -26,6 +26,9 @@ const GEO_OUT       = path.join(REPO_ROOT, "geo", "out", "parcels.json");
 const REGISTER_JS   = path.join(REGISTRAR_DIR, "src", "register.js");
 const STATE_FILE    = path.join(REGISTRAR_DIR, "data", "demo_state.json");
 const DEPLOY_FILE   = path.join(CONTRACTS_DIR, "deployments", "local.json");
+// Run Hardhat through Node directly (no npx, no shell), so reset and deploy
+// work the same on Windows, macOS and Linux.
+const HARDHAT_BIN   = path.join(CONTRACTS_DIR, "node_modules", "hardhat", "internal", "cli", "bootstrap.js");
 
 const PORT    = 3000;
 const RPC_URL = "http://127.0.0.1:8545";
@@ -112,13 +115,31 @@ function waitForNode(maxMs) {
   });
 }
 
-// Kill any process already listening on port 8545.
+// Stop any process already listening on port 8545 (for example a node left
+// over from an earlier run). Uses only commands that ship with the OS:
+// netstat/taskkill on Windows, lsof elsewhere. Failures are ignored.
 function killPort8545() {
+  const pids = new Set();
   try {
-    execSync("lsof -ti tcp:8545 | xargs kill -TERM 2>/dev/null", {
-      shell: "/bin/bash", stdio: "ignore"
-    });
-  } catch (_) { /* nothing on the port: fine */ }
+    if (process.platform === "win32") {
+      const out = execFileSync("netstat", ["-ano", "-p", "tcp"], { encoding: "utf8" });
+      for (const line of out.split(/\r?\n/)) {
+        const cols = line.trim().split(/\s+/);
+        if (cols.length >= 5 && /:8545$/.test(cols[1]) && cols[3] === "LISTENING") {
+          pids.add(cols[4]);
+        }
+      }
+      pids.forEach(function (pid) {
+        try { execFileSync("taskkill", ["/PID", pid, "/T", "/F"], { stdio: "ignore" }); }
+        catch (_) { /* already gone */ }
+      });
+    } else {
+      const out = execFileSync("lsof", ["-ti", "tcp:8545"], { encoding: "utf8" });
+      out.split(/\s+/).filter(Boolean).forEach(function (pid) {
+        try { process.kill(Number(pid), "SIGTERM"); } catch (_) { /* already gone */ }
+      });
+    }
+  } catch (_) { /* nothing on the port, or the tool is missing: fine */ }
 }
 
 // Run one registration and call onStep / onResult.
@@ -159,12 +180,12 @@ function doRegistration(parcelId, onStep, onResult, abortRef) {
     // Step 2: generate proof (register.js does the proving + tx in one shot).
     onStep("generating proof");
 
-    const proc = spawn("node", [
+    const proc = spawn(process.execPath, [
       REGISTER_JS,
       "--parcel-id",   parcelId,
       "--state-file",  STATE_FILE,
       "--deployment",  DEPLOY_FILE
-    ], { cwd: REPO_ROOT });
+    ], { cwd: REPO_ROOT, windowsHide: true });
 
     if (abortRef) abortRef.proc = proc;
 
@@ -210,11 +231,16 @@ app.post("/api/reset", async function (req, res) {
     // Clear demo state so the tree starts empty.
     if (fs.existsSync(STATE_FILE)) fs.rmSync(STATE_FILE);
 
+    if (!fs.existsSync(HARDHAT_BIN)) {
+      throw new Error("Hardhat is not installed. Run 'npm ci' in the contracts folder first.");
+    }
+
     // Start a fresh Hardhat node.
     hardhatProc = spawn(
-      "npx", ["hardhat", "node", "--port", "8545"],
-      { cwd: CONTRACTS_DIR, stdio: "ignore" }
+      process.execPath, [HARDHAT_BIN, "node", "--port", "8545"],
+      { cwd: CONTRACTS_DIR, stdio: "ignore", windowsHide: true }
     );
+    hardhatProc.on("error", function () { hardhatProc = null; });
     hardhatProc.on("exit", function () { hardhatProc = null; });
 
     await waitForNode();
@@ -222,13 +248,15 @@ app.post("/api/reset", async function (req, res) {
     // Deploy real Groth16Verifier + LandRegistry with the registrar address.
     await new Promise(function (resolve, reject) {
       const p = spawn(
-        "npx", ["hardhat", "run", "scripts/deploy.js", "--network", "localhost"],
+        process.execPath, [HARDHAT_BIN, "run", "scripts/deploy.js", "--network", "localhost"],
         {
           cwd: CONTRACTS_DIR,
           env: Object.assign({}, process.env, { REGISTRAR_ADDRESS: REGISTRAR_ADDRESS }),
-          stdio: "ignore"
+          stdio: "ignore",
+          windowsHide: true
         }
       );
+      p.on("error", reject);
       p.on("exit", function (code) {
         if (code === 0) resolve();
         else reject(new Error("deploy.js exited with code " + code));
